@@ -1,0 +1,114 @@
+/* General Reset */
+body {
+    background-color: #0f1115;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 20px 50px;
+    border-bottom: 1px solid #2d2f36;
+    gap: 30px;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+nav a {
+    color: #b0b3b8;
+    text-decoration: none;
+    margin-right: 20px;
+    font-size: 14px;
+}
+
+.search-bar input {
+    background: #1c1e24;
+    border: 1px solid #3e414d;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+}
+
+/* Main Container */
+.container {
+    max-width: 500px;
+    margin: 50px 0 0 100px; /* Aligned left as per image */
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #e4e6eb;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    background-color: #1c1e24;
+    border: 1px solid #3e414d;
+    border-radius: 8px;
+    color: white;
+    box-sizing: border-box;
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-save {
+    background-color: #1a56db; /* Blue color from image */
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-cancel {
+    background-color: #2d2f36;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Footer */
+.footer {
+    margin-top: 100px;
+    padding: 40px 100px;
+    color: #b0b3b8;
+    font-size: 14px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 20px;
+}
+
+.footer-links a {
+    color: #b0b3b8;
+    text-decoration: none;
+}

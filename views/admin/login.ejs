@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login | Wearify</title>
+  <link rel="stylesheet" href="/css/adminlogin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="admin-wrapper">
+  <!-- Header -->
+  <header class="admin-header">
+    <div class="logo">
+      <span class="logo-icon"></span>
+      <h1>Wearify Admin</h1>
+    </div>
+  </header>
+
+  <!-- Login Container -->
+  <main class="login-container">
+    <h2>Admin Login</h2>
+
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <form action="/admin/login" method="POST" class="login-form">
+
+      <!-- Email -->
+      <div class="form-group">
+        <label>Email / Username</label>
+        <input
+          type="text"
+          name="email"
+          placeholder="Enter your email or username"
+          required
+        >
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+        >
+      </div>
+
+      <!-- Remember Me -->
+      <div class="remember-me">
+        <input type="checkbox" name="remember">
+        <span>Remember me</span>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="login-btn">Login</button>
+
+    </form>
+
+    <a href="/admin/forgot-password" class="forgot">Forgot Password?</a>
+    <p class="note">Authorized access only</p>
+  </main>
+</div>
+
+</body>
+</html>

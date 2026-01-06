@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify - Edit Address</title>
+    <link rel="stylesheet" href="/css/edit-adress.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo-section">
+            <span class="logo-icon">L</span>
+            <span class="logo-text">Wearify</span>
+        </div>
+        <nav>
+            <a href="#">Shirts</a>
+            <a href="#">T-Shirts</a>
+            <a href="#">Pants</a>
+            <a href="#">Shorts</a>
+        </nav>
+        <div class="header-right">
+            <div class="search-container">
+                <input type="text" placeholder="Search">
+            </div>
+            <div class="icon-group">
+                <button class="icon-btn">♡</button>
+                <button class="icon-btn">🛒</button>
+                <img src="/images/user-avatar.png" alt="Profile" class="user-avatar">
+            </div>
+        </div>
+    </header>
+
+    <main class="form-container">
+        <h1>Edit Address</h1>
+        
+        <form action="/profile/adresses/edit/<%= address._id %>" method="POST" class="address-form">
+            
+            <div class="input-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" value="<%= address.fullName %>" required>
+            </div>
+
+            <div class="input-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" name="phone" value="<%= address.phone %>" required>
+            </div>
+
+            <div class="input-group">
+                <label for="streetAddress">Street Address</label>
+                <input type="text" id="streetAddress" name="addressLine" value="<%= address.addressLine %>" required>
+            </div>
+
+            <div class="input-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" value="<%= address.city %>" required>
+            </div>
+
+            <div class="input-group">
+                <label for="state">State</label>
+                <input type="text" id="state" name="state" value="<%= address.state %>" required>
+            </div>
+
+            <div class="input-group">
+                <label for="postalCode">Postal Code</label>
+                <input type="text" id="postalCode" name="pincode" value="<%= address.pincode %>" required>
+            </div>
+
+            <div class="input-group">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" value="<%= address.country %>" required>
+            </div>
+
+            <div class="checkbox-container">
+                <label for="isDefault">Set as Default Address</label>
+                <input type="checkbox" id="isDefault" name="isDefault" <%= address.isDefault ? 'checked' : '' %>>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="window.location.href='/addresses'">Cancel</button>
+                <button type="submit" class="btn-save">Save Changes</button>
+            </div>
+        </form>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </div>
+        <p class="copyright">© 2024 Wearify. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

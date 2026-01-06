@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile | Wearify</title>
+    <link rel="stylesheet" href="/css/editprofile.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="navbar">
+                <div class="logo">Wearify</div>
+                <ul class="nav-links">
+                    <li><a href="#">Shirts</a></li>
+                    <li><a href="#">T-Shirts</a></li>
+                    <li><a href="#">Pants</a></li>
+                    <li><a href="#">Shorts</a></li>
+                </ul>
+                <div class="nav-icons">
+                    <input type="text" placeholder="Search" class="search-bar">
+                    <span class="icon">❤️</span>
+                    <span class="icon">🛒</span>
+                </div>
+            </nav>
+        </header>
+
+        <main class="profile-section">
+            <h1>Edit Profile</h1>
+            
+            <form action="/profile/edit-profile" method="POST" class="edit-form">
+                
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="name" value="<%= user.name %>" placeholder="Enter full name">
+                </div>
+
+              
+
+               <% if (user.authProvider === 'local') { %>
+                 <div class="form-group email-group">
+                    <div class="input-container">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="<%= user.email %>" readonly>
+                        <small class="note">Email cannot be changed directly.</small>
+                    </div>
+                  <a href="/profile/edit-profile/change-email"><button  type="button" class="btn-change-mail">Change Email</button></a>  
+                </div>
+  <div class="form-group">
+    <label>New Password</label>
+    <input type="password" id="newPassword" name="password" placeholder="New password">
+  </div>
+
+  <div class="form-group">
+    <label>Confirm Password</label>
+    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password">
+  </div>
+<% } else { %>
+  <p style="color: gray; font-size: 14px;">
+    Password is managed by Google and cannot be changed.
+  </p>
+<% } %>
+
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">Save Changes</button>
+                    <button type="button" class="btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </main>
+
+        <footer>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+                <a href="#">FAQ</a>
+                <a href="#">Shipping & Returns</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            <p>© 2024 Wearify. All rights reserved.</p>
+        </footer>
+    </div>
+    <% if (error) { %>
+<script>
+  Swal.fire({
+    icon: 'error',
+    title: 'Registration Error',
+    text: '<%= error %>'
+  });
+</script>
+<% } %>
+</body>
+</html>

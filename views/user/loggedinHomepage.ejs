@@ -1,0 +1,114 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify | Style Built for Men</title>
+    <link rel="stylesheet" href="/css/logged-in-home.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo"><strong>Wearify</strong></div>
+        
+        <nav class="nav-links">
+            <a href="/shirts">Shirts</a>
+            <a href="/t-shirts">T-Shirts</a>
+            <a href="/pants">Pants</a>
+            <a href="/shorts">Shorts</a>
+        </nav>
+
+        <div class="header-icons">
+            <button class="icon-btn"><i class="ph ph-magnifying-glass"></i></button>
+            <button class="icon-btn"><i class="ph ph-heart"></i></button>
+            <button class="icon-btn"><i class="ph ph-shopping-bag"></i></button>
+            <!-- <div class="user-avatar">
+              <a href="/profile"><img src="/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png" alt="Profile"></a>  
+            </div> -->
+            <div class="user-profile">
+  
+
+  <div class="profile-dropdown">
+    <a href="/profile"><img src="<%= user && user.profilePic ? user.profilePic : '/images/default-avatar.png' %>" 
+  alt="Profile" alt="Profile"class="avatar"></a>
+
+    
+  </div>
+</div>
+
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-banner">
+            <div class="hero-overlay">
+                <h1>Style Built for Men</h1>
+                <a href="/shop" class="btn-shop-now">Shop Now</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Categories</h2>
+            <div class="category-grid">
+                <% categories.forEach(cat => { %>
+                    <div class="category-item">
+                        <div class="cat-img-box" style="background-color: <%= cat.bgColor %>;">
+                            <img src="<%= cat.image %>" alt="<%= cat.name %>">
+                        </div>
+                        <p><%= cat.name %></p>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">New Arrivals</h2>
+            <div class="product-grid">
+                <% newArrivals.forEach(product => { %>
+                    <div class="product-card">
+                        <div class="product-img-box">
+                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                        </div>
+                        <p><%= product.name %></p>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Best Sellers</h2>
+            <div class="product-grid">
+                <% bestSellers.forEach(product => { %>
+                    <div class="product-card">
+                        <div class="product-img-box">
+                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                        </div>
+                        <p><%= product.name %></p>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-links">
+            <a href="#">About Us</a>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+            <a href="#">Returns</a>
+        </div>
+        <div class="social-icons">
+            <i class="ph ph-twitter-logo"></i>
+            <i class="ph ph-instagram-logo"></i>
+            <i class="ph ph-facebook-logo"></i>
+        </div>
+        <p class="copyright">© 2024 Wearify. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

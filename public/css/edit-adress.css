@@ -1,0 +1,105 @@
+/* General Styling */
+body {
+    background-color: #0d1117;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    border-bottom: 1px solid #30363d;
+}
+
+.logo-section { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+nav a { color: #8b949e; text-decoration: none; margin-right: 20px; font-size: 14px; }
+.header-right { display: flex; align-items: center; gap: 15px; }
+
+.search-container input {
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 8px 15px;
+    border-radius: 6px;
+    color: white;
+}
+
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; }
+
+/* Form Layout */
+.form-container {
+    max-width: 500px;
+    margin: 60px auto;
+}
+
+h1 { font-size: 28px; margin-bottom: 30px; }
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #c9d1d9;
+}
+
+input[type="text"], input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: white;
+    box-sizing: border-box;
+}
+
+/* Checkbox and Buttons */
+.checkbox-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 0;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.btn-cancel {
+    background: #21262d;
+    border: 1px solid #30363d;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-save {
+    background: #1f6feb;
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 60px 0 30px;
+    border-top: 1px solid #30363d;
+    margin-top: 80px;
+}
+
+.footer-links { margin-bottom: 20px; display: flex; justify-content: center; gap: 40px; }
+.footer-links a { color: #8b949e; text-decoration: none; font-size: 14px; }
+.copyright { color: #484f58; font-size: 13px; }

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify | My Profile</title>
+    <link rel="stylesheet" href="/css/userprofile.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+
+    <header class="profile-header">
+        <div class="header-left">
+            <div class="logo"><strong>Wearify</strong></div>
+            <nav class="nav-links">
+                <a href="/shirts">Shirts</a>
+                <a href="/t-shirts">T-Shirts</a>
+                <a href="/pants">Pants</a>
+                <a href="/shorts">Shorts</a>
+            </nav>
+        </div>
+
+        <div class="header-right">
+            <div class="search-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" placeholder="Search">
+            </div>
+            <button class="icon-btn"><i class="ph ph-heart"></i></button>
+            <button class="icon-btn"><i class="ph ph-shopping-bag"></i></button>
+           <img 
+  src="<%= user?.profilePic || '/images/default-avatar.png' %>" 
+  alt="Avatar"
+  style="width:80px;height:80px;border-radius:50%;object-fit:cover;"
+>
+
+        </div>
+    </header>
+
+    <main class="profile-container">
+        <h1>My Profile</h1>
+
+        <div class="profile-content">
+            <div class="user-info">
+                <h2><%= user.name %></h2>
+                <p class="user-detail"><%= user.email %></p>
+                <p class="user-detail"><%= user.phone %></p>
+                <p class="user-detail"><%= user.address %></p>
+
+                <div class="action-grid">
+                    <a href="/profile/edit-profile" class="btn-secondary">Edit Profile</a>
+                    <a href="/profile/adresses" class="btn-secondary">Manage Addresses</a>
+                    <a href="/orders" class="btn-secondary">My Orders</a>
+                    <a href="/wallets" class="btn-secondary">Wallets</a>
+                </div>
+
+                <a href="/auth/logout" class="btn-logout">Logout</a>
+            </div>
+
+            <div class="profile-image-section">
+    <img 
+      src="<%= user.profilePic %>" 
+      alt="Profile Image"
+      class="profile-image-large"
+    >
+
+    <form 
+      action="/profile/upload-image"
+      method="POST"
+      enctype="multipart/form-data"
+      class="profile-image-form"
+    >
+        <label for="profilePic" class="change-photo-btn">
+            Change Photo
+        </label>
+
+        <input 
+          type="file"
+          id="profilePic"
+          name="profilePic"
+          accept="image/*"
+          hidden
+          onchange="this.form.submit()"
+        >
+    </form>
+</div>
+
+
+        </div>
+    </main>
+
+    <footer class="profile-footer">
+        <div class="footer-nav">
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+            <a href="#">Shipping & Returns</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </div>
+        <p>© 2024 Wearify. All rights reserved.</p>
+    </footer>
+<p><%= user.profilePic %></p>
+
+</body>
+</html>

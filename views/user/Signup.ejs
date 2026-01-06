@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wearify | Create Account</title>
+  <link rel="stylesheet" href="/css/userSignup.css">
+</head>
+<body class="auth-page">
+
+<header class="auth-header">
+  <div class="logo"><strong>Wearify</strong></div>
+  <nav class="auth-nav">
+    <a href="/">Home</a>
+    <a href="/shop">Shop</a>
+  </nav>
+</header>
+
+<main class="auth-container">
+  <div class="auth-card">
+    <h1>Create your Wearify account</h1>
+
+    <form action="/signup" method="POST" class="auth-form">
+
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter your full name" novalidate>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="text" id="email" name="email" placeholder="Enter your email" novalidate>
+      </div>
+
+      
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" novalidate>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" novalidate>
+      </div>
+
+      <button type="submit" class="btn-primary">SEND OTP</button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a href="/login">Login</a></p>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<% if (message) { %>
+<script>
+  Swal.fire({
+    icon: 'error',
+    title: 'Registration Error',
+    text: '<%= message %>'
+  });
+</script>
+<% } %>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wearify Admin | Dashboard</title>
+    <link rel="stylesheet" href="/css/adminDashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Add these styles to your adminDashboard.css or keep them here */
+        .header {
+            display: flex;
+            justify-content: space-between; /* Pushes title to left and profile to right */
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-icon-container {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #2e2e3a;
+            background-color: #1c1c24;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .profile-icon-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Dashboard label next to profile as seen in Figma */
+        .header-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Wearify Admin</h2>
+        <nav>
+            <a href="#" class="nav-item active">Dashboard</a>
+            <a href="#" class="nav-item">Orders</a>
+            <a href="#" class="nav-item">Products</a>
+            <a href="#" class="nav-item">Categories</a>
+            <a href="/admin/users" class="nav-item">Users</a>
+            <a href="#" class="nav-item">Payments</a>
+            <a href="#" class="nav-item">Reports</a>
+            <a href="#" class="nav-item">Settings</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="header">
+            <div class="header-titles">
+                <h1>Dashboard</h1>
+                <p style="color: var(--text-secondary); margin: 0;">Overview</p>
+            </div>
+            
+            <div class="header-profile">
+                <span class="header-label">Dashboard</span>
+                <div class="profile-icon-container">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Profile">
+                </div>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="card">
+                <h4>Sales Summary</h4>
+                <div class="value">$<%= stats.sales %></div>
+            </div>
+            <div class="card">
+                <h4>Total Orders</h4>
+                <div class="value"><%= stats.orders %></div>
+            </div>
+            <div class="card">
+                <h4>Total Revenue</h4>
+                <div class="value">$<%= stats.revenue %></div>
+            </div>
+            <div class="card">
+                <h4>Average Order Value</h4>
+                <div class="value">$<%= stats.avgValue %></div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="card">
+                <h4>Sales Over Time</h4>
+                <canvas id="salesChart"></canvas>
+            </div>
+            <div class="card">
+                <h4>Orders Per Week</h4>
+                <canvas id="ordersChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>Recent Activity</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% activity.forEach(item => { %>
+                    <tr>
+                        <td><%= item.id %></td>
+                        <td><%= item.customer %></td>
+                        <td>$<%= item.amount %></td>
+                        <td><span class="status <%= item.status.toLowerCase() %>"><%= item.status %></span></td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Sales Chart (Line)
+        const ctx1 = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Sales',
+                    data: [1200, 1900, 1500, 2500, 2200, 3000],
+                    borderColor: '#6366f1',
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+        });
+
+        // Orders Chart (Bar)
+        const ctx2 = document.getElementById('ordersChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    data: [12, 19, 3, 5, 2, 3, 9],
+                    backgroundColor: '#3f3f46'
+                }]
+            },
+            options: { plugins: { legend: { display: false } } }
+        });
+    </script>
+</body>
+</html>

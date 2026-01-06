@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify - My Addresses</title>
+    <link rel="stylesheet" href="/css/adresses.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">Wearify</div>
+        <nav>
+            <a href="/shirts">Shirts</a>
+            <a href="/t-shirts">T-Shirts</a>
+            <a href="/pants">Pants</a>
+            <a href="/shorts">Shorts</a>
+        </nav>
+        <div class="header-right">
+            <div class="search-bar">
+                <input type="text" placeholder="Search">
+            </div>
+            <div class="icon-group">
+                <span class="icon">♡</span>
+                <span class="icon">🛒</span>
+                <img src="<%= user && user.profilePic ? user.profilePic : '/images/default-avatar.png' %>" alt="Profile" class="profile-thumb">
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>My Addresses</h1>
+
+        <div class="address-list">
+            <% if (addresses && addresses.length > 0) { %>
+                <% addresses.forEach(address => { %>
+                    <div class="address-card">
+                        <div class="address-info">
+                            <% if(address.isDefault) { %>
+                                <p class="label-default">Default address</p>
+                            <% } %>
+                            
+                            <h3><%= address.fullName %></h3>
+                            <p><%= address.phone %></p>
+                            <p><%= address.addressLine %></p>
+                            <p>
+                                <%= address.city %>, <%= address.state%>, 
+                                <%= address.pincode %> <%= address.country %>
+                            </p>
+                            
+                            <div class="action-buttons">
+                                <a href="/profile/adresses/edit/<%= address._id %>" class="btn-secondary">Edit</a>
+                                <form action="/profile/adresses/delete/<%= address._id %>" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn-secondary">Delete</button>
+                                </form>
+                            </div>
+
+                            <% if(!address.isDefault) { %>
+                                <form action="/profile/adresses/set-default/<%= address._id %>" method="POST">
+                                    <button type="submit" class="btn-outline">Set as Default</button>
+                                </form>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No addresses found. Please add one below.</p>
+            <% } %>
+        </div>
+
+        <a href="/profile/adresses/add" class="btn-primary" style="text-decoration: none; display: inline-block;">Add New Address</a>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/about">About Us</a>
+            <a href="/contact">Contact</a>
+            <a href="/faq">FAQ</a>
+            <a href="/shipping">Shipping & Returns</a>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+        </div>
+        <p class="copyright">@2024 Wearify. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

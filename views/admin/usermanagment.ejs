@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wearify Admin | User Management</title>
+    <link rel="stylesheet" href="/css/adminDashboard.css">
+    <link rel="stylesheet" href="/css/usermanagement.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Wearify Admin</h2>
+        <nav>
+            <a href="/admin/dashboard" class="nav-item">Dashboard</a>
+            <a href="#" class="nav-item">Orders</a>
+            <a href="#" class="nav-item">Products</a>
+            <a href="#" class="nav-item">Categories</a>
+            <a href="/admin/users" class="nav-item active">Users</a>
+            <a href="#" class="nav-item">Settings</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="header">
+            <div class="header-titles">
+                <h1>User Management</h1>
+                <p style="color: var(--text-secondary); margin: 0;">Manage your customers and staff</p>
+            </div>
+            
+            <div class="header-profile">
+                <span class="header-label">Admin Panel</span>
+                <div class="profile-icon-container">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Profile">
+                </div>
+            </div>
+        </header>
+
+        <div class="user-controls">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Search users by name or email...">
+            </div>
+            <button class="add-user-btn">+ Add New User</button>
+        </div>
+
+        <div class="user-table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                    <tr>
+                 <td>
+  <div class="user-info-cell">
+    <% if (user.profilePic) { %>
+      <img src="<%= user.profilePic %>" class="user-avatar" alt="User">
+    <% } else { %>
+      <img 
+        src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.name) %>&background=1c2e2a&color=fff"
+        class="user-avatar"
+        alt="Avatar"
+      >
+    <% } %>
+    <span><%= user.name %></span>
+  </div>
+</td>
+
+                        <td><%= user.email %></td>
+                        <td><%= user.role %></td>
+                        <td>
+                            <span class="status-badge <%= user.status === 'Active' ? 'status-active' : 'status-inactive' %>">
+                                <%= user.status %>
+                            </span>
+                        </td>
+                        <td><%= user.joinedDate %></td>
+                        <td>
+                            <button class="action-btn">Edit</button>
+                            <button class="action-btn" style="color: #ef4444;">Delete</button>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

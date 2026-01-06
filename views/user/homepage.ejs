@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wearify | Style Built for Men</title>
+    <link rel="stylesheet" href="/css/userhomepage.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo"><strong>Wearify</strong></div>
+    
+    <nav class="nav-links">
+        <a href="#">Shirts</a>
+        <a href="#">T-Shirts</a>
+        <a href="#">Pants</a>
+        <a href="#">Shorts</a>
+    </nav>
+
+    <div class="header-actions">
+        <a href="/signup" class="btn-login">Login</a>
+    </div>
+</header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Style Built for Men</h1>
+                <a href="/signup" class="btn-shop">Shop Now</a>
+            </div>
+        </section>
+
+        <section>
+            <h2>Categories</h2>
+            <div class="product-grid">
+                <% categories.forEach(cat => { %>
+                    <div class="product-card">
+                        <div class="img-container" style="background-color: <%= cat.bgColor %>;">
+                            <img src="<%= cat.image %>" alt="<%= cat.name %>">
+                        </div>
+                        <p><%= cat.name %></p>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+
+        <section>
+            <h2>New Arrivals</h2>
+            <div class="product-grid">
+                <% newArrivals.forEach(product => { %>
+                    <div class="product-card">
+                        <div class="img-container">
+                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                        </div>
+                        <p><%= product.name %></p>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+
+        <section>
+            <h2>Best Sellers</h2>
+            <div class="product-grid">
+                <% bestSellers.forEach(product => { %>
+                    <div class="product-card">
+                        <div class="img-container">
+                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                        </div>
+                        <p><%= product.name %></p>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+    </main>
+
+    <footer style="text-align: center; padding: 50px; border-top: 1px solid #141d1b;">
+        <div class="footer-links">
+            <a href="#">About Us</a> | <a href="#">Contact</a> | <a href="#">FAQ</a>
+        </div>
+        <p style="margin-top: 20px; color: var(--text-gray);">&copy; 2024 Wearify. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify - Add New Address</title>
+    <link rel="stylesheet" href="/css/addaddress.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">Wearify</div>
+        <nav>
+            <a href="#">Shirts</a>
+            <a href="#">T-Shirts</a>
+            <a href="#">Pants</a>
+            <a href="#">Shorts</a>
+        </nav>
+        <div class="header-right">
+            <div class="search-bar">
+                <input type="text" placeholder="Search">
+            </div>
+            <div class="icon-group">
+                <span class="icon">♡</span>
+                <span class="icon">🛒</span>
+                <img src="/path-to-user-icon.jpg" alt="Profile" class="profile-thumb">
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>Add New Address</h1>
+        
+        <form action="/profile/adresses/add" method="POST" class="address-form">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+            </div>
+
+            <div class="form-group">
+                <label for="street">Street Address</label>
+                <input type="text" id="street" name="addressLine" placeholder="Enter your street address" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" placeholder="Enter your city" required>
+                </div>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <input type="text" id="state" name="state" placeholder="Enter your state" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="zipCode">Postal Code</label>
+                    <input type="text" id="zipCode" name="pincode" placeholder="Enter your postal code" required>
+                </div>
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <input type="text" id="country" name="country" placeholder="Enter your country" required>
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="isDefault" name="isDefault">
+                <label for="isDefault">Set as Default Address</label>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
+                <button type="submit" class="btn-save">Save Address</button>
+            </div>
+        </form>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#">FAQ</a>
+            <a href="#">Returns</a>
+            <a href="#">Shipping</a>
+        </div>
+        <div class="social-icons">
+            </div>
+        <p>@2024 Wearify. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

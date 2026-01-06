@@ -1,0 +1,147 @@
+/* Layout & Background */
+body {
+    background-color: #0f1115;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 50px;
+    border-bottom: 1px solid #2d2f36;
+}
+
+.logo { font-weight: bold; font-size: 20px; }
+
+nav a {
+    color: #b0b3b8;
+    text-decoration: none;
+    margin-right: 25px;
+    font-size: 14px;
+}
+
+.header-right { display: flex; align-items: center; gap: 20px; }
+
+.search-bar input {
+    background: #1c1e24;
+    border: 1px solid #3e414d;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 6px;
+}
+
+.profile-thumb { border-radius: 50%; }
+
+/* Main Content */
+.container {
+    max-width: 800px;
+    margin: 60px 100px;
+}
+
+h1 { font-size: 32px; margin-bottom: 40px; }
+
+/* Address Card Styling */
+.address-list { margin-bottom: 30px; }
+
+.address-card {
+    margin-bottom: 50px;
+}
+
+.label-default {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+h3 { margin: 0 0 10px 0; font-size: 18px; }
+
+.address-info p {
+    color: #b0b3b8;
+    margin: 5px 0;
+    line-height: 1.5;
+}
+
+/* Button Styling */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.btn-secondary {
+    background: #2d2f36;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-outline {
+    background: transparent;
+    color: white;
+    border: 1px solid #3e414d;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #1a56db;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* Footer */
+.footer {
+    padding: 60px 100px;
+    margin-top: 80px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.footer-links a {
+    color: #b0b3b8;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.copyright {
+    color: #666;
+    font-size: 13px;
+}
+
+
+/* Fix for buttons inside forms to keep horizontal alignment */
+.action-buttons form {
+    display: inline-block;
+}
+
+.address-info form {
+    margin-top: 10px;
+}
+
+/* Ensure images don't break layout if not provided */
+.profile-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #3e414d;
+}
