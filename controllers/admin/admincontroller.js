@@ -2,12 +2,12 @@ const Admin = require('../../model/Admin');
 const User = require('../../model/User'); 
 const bcrypt = require('bcryptjs');
 
-// load login page
+
 const loadLoginPage = (req, res) => {
   res.render('admin/login',{error:null});
 };
 
-// handle login
+
 const logingIn = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -38,7 +38,7 @@ const logingIn = async (req, res) => {
 
 
 
-// Load User List Page
+
 const loadUserList = async (req, res) => {
   try {
     const users = await User.find().lean(); // lean() returns plain JS objects
@@ -49,7 +49,6 @@ const loadUserList = async (req, res) => {
   }
 };
 
-// Block / Unblock User
 const toggleUserStatus = async (req, res) => {
   try {
     const { id } = req.params;

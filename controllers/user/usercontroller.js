@@ -6,15 +6,12 @@ const { error } = require('console');
 const Address = require('../../model/address');
 
 
-
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-
-
 const loadHome = async(req,res)=>{
-    // 1. Define your data (Usually fetched from a database)
+   
     const categories = [
         { name: 'Shirts', image: '/images/Gemini_Generated_Image_akh47dakh47dakh4.png', bgColor: '#1c2e2a' },
         { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#1c2e2a' },
@@ -25,13 +22,13 @@ const loadHome = async(req,res)=>{
     const newArrivals = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
         { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },
         { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#314b5c' },
-        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }]; // Define this too so you don't get another error!
+        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }]; 
     const bestSellers = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
         { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },
         { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#314b5c' },
         { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }];
 
-     // 2. Pass the data to the render function
+
     res.render('user/homepage', { 
         categories: categories, 
         newArrivals: newArrivals,
@@ -39,13 +36,9 @@ const loadHome = async(req,res)=>{
     });
 }
 
-
-
 const loadSignup = async(req,res)=>{
     res.render('user/Signup',{message:null})
 }
-
-
 
 const registerUser = async(req,res)=>{
 
@@ -117,11 +110,9 @@ req.session.save(() => {
 
 }
 
-
-
 const loadOtpPage = (req, res) => {
   try {
-    // If no OTP session, block direct access
+
     if (!req.session.otp || !req.session.tempUser) {
       return res.redirect('/signup');
     }
@@ -135,8 +126,6 @@ const loadOtpPage = (req, res) => {
     res.redirect('/signup');
   }
 };
-
-
 
 const verifyOtp = async (req, res) => {
   try {
@@ -154,12 +143,11 @@ const sessionOtp = String(req.session.otp).trim();
  console.log('Entered OTP:', enteredOtp);
     console.log('Session OTP:', sessionOtp);
 
-    // 1️⃣ Session validation
+   
     if (!req.session.otp || !req.session.tempUser) {
       return res.redirect('/signup');
     }
 
-    // 2️⃣ OTP expiry check
     if (Date.now() > req.session.otpExpiry) {
       req.session.destroy();
       return res.render('user/verifyotp', {
@@ -169,7 +157,7 @@ const sessionOtp = String(req.session.otp).trim();
       console.log('hai');
     }
 
-    // 3️⃣ OTP match
+    
     if (enteredOtp !== sessionOtp) {
       return res.render('user/verifyotp', {
         email: req.session.tempUser.email,
@@ -179,13 +167,13 @@ const sessionOtp = String(req.session.otp).trim();
       console.log(req.session.otp);
     }
 
-    // 4️⃣ Hash password
+   
     const hashedPassword = await bcrypt.hash(
       req.session.tempUser.password,
       10
     );
 
-    // 5️⃣ Create user ONLY AFTER OTP VERIFIED
+
     const user = new User({
       name: req.session.tempUser.name,
       email: req.session.tempUser.email,
@@ -195,12 +183,12 @@ const sessionOtp = String(req.session.otp).trim();
 
     await user.save();
 
-    // 6️⃣ Clear OTP session
+   
    delete req.session.otp;
 delete req.session.otpExpiry;
 delete req.session.tempUser;
 
-    // 7️⃣ Login user
+    
     req.session.user = user._id;
 
     res.redirect('/login');
@@ -214,13 +202,9 @@ delete req.session.tempUser;
   }
 };
 
-
-
 const loadLoginPage = async (req,res)=>{
  return res.render('user/login',{message:"feilds cannot be empty"})
 }
-
-
 
 const VerifyLogin = async(req,res)=>{
     const {email,password} = req.body
@@ -247,7 +231,7 @@ const VerifyLogin = async(req,res)=>{
     if(!userExist){
         return res.render('user/login',{message:"Invalid Email_id"})
     }   
-    // const passwordMatch = await bcrypt.compare(password,userExist.password)
+   
         const passwordMatch = await bcrypt.compare(password, userExist.password);
     console.log('PASSWORD MATCH:', passwordMatch);
 
@@ -267,24 +251,21 @@ const VerifyLogin = async(req,res)=>{
 
 }
 
-
-
 const loadLoggedinHomepage = async(req,res)=>{
 
      let userData;
 const userId = req.user?._id || req.session.user.id;
-    // ✅ Google login (Passport)
+   
     if (req.user) {
       userData = req.user;
       userData = await User.findById(userId);
     }
     
-    // ✅ Normal login (Email + Password)
-    else if (req.session.user) {
-      //userData = await User.findById(req.session.user.id);
+    else if (req.session.user){
+   
       userData = await User.findById(userId);
     }
-    // ❌ Not logged in
+    
     else {
       return res.redirect('/login');
     }
@@ -299,17 +280,14 @@ const categories = [
     const newArrivals = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
         { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },
         { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#314b5c' },
-        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }]; // Define this too so you don't get another error!
+        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }];
     const bestSellers = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
         { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },
         { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#314b5c' },
         { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }];
 
-
-
-
     console.log(req.session.user)
-    //const userData = await User.findById(req.session.user.id);
+    
     res.render('user/loggedinHomepage',{
         user:userData,
         categories: categories, 
@@ -318,30 +296,28 @@ const categories = [
     })
 }
 
-
-
 const resendOtp = async (req, res) => {
   try {
-    // 1️⃣ Get email from session
+    
     if (!req.session.tempUser) {
       return res.redirect('/signup');
     }
 
     const email = req.session.tempUser.email;
 
-    // 2️⃣ Generate new OTP
+   
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // 3️⃣ Save OTP in session (same place verifyOtp checks)
+   
     req.session.otp = otp;
-    req.session.otpExpires = Date.now() + 2 * 60 * 1000; // 2 min
+    req.session.otpExpires = Date.now() + 2 * 60 * 1000; 
 
-    // 4️⃣ SEND OTP AGAIN (IMPORTANT)
+    
     await sendOtp(email, otp);
 
     console.log("Resent OTP:", otp);
 
-    // 5️⃣ Render verify page again
+    
     res.render('user/verifyotp', {
       email,
       error: 'New OTP sent successfully'
@@ -354,8 +330,6 @@ const resendOtp = async (req, res) => {
     });
   }
 };
-
-
 
 const loadProfile = async (req, res) => {
   const currentUser = req.user || req.session.user;
@@ -374,19 +348,12 @@ const userId = currentUser._id || currentUser.id;
     return res.redirect('/login');
   }
 
-  res.render('user/userprofile', { user });
-
-  
+  res.render('user/userprofile', { user }); 
 };
-
-
-
 
 const loadforgetPassPage = async(req,res)=>{
     res.render('user/forgotpassword')
 }
-
-
 
 const sendOtpforForgot = async (req, res) => {
   try {
@@ -398,7 +365,7 @@ const sendOtpforForgot = async (req, res) => {
     const user = await User.findOne({ email });
     console.log('step3');
 
-    // ❌ USER NOT FOUND
+    
     if (!user) {
       console.log('step4 - invalid email');
       return res.render('user/forgotpassword', {
@@ -406,13 +373,13 @@ const sendOtpforForgot = async (req, res) => {
       });
     }
 
-    // ✅ USER FOUND → CONTINUE
+  
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     console.log('step5 OTP:', otp);
 
     req.session.forgotOtp = otp;
     req.session.forgotOtpExpiry = Date.now() + 5 * 60 * 1000;
-    req.session.forgotUserId = user._id; // ✅ CORRECT
+    req.session.forgotUserId = user._id; 
     console.log('step6 session set');
 
     await sendOtp(email, otp);
@@ -427,7 +394,6 @@ const sendOtpforForgot = async (req, res) => {
     });
   }
 };
-
 
 const verifyotpForget = async(req,res)=>{
    const{otp}=req.body
@@ -464,18 +430,13 @@ const sessionOtp = String(req.session.forgotOtp).trim();
 
 }
 
-
-
-
 const loadForgotOtp = (req, res) => {
   if (!req.session.forgotOtp) {
-    //return res.redirect('/forgot-password');
+   
     console.log('hello')
   }
   res.render('user/verifyotpPassreset',{error:null});
 };
-
-
 
 const loadResetPassword = (req, res) => {
   if (!req.session.forgotUserId) {
@@ -483,7 +444,6 @@ const loadResetPassword = (req, res) => {
   }
   res.render('user/resetPassword',{error:null});
 };
-
 
 const resetPassword = async (req, res) => {
   const { password, confirmPassword } = req.body;
@@ -501,16 +461,13 @@ console.log(req.session.forgotUserId)
     password: hashedPassword
   });
 
-  // Clear session
+
   req.session.forgotOtp = null;
   req.session.forgotOtpExpiry = null;
   req.session.forgotUserId = null;
 
   res.redirect('/login');
 }; 
-
-
-
 
 const uploadProfileImage = async (req, res) => {
   try {
@@ -546,88 +503,20 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
-
-
-
-
 const loadeditProfile = async(req,res)=>{
   const currentUser = req.user || req.session.user;
   
   if (!currentUser) { 
     return res.redirect('/login');
   }
-
 const userId = currentUser._id || currentUser.id;
   const user = await User.findById(userId);
 
   if (!user) {
     return res.redirect('/login');
   }
-
-
-
   res.render('user/editprofile',{user,error:null})
-
 }
-
-
-
-// const editProfile = async(req,res)=>{
-
-//   console.log("req.user",req.user)
-//   console.log("req.user",req.session.user)
-   
-//   const {name,password,confirmPassword} = req.body
-//   console.log(req.body)
-
-//   const currentUser = req.user || req.session.user
-
-//   const userId =  currentUser._id || currentUser.id
-//    const user = await User.findById(userId)
-
-//   if(name==""){
-//     res.render('user/editprofile',{error:'field cannot be empty',user:user})
-//     console.log("hello1")
-//   }
-//   if(password==""){
-//     res.render('user/editprofile',{error:'field cannot be empty',user:user})
-//         console.log("hello2")
-
-//   }
-//   if(confirmPassword==""){
-//     res.render('user/editprofile',{error:'field cannot be empty',user:user})
-//         console.log("hello3")
-
-//   }
-
-//   if(password!==confirmPassword){
-//     res.render('user/editprofile',{error:'password not matched',user:user})
-//         console.log("hello4")
-
-//   }
-//   if (user.authProvider === 'google') {
-//   // never touch password
-//   delete req.body.password;
-//   delete req.body.confirmPassword;
-// }
-
-    
-   
-
-//    if(!currentUser){
-//     res.redirect('/login')
-//    }
-
-//     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-//     user.password=hashedPassword
-   
-//    await User.findByIdAndUpdate(userId,{name,password:hashedPassword},{new:true})
-
-//    res.redirect('/profile')
-
-
-// }
-
 
 const editProfile = async (req, res) => {
   try {
@@ -648,7 +537,7 @@ const editProfile = async (req, res) => {
       return res.redirect('/login');
     }
 
-    // ✅ NAME VALIDATION
+    
     if (!name || name.trim() === "") {
       return res.render('user/editprofile', {
         error: 'Name cannot be empty',
@@ -656,13 +545,12 @@ const editProfile = async (req, res) => {
       });
     }
 
-    // ✅ UPDATE NAME
     user.name = name;
 
-    // ✅ PASSWORD LOGIC ONLY FOR LOCAL USERS
+    
     if (user.authProvider === 'local') {
 
-      // user wants to change password
+      
       if (password || confirmPassword) {
 
         if (!password || !confirmPassword) {
@@ -679,12 +567,12 @@ const editProfile = async (req, res) => {
           });
         }
 
-        // ✅ HASH ONLY WHEN VALID PASSWORD EXISTS
+       
         user.password = await bcrypt.hash(password, 10);
       }
     }
 
-    // ❌ GOOGLE USERS NEVER TOUCH PASSWORD
+  
     await user.save();
 
     res.redirect('/profile');
@@ -697,9 +585,6 @@ const editProfile = async (req, res) => {
     });
   }
 };
-
-
-
 
 const  loadupdateMail = async(req,res)=>{
   res.render('user/editemail')
@@ -720,12 +605,9 @@ const updateEmail = async(req,res)=>{
   }
 }
 
-
-
 const  loadchangeEmailOtp = async(req,res)=>{
   res.render('user/verifyotpEmail',{error:null})
 }
-
 
 const verifychangeEmailOtp  = async(req,res)=>{
   try{
@@ -763,10 +645,6 @@ const sessionOtp = String(req.session.otp).trim();
   } 
 }
 
-
-
-
-
 const loadAdressPage = async(req,res)=>{
 
   const currentUser = req.user || req.session.user
@@ -784,14 +662,9 @@ const loadAdressPage = async(req,res)=>{
   res.render('user/myAdress',{user,addresses})
 }
 
-
-
 const loadAddAddressPage = async(req,res)=>{
   res.render('user/addAdress')
 }
-
-
-
 
 const Addaddress = async(req,res)=>{
   try{
@@ -828,9 +701,6 @@ const Addaddress = async(req,res)=>{
 
 }
 
-
-
-
 const LoadeditAdressPage = async(req,res)=>{
   
   const currentUser = req.user || req.session.user
@@ -842,9 +712,6 @@ const LoadeditAdressPage = async(req,res)=>{
   res.render('user/edit-adress',{user,address})
 
 }
-
-
-
 
 const updateAdress = async(req,res)=>{
 
@@ -869,9 +736,6 @@ const updateAdress = async(req,res)=>{
 
 }
 
-
-
-
 const deleteAdress = async(req,res)=>{
   try{
       
@@ -884,9 +748,6 @@ const deleteAdress = async(req,res)=>{
     console.log(error)
   }
 }
-
-
-
 
 const setDefaultAdress = async(req,res)=>{
   try{
@@ -903,11 +764,6 @@ const setDefaultAdress = async(req,res)=>{
     console.log(error)
   }
 }
-
-
-
-
-
 
 module.exports = {
     verifyOtp,
