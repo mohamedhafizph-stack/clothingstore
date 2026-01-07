@@ -84,3 +84,22 @@
 .unblock-btn:hover {
   background-color: #bbf7d0;
 }
+
+.search-wrapper {
+  position: relative;
+}
+
+.cancel-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-decoration: none;
+  color: #888;
+  font-size: 14px;
+}
+
+.cancel-btn:hover {
+  color: #ef4444;
+}
+

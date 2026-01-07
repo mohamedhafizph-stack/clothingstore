@@ -33,21 +33,34 @@ const logingIn = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
 const loadUserList = async (req, res) => {
   try {
-    const users = await User.find().lean(); // lean() returns plain JS objects
-    res.render('admin/usermanagment', { users });
+    const search = req.query.search || '';
+
+    let query = {};
+
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } }
+        ]
+      };
+    }
+
+    const users = await User.find(query).lean();
+
+    res.render('admin/usermanagment', {
+      users,
+      search
+    });
+
   } catch (error) {
     console.log(error);
     res.send('Error loading users');
   }
 };
+
 
 const toggleUserStatus = async (req, res) => {
   try {

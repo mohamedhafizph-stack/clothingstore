@@ -36,10 +36,20 @@
         </header>
 
         <div class="user-controls">
-            <div class="search-wrapper">
-                <input type="text" class="search-input" placeholder="Search users by name or email...">
-            </div>
-            <button class="add-user-btn">+ Add New User</button>
+           <form action="/admin/users" method="GET" class="search-wrapper">
+  <input
+    type="text"
+    name="search"
+    class="search-input"
+    placeholder="Search users by name or email..."
+    value="<%= search || '' %>"
+  >
+
+  <% if (search) { %>
+    <a href="/admin/users" class="cancel-btn">✖</a>
+  <% } %>
+</form>
+
         </div>
 
         <div class="user-table-card">
