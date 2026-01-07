@@ -3,7 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/admin/admincontroller');
 const adminAuth = require('../middlewares/adminAuth')
 const userController = require('../controllers/user/usercontroller')
-const user = require('../controllers/admin/user')
+const user = require('../controllers/admin/customer')
 
 
 router.get('/login', authController.loadLoginPage);
