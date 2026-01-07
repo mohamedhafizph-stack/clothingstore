@@ -227,6 +227,13 @@ const VerifyLogin = async(req,res)=>{
     
     const userExist = await User.findOne({email})
       console.log('USER FROM DB:', userExist);
+
+      if (userExist.status === 'blocked') {
+  return res.render('user/login', {
+    message: 'Your account has been blocked by admin'
+  });
+}
+
     
     if(!userExist){
         return res.render('user/login',{message:"Invalid Email_id"})

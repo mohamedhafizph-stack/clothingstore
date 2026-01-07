@@ -3,9 +3,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../model/User');
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,           // From Google Cloud Console
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,   // From Google Cloud Console
-    callbackURL: "/auth/google/callback"             // Route Google will redirect to
+    clientID: process.env.GOOGLE_CLIENT_ID,           
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,   
+    callbackURL: "/auth/google/callback"            
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
@@ -13,13 +13,20 @@ passport.use(new GoogleStrategy({
 
       let user = await User.findOne({ email });
 
+       if (user && user.status === 'blocked') {
+        return done(null, false, {
+          message: 'Your account is blocked'
+        });
+      }
+
       if (!user) {
-        // If user doesn't exist, create a new user
+     
         user = new User({
           name: profile.displayName,
           email,
           password: '', 
-          authProvider:"google" ,      // no password needed for Google login
+          authProvider:"google" ,      
+          status:"active" , 
           isVerified: true
         });
         await user.save();
@@ -35,12 +42,12 @@ passport.use(new GoogleStrategy({
   }
 ));
 
-// Serialize user into session
+
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// Deserialize user from session
+
 passport.deserializeUser(async (id, done) => {
   const user = await User.findById(id);
   done(null, user); 
