@@ -103,3 +103,29 @@
   color: #ef4444;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+}
+
+.page-btn:hover {
+  background: #f3f4f6;
+}
+
+.page-btn.active {
+  background: #1c2e2a;
+  color: #fff;
+  border-color: #1c2e2a;
+}
+

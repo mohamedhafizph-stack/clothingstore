@@ -35,8 +35,11 @@ const logingIn = async (req, res) => {
 
 const loadUserList = async (req, res) => {
   try {
-    const search = req.query.search || '';
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
 
+    const search = req.query.search || '';
     let query = {};
 
     if (search) {
@@ -48,10 +51,19 @@ const loadUserList = async (req, res) => {
       };
     }
 
-    const users = await User.find(query).lean();
+    const totalUsers = await User.countDocuments(query);
+
+    const users = await User.find(query)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const totalPages = Math.ceil(totalUsers / limit);
 
     res.render('admin/usermanagment', {
       users,
+      currentPage: page,
+      totalPages,
       search
     });
 
@@ -60,6 +72,7 @@ const loadUserList = async (req, res) => {
     res.send('Error loading users');
   }
 };
+
 
 
 const toggleUserStatus = async (req, res) => {
