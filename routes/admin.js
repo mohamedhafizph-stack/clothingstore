@@ -3,12 +3,13 @@ const router = express.Router();
 const authController = require('../controllers/admin/admincontroller');
 const adminAuth = require('../middlewares/adminAuth')
 const userController = require('../controllers/user/usercontroller')
+const user = require('../controllers/admin/user')
 
-// login
+
 router.get('/login', authController.loadLoginPage);
 router.post('/login', authController.logingIn);
 
-// dashboard (temporary)
+
 router.get('/dashboard', (req, res) => {
     const data = {
         stats: { sales: '12,500', orders: 350, revenue: '25,000', avgValue: '71.43' },
@@ -25,6 +26,10 @@ router.get('/dashboard', (req, res) => {
 router.get('/users',adminAuth,authController.loadUserList)
 
 router.get('/users/status/:id',adminAuth,authController.toggleUserStatus)
+
+router.post('/users/block/:id',adminAuth,user.blockUser);
+router.post('/users/unblock/:id',adminAuth,user.unblockUser);
+
   
  
 router.get('/logout',(req,res)=>{
