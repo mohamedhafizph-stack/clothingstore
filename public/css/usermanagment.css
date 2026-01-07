@@ -1,10 +1,10 @@
-/* User Management Specific Styles */
+
 .user-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
-    gap: 20px;
+    gap: 80px;
 }
 
 .search-wrapper {
@@ -24,9 +24,9 @@
 
 .add-user-btn {
     background: var(--accent-color);
-    color: white;
+    color: rgb(245, 233, 233);
     padding: 12px 24px;
-    border-radius: 8px;
+    border-radius: 80px;
     border: none;
     font-weight: 600;
     cursor: pointer;
@@ -45,18 +45,7 @@
     overflow: hidden;
 }
 
-.user-info-cell {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
 
-.user-avatar {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: #333;
-}
 
 .status-badge {
     padding: 4px 10px;
@@ -69,24 +58,29 @@
 .status-inactive { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
 
 .action-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 5px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.action-btn:hover { color: white; }
+.block-btn {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
 
+.block-btn:hover {
+  background-color: #fecaca;
+}
 
-.avatar-letter {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #1c2e2a;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+.unblock-btn {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.unblock-btn:hover {
+  background-color: #bbf7d0;
 }

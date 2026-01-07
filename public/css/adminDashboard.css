@@ -143,3 +143,15 @@ td { padding: 15px; border-bottom: 1px solid var(--border-color); }
     font-size: 1.2rem;
     cursor: pointer;
 }
+
+.user-info-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.user-avatar {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}

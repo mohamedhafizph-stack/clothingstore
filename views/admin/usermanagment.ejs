@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Wearify Admin | User Management</title>
+    <link rel="stylesheet" href="/css/usermanagment.css">
     <link rel="stylesheet" href="/css/adminDashboard.css">
-    <link rel="stylesheet" href="/css/usermanagement.css">
 </head>
 <body>
 
@@ -48,7 +48,7 @@
                     <tr>
                         <th>User</th>
                         <th>Email</th>
-                        <th>Role</th>
+                       
                         <th>Status</th>
                         <th>Joined Date</th>
                         <th>Actions</th>
@@ -73,17 +73,23 @@
 </td>
 
                         <td><%= user.email %></td>
-                        <td><%= user.role %></td>
                         <td>
                             <span class="status-badge <%= user.status === 'Active' ? 'status-active' : 'status-inactive' %>">
                                 <%= user.status %>
                             </span>
                         </td>
-                        <td><%= user.joinedDate %></td>
+                        <td><%= user.createdAt %></td>
                         <td>
-                            <button class="action-btn">Edit</button>
-                            <button class="action-btn" style="color: #ef4444;">Delete</button>
-                        </td>
+  <% if (user.status === 'active') { %>
+    <form action="/admin/users/block/<%= user._id %>" method="POST" style="display:inline;">
+      <button class="action-btn block-btn">Block</button>
+    </form>
+  <% } else { %>
+    <form action="/admin/users/unblock/<%= user._id %>" method="POST" style="display:inline;">
+      <button class="action-btn unblock-btn">Unblock</button>
+    </form>
+  <% } %>
+</td>
                     </tr>
                     <% }) %>
                 </tbody>
