@@ -4,10 +4,11 @@ const authController = require('../controllers/admin/admincontroller');
 const adminAuth = require('../middlewares/adminAuth')
 const userController = require('../controllers/user/usercontroller')
 const user = require('../controllers/admin/customer')
+const isLoggedIn = require('../middlewares/isloggedinAdmin')
 
 
-router.get('/login', authController.loadLoginPage);
-router.post('/login', authController.logingIn);
+router.get('/login',isLoggedIn,authController.loadLoginPage);
+router.post('/login',isLoggedIn,authController.logingIn);
 
 
 router.get('/dashboard', (req, res) => {
