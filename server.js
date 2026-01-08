@@ -1,7 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const nodemon = require('nodemon')
-
+const methodOverride = require('method-override')
 const path = require('path')
 const session = require('express-session');
 const connectDB = require('./db/connectDB');
@@ -25,8 +25,9 @@ app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 
 // Middleware
-app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

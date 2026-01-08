@@ -34,7 +34,8 @@ router.get('/home',userAuth,userController.loadLoggedinHomepage)
 router.get('/profile',userAuth,userController.loadProfile)  
 router.post('/profile/upload-image',userAuth,upload.single('profilePic'),userController.uploadProfileImage);
 router.get('/profile/edit-profile',userAuth,userController.loadeditProfile)
-router.post('/profile/edit-profile',userAuth,userController.editProfile)
+//router.post('/profile/edit-profile',userAuth,userController.editProfile)
+router.put('/profile',userAuth,userController.editProfile)
 router.get('/profile/edit-profile/change-email',userAuth,userController.loadupdateMail)
 router.post('/profile/edit-profile/change-email',userAuth,userController.updateEmail)
 router.get('/verify-email-otp',userAuth,userController.loadchangeEmailOtp)
@@ -44,13 +45,13 @@ router.get('/profile/adresses',userAuth,userController.loadAdressPage)
 router.get('/profile/adresses/add',userAuth,userController.loadAddAddressPage)
 router.post('/profile/adresses/add',userAuth,userController.Addaddress)
 router.get('/profile/adresses/edit/:id',userAuth,userController.LoadeditAdressPage)
-router.post('/profile/adresses/edit/:id',userAuth,userController.updateAdress)
+router.put('/profile/adresses/:id',userAuth,userController.updateAdress)
 
-router.post('/profile/adresses/delete/:id',userAuth,userController.deleteAdress)
+router.delete('/profile/adresses/:id',userAuth,userController.deleteAdress)
 
 router.post('/profile/adresses/set-default/:id',userAuth,userController.setDefaultAdress)
 
-router.get('/test', (req, res) => {
+router.get('/test', (req, res) => { 
   res.send('User routes working'); 
 });   
   

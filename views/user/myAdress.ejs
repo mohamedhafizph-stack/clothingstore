@@ -50,7 +50,7 @@
                             
                             <div class="action-buttons">
                                 <a href="/profile/adresses/edit/<%= address._id %>" class="btn-secondary">Edit</a>
-                                <form action="/profile/adresses/delete/<%= address._id %>" method="POST" style="display:inline;">
+                               <form action="/profile/adresses/<%= address._id %>?_method=DELETE" method="POST" style="display: inline;">
                                     <button type="submit" class="btn-secondary">Delete</button>
                                 </form>
                             </div>
