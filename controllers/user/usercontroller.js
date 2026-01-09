@@ -338,6 +338,22 @@ const resendOtp = async (req, res) => {
   }
 };
 
+const resendForgotOtp = async (req, res) => {
+  if (!req.session.forgotUserId) {
+    return res.redirect('/forgot-password');
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  req.session.forgotOtp = otp;
+  req.session.forgotOtpExpiry = Date.now() + 5 * 60 * 1000;
+
+  await sendOtp(req.session.forgotEmail, otp);
+
+  res.redirect('/forgot-password/otp');
+};
+
+
 const loadProfile = async (req, res) => {
   const currentUser = req.user || req.session.user;
   console.log('req.user:', req.user);
@@ -802,5 +818,6 @@ module.exports = {
     LoadeditAdressPage,
     updateAdress,
     deleteAdress,
-    setDefaultAdress
+    setDefaultAdress,
+    resendForgotOtp
 };

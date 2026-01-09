@@ -22,6 +22,7 @@ router.post('/login',userController.VerifyLogin)
 
 router.get('/forgot-password',userController.loadforgetPassPage)
 router.post('/forgot-password',userController.sendOtpforForgot)
+router.get('/resend-otp-forgot',userController.resendForgotOtp)
 
 router.get('/forgot-otp', userController.loadForgotOtp);
 router.post('/forgot-otp', userController.verifyotpForget);
@@ -55,8 +56,6 @@ router.get('/test', (req, res) => {
   res.send('User routes working'); 
 });   
   
-
-//router.post('/signup')
 
   
 
