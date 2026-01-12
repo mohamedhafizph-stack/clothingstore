@@ -295,7 +295,7 @@ const categories = [
 
     console.log(req.session.user)
     
-    res.render('user/loggedinHomepage',{
+   return res.render('user/loggedinHomepage',{
         user:userData,
         categories: categories, 
         newArrivals: newArrivals,
