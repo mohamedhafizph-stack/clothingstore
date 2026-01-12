@@ -203,7 +203,7 @@ delete req.session.tempUser;
 };
 
 const loadLoginPage = async (req,res)=>{
- return res.render('user/login',{message:"feilds cannot be empty"})
+ return res.render('user/login',{message:null})
 }
 
 const VerifyLogin = async(req,res)=>{
