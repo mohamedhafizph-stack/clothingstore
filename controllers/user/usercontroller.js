@@ -546,7 +546,7 @@ const editProfile = async (req, res) => {
     console.log("req.user:", req.user);
     console.log("req.session.user:", req.session.user);
 
-    const { name, password, confirmPassword } = req.body;
+    const { name,currentpassword, password, confirmPassword } = req.body;
 
     const currentUser = req.user || req.session.user;
     if (!currentUser) {
@@ -572,7 +572,15 @@ const editProfile = async (req, res) => {
 
     
     if (user.authProvider === 'local') {
-
+     
+      const passwordMatch = await bcrypt.compare(currentpassword,user.password);
+        console.log(passwordMatch)
+               if (!passwordMatch) {
+                 return res.render('user/editprofile', {
+                   error: 'Current Passwords do not match',
+                   user
+                 });
+               }
       
       if (password || confirmPassword) {
 
@@ -582,6 +590,8 @@ const editProfile = async (req, res) => {
             user
           });
         }
+
+        
 
         if (password !== confirmPassword) {
           return res.render('user/editprofile', {
