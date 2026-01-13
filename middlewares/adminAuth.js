@@ -1,4 +1,4 @@
-const adminAuth = (req,res,next)=>{
+ const adminAuth = (req,res,next)=>{
     if(req.session.admin){
         next()
     }else{
@@ -8,5 +8,6 @@ const adminAuth = (req,res,next)=>{
 
  
 
-module.exports = adminAuth;
 
+
+export default adminAuth

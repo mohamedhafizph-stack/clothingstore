@@ -1,58 +1,66 @@
-require('dotenv').config()
-const express = require('express')
-const nodemon = require('nodemon')
-const methodOverride = require('method-override')
-const path = require('path')
-const session = require('express-session');
-const connectDB = require('./db/connectDB');
-const passport = require('passport');
-require('./config/passport');  // load Google strategy
+import "./config/env.js";
 
-const app = express()
+import express from "express";
+import methodOverride from "method-override";
+import path from "path";
+import session from "express-session";
+import passport from "passport";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+import connectDB from "./db/connectDB.js";
+import "./config/passport.js"; 
+
+import adminRoutes from "./routes/admin.js";
+import userRoutes from "./routes/user/user.js";
+import authRoutes from "./routes/auth.js";
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const app = express();
 connectDB();
 
-
-
-app.use(session({
+app.use(
+  session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
-}));
+    saveUninitialized: false,
+  })
+);
+
 app.use(passport.initialize());
 app.use(passport.session());
-// EJS setup
-app.set('view engine', 'ejs')
-app.set('views', path.join(__dirname, 'views'))
 
-// Middleware
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
-app.use(methodOverride('_method'));
-app.use(express.static(path.join(__dirname, 'public')))
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+app.set('view engine', 'ejs'); 
+
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(methodOverride("_method"));
+
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use((req, res, next) => {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
   next();
 });
 
 
+app.use("/admin", adminRoutes);
+app.use("/auth", authRoutes);
+app.use("/", userRoutes);
 
-const adminRoutes = require('./routes/admin');
-const userRoutes = require('./routes/user/user')
-const authRoutes = require('./routes/auth');
-app.use('/admin', adminRoutes);
-app.use('/', userRoutes);
-app.use('/auth', authRoutes);
+app.get("/", (req, res) => {
+  res.send("Wearify server is running 🚀");
+});
 
-// Home route
-app.get('/', (req, res) => {
-  res.send('Wearify server is running 🚀')
-})
 
-// Start server
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
-})
-
+  console.log(`Server running on http://localhost:${PORT}`);
+});

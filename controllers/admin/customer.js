@@ -1,6 +1,7 @@
-const User = require('../../model/User');
 
-const blockUser = async (req, res) => {
+import User from '../../model/User.js'
+
+export const blockUser = async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.params.id, {
       status: 'blocked'
@@ -12,7 +13,7 @@ const blockUser = async (req, res) => {
   }
 };
 
-const unblockUser = async (req, res) => {
+export const unblockUser = async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.params.id, {
       status: 'active'
@@ -25,7 +26,8 @@ const unblockUser = async (req, res) => {
 };
 
 
-module.exports={
+const user ={
     blockUser,
     unblockUser
 }
+export default user;

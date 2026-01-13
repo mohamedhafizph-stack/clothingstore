@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express'
 const router = express.Router(); 
-const userController = require('../../controllers/user/usercontroller')
-const userAuth = require('../../middlewares/userAuth');
-const isLoggedIn = require('../../middlewares/isLoggedin')
-const upload = require('../../config/multer');
+import userController from '../../controllers/user/usercontroller.js'
+import {userAuth}  from '../../middlewares/userAuth.js'
+import { isLoggedIn } from '../../middlewares/isLoggedin.js';
+import upload from '../../config/multer.js'
 
 
 
@@ -52,12 +52,11 @@ router.delete('/profile/adresses/:id',userAuth,userController.deleteAdress)
 
 router.post('/profile/adresses/set-default/:id',userAuth,userController.setDefaultAdress)
 
-router.get('/test', (req, res) => { 
+router.get('/test', (req, res) => {  
   res.send('User routes working'); 
 });   
   
 
   
 
-
-module.exports = router 
+export default router

@@ -1,14 +1,18 @@
-const Admin = require('../../model/Admin');
-const User = require('../../model/User'); 
-const bcrypt = require('bcryptjs');
+
+import Admin from '../../model/Admin.js'
+
+import User from '../../model/User.js'
+
+import bcrypt from "bcryptjs";
 
 
-const loadLoginPage = (req, res) => {
+
+export const loadLoginPage = (req, res) => {
   res.render('admin/login',{error:null});
 };
 
 
-const logingIn = async (req, res) => {
+export const logingIn = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -33,7 +37,7 @@ const logingIn = async (req, res) => {
   }
 };
 
-const loadUserList = async (req, res) => {
+export const loadUserList = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
@@ -75,7 +79,7 @@ const loadUserList = async (req, res) => {
 
 
 
-const toggleUserStatus = async (req, res) => {
+export const toggleUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
@@ -90,4 +94,5 @@ const toggleUserStatus = async (req, res) => {
     res.send('Error updating user status');
   }
 };
-module.exports={loadLoginPage,logingIn,loadUserList,toggleUserStatus}
+const authController={loadLoginPage,logingIn,loadUserList,toggleUserStatus}
+export default authController

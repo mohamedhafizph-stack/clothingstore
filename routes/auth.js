@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express'
 const router = express.Router();
-const passport = require('passport');
+import passport from 'passport'
 
 
 router.get('/google',
@@ -24,4 +24,4 @@ router.get('/logout', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router

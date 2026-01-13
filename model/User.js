@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from 'mongoose'
 const userSchema = new mongoose.Schema({
   name: { 
     type: String, 
@@ -12,13 +11,11 @@ const userSchema = new mongoose.Schema({
     unique: true 
   }, 
 
-  // ❗ password NOT required (for Google users)
   password: { 
     type: String, 
     required: false 
   },
 
-  // ✅ Google login support
   googleId: {
     type: String,
     default: null
@@ -36,7 +33,6 @@ const userSchema = new mongoose.Schema({
     default: 'active' 
   },
 
-  // OTP (can keep for now)
   otp: String,
   otpExpires: Date,
 
@@ -52,4 +48,5 @@ const userSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User',userSchema)
+export default User

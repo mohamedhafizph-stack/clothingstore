@@ -1,7 +1,9 @@
-const multer = require('multer');
-const path = require('path');
 
-const storage = multer.diskStorage({
+import multer from 'multer'
+
+import path from 'path'
+
+export const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/uploads/profile');
   },
@@ -11,7 +13,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const fileFilter = (req, file, cb) => {
+export const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
@@ -19,6 +21,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage, fileFilter });
+export const upload = multer({ storage, fileFilter });
 
-module.exports = upload;
+export default upload

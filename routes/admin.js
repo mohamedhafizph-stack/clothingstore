@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express'
 const router = express.Router();
-const authController = require('../controllers/admin/admincontroller');
-const adminAuth = require('../middlewares/adminAuth')
-const userController = require('../controllers/user/usercontroller')
-const user = require('../controllers/admin/customer')
-const isLoggedIn = require('../middlewares/isloggedinAdmin')
+import authController from '../controllers/admin/admincontroller.js'
+import adminAuth from '../middlewares/adminAuth.js'
+import user from '../controllers/admin/customer.js'
+import { isLoggedIn } from '../middlewares/isloggedinAdmin.js';
+import { loadCategory } from '../controllers/admin/category-managment.js';
 
 
 router.get('/login',isLoggedIn,authController.loadLoginPage);
@@ -31,6 +31,8 @@ router.get('/users/status/:id',adminAuth,authController.toggleUserStatus)
 router.post('/users/block/:id',adminAuth,user.blockUser);
 router.post('/users/unblock/:id',adminAuth,user.unblockUser);
 
+router.get('/categories',adminAuth,loadCategory)
+
   
  
 router.get('/logout',(req,res)=>{
@@ -39,4 +41,4 @@ router.get('/logout',(req,res)=>{
     })
 })
  
-module.exports = router;
+export default router

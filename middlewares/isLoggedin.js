@@ -1,4 +1,4 @@
-const isLoggedIn = (req, res, next) => {
+export const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated && req.isAuthenticated()) {
     return res.redirect('/home');
   }
@@ -10,4 +10,3 @@ const isLoggedIn = (req, res, next) => {
   next();
 };
 
-module.exports = isLoggedIn

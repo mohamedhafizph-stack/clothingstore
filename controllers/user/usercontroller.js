@@ -1,16 +1,16 @@
-const User = require('../../model/User');
-const optgenerator = require('otp-generator')
-const {sendOtp} = require('../../utils/sendOtp');
-const bcrypt = require('bcryptjs');
-const { error } = require('console');
-const Address = require('../../model/address');
+import User from '../../model/User.js'
+import optgenerator from 'otp-generator'
+import {sendOtp} from '../../utils/sendOtp.js'
+import bcrypt from 'bcryptjs'
+import {error} from 'console'
+import Address from '../../model/address.js'
 
 
-const generateOTP = () => {
+export const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-const loadHome = async(req,res)=>{
+export const loadHome = async(req,res)=>{
    
     const categories = [
         { name: 'Shirts', image: '/images/Gemini_Generated_Image_akh47dakh47dakh4.png', bgColor: '#1c2e2a' },
@@ -36,11 +36,11 @@ const loadHome = async(req,res)=>{
     });
 }
 
-const loadSignup = async(req,res)=>{
+export const loadSignup = async(req,res)=>{
     res.render('user/Signup',{message:null})
 }
 
-const registerUser = async(req,res)=>{
+export const registerUser = async(req,res)=>{
 
     try{
     const {name,email,password,confirmPassword}=req.body
@@ -110,7 +110,7 @@ req.session.save(() => {
 
 }
 
-const loadOtpPage = (req, res) => {
+export const loadOtpPage = (req, res) => {
   try {
 
     if (!req.session.otp || !req.session.tempUser) {
@@ -127,7 +127,7 @@ const loadOtpPage = (req, res) => {
   }
 };
 
-const verifyOtp = async (req, res) => {
+export const verifyOtp = async (req, res) => {
   try {
     const { otp } = req.body;
 
@@ -202,11 +202,11 @@ delete req.session.tempUser;
   }
 };
 
-const loadLoginPage = async (req,res)=>{
+export const loadLoginPage = async (req,res)=>{
  return res.render('user/login',{message:null})
 }
 
-const VerifyLogin = async(req,res)=>{
+export const VerifyLogin = async(req,res)=>{
     const {email,password} = req.body
       console.log('REQ BODY:', req.body);
     
@@ -258,7 +258,7 @@ const VerifyLogin = async(req,res)=>{
 
 }
 
-const loadLoggedinHomepage = async(req,res)=>{
+export const loadLoggedinHomepage = async(req,res)=>{
 
      let userData;
 const userId = req.user?._id || req.session.user.id;
@@ -303,7 +303,7 @@ const categories = [
     })
 }
 
-const resendOtp = async (req, res) => {
+export const resendOtp = async (req, res) => {
   try {
     
     if (!req.session.tempUser) {
@@ -338,7 +338,7 @@ const resendOtp = async (req, res) => {
   }
 };
 
-const resendForgotOtp = async (req, res) => {
+export const resendForgotOtp = async (req, res) => {
   if (!req.session.forgotUserId) {
     return res.redirect('/forgot-password');
   }
@@ -354,7 +354,7 @@ const resendForgotOtp = async (req, res) => {
 };
 
 
-const loadProfile = async (req, res) => {
+export const loadProfile = async (req, res) => {
   const currentUser = req.user || req.session.user;
   console.log('req.user:', req.user);
 console.log('req.session.user:', req.session.user);
@@ -374,11 +374,11 @@ const userId = currentUser._id || currentUser.id;
   res.render('user/userprofile', { user }); 
 };
 
-const loadforgetPassPage = async(req,res)=>{
+export const loadforgetPassPage = async(req,res)=>{
     res.render('user/forgotpassword')
 }
 
-const sendOtpforForgot = async (req, res) => {
+export const sendOtpforForgot = async (req, res) => {
   try {
     console.log('step1');
 
@@ -418,7 +418,7 @@ const sendOtpforForgot = async (req, res) => {
   }
 };
 
-const verifyotpForget = async(req,res)=>{
+export const verifyotpForget = async(req,res)=>{
    const{otp}=req.body
 
 let enteredOtp = req.body.otp;
@@ -453,7 +453,7 @@ const sessionOtp = String(req.session.forgotOtp).trim();
 
 }
 
-const loadForgotOtp = (req, res) => {
+export const loadForgotOtp = (req, res) => {
   if (!req.session.forgotOtp) {
    
     console.log('hello')
@@ -461,14 +461,14 @@ const loadForgotOtp = (req, res) => {
   res.render('user/verifyotpPassreset',{error:null});
 };
 
-const loadResetPassword = (req, res) => {
+export const loadResetPassword = (req, res) => {
   if (!req.session.forgotUserId) {
     return res.redirect('/login');
   }
   res.render('user/resetPassword',{error:null});
 };
 
-const resetPassword = async (req, res) => {
+export const resetPassword = async (req, res) => {
   const { password, confirmPassword } = req.body;
    console.log(password)
    console.log(confirmPassword)
@@ -492,7 +492,7 @@ console.log(req.session.forgotUserId)
   res.redirect('/login');
 }; 
 
-const uploadProfileImage = async (req, res) => {
+export const uploadProfileImage = async (req, res) => {
   try {
     
     const userId =
@@ -526,7 +526,7 @@ const uploadProfileImage = async (req, res) => {
   }
 };
 
-const loadeditProfile = async(req,res)=>{
+export const loadeditProfile = async(req,res)=>{
   const currentUser = req.user || req.session.user;
   
   if (!currentUser) { 
@@ -541,7 +541,7 @@ const userId = currentUser._id || currentUser.id;
   res.render('user/editprofile',{user,error:null})
 }
 
-const editProfile = async (req, res) => {
+export const editProfile = async (req, res) => {
   try {
     console.log("req.user:", req.user);
     console.log("req.session.user:", req.session.user);
@@ -619,11 +619,11 @@ const editProfile = async (req, res) => {
   }
 };
 
-const  loadupdateMail = async(req,res)=>{
+export const  loadupdateMail = async(req,res)=>{
   res.render('user/editemail')
 }
 
-const updateEmail = async(req,res)=>{
+export const updateEmail = async(req,res)=>{
   try{
      const {email} = req.body
      const otp = generateOTP()
@@ -638,11 +638,11 @@ const updateEmail = async(req,res)=>{
   }
 }
 
-const  loadchangeEmailOtp = async(req,res)=>{
+export const  loadchangeEmailOtp = async(req,res)=>{
   res.render('user/verifyotpEmail',{error:null})
 }
 
-const verifychangeEmailOtp  = async(req,res)=>{
+export const verifychangeEmailOtp  = async(req,res)=>{
   try{
      const{otp} = req.body
 
@@ -678,7 +678,7 @@ const sessionOtp = String(req.session.otp).trim();
   } 
 }
 
-const loadAdressPage = async(req,res)=>{
+export const loadAdressPage = async(req,res)=>{
 
   const currentUser = req.user || req.session.user
 
@@ -695,11 +695,11 @@ const loadAdressPage = async(req,res)=>{
   res.render('user/myAdress',{user,addresses})
 }
 
-const loadAddAddressPage = async(req,res)=>{
+export const loadAddAddressPage = async(req,res)=>{
   res.render('user/addAdress')
 }
 
-const Addaddress = async(req,res)=>{
+export const Addaddress = async(req,res)=>{
   try{
 
      const currentUser = req.user || req.session.user
@@ -734,7 +734,7 @@ const Addaddress = async(req,res)=>{
 
 }
 
-const LoadeditAdressPage = async(req,res)=>{
+export const LoadeditAdressPage = async(req,res)=>{
   
   const currentUser = req.user || req.session.user
   
@@ -746,7 +746,7 @@ const LoadeditAdressPage = async(req,res)=>{
 
 }
 
-const updateAdress = async(req,res)=>{
+export const updateAdress = async(req,res)=>{
 
   const {fullName,phone,addressLine,city,state,pincode,country} = req.body
    
@@ -769,7 +769,7 @@ const updateAdress = async(req,res)=>{
 
 }
 
-const deleteAdress = async(req,res)=>{
+export const deleteAdress = async(req,res)=>{
   try{
       
       await Address.findByIdAndDelete(req.params.id)
@@ -782,9 +782,9 @@ const deleteAdress = async(req,res)=>{
   }
 }
 
-const setDefaultAdress = async(req,res)=>{
+export const setDefaultAdress = async(req,res)=>{
   try{
-     const userId = req.user._id || req.session.user.id
+     const userId = req.user?._id || req.session.user.id
 
      await Address.updateMany({userId},{isDefault:false})
 
@@ -798,7 +798,7 @@ const setDefaultAdress = async(req,res)=>{
   }
 }
 
-module.exports = {
+const userController = {
     verifyOtp,
     loadHome,
     loadSignup,
@@ -831,3 +831,4 @@ module.exports = {
     setDefaultAdress,
     resendForgotOtp
 };
+export default userController;

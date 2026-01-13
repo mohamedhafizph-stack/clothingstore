@@ -1,6 +1,9 @@
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const User = require('../model/User');
+
+
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import User from "../model/User.js";
+
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,           
@@ -19,7 +22,7 @@ passport.use(new GoogleStrategy({
         });
       }
 
-      if (!user) {
+      if (!user) {  
      
         user = new User({
           name: profile.displayName,

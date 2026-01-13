@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify Admin - Categories</title>
+    <link rel="stylesheet" href="/css/categorymanagment.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-brand">Wearify Admin</div>
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard" class="nav-link">Dashboard</a>
+                <a href="/admin/orders" class="nav-link">Orders</a>
+                <a href="/admin/products" class="nav-link">Products</a>
+                <a href="/admin/categories" class="nav-link active">Categories</a>
+                <a href="/admin/users" class="nav-link">Users</a>
+                <a href="/admin/payments" class="nav-link">Payments</a>
+                <a href="/admin/reports" class="nav-link">Reports</a>
+                <a href="/admin/settings" class="nav-link">Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <div class="breadcrumb">Wearify Admin</div>
+                <a href="/admin/categories/add" class="btn-primary">Add Category</a>
+            </header>
+
+            <section class="table-section">
+                <h1>Categories</h1>
+
+                <div class="table-controls">
+                    <div class="search-wrapper">
+                        <input type="text" placeholder="Search categories..." id="categorySearch">
+                    </div>
+                    <div class="filter-wrapper">
+                        <button class="btn-filter">Status ▼</button>
+                    </div>
+                </div>
+
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Category Name</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (categories && categories.length > 0) { %>
+                            <% categories.forEach(category => { %>
+                                <tr>
+                                    <td><%= category.name %></td>
+                                    <td class="text-muted"><%= category.description %></td>
+                                    <td>
+                                        <span class="status-badge <%= category.status.toLowerCase() %>">
+                                            <%= category.status %>
+                                        </span>
+                                    </td>
+                                    <td class="action-links">
+                                        <a href="/admin/categories/edit/<%= category._id %>">Edit</a> | 
+                                        <form action="/admin/categories/delete/<%= category._id %>?_method=DELETE" method="POST" style="display:inline;">
+                                            <button type="submit" class="btn-link">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="4" class="empty-msg">No categories found.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button class="pg-arrow">&lt;</button>
+                    <button class="pg-num active">1</button>
+                    <button class="pg-num">2</button>
+                    <button class="pg-num">3</button>
+                    <span class="pg-dots">...</span>
+                    <button class="pg-num">10</button>
+                    <button class="pg-arrow">&gt;</button>
+                </div>
+
+                <footer class="admin-footer">
+                    Wearify Admin ©
+                </footer>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>
