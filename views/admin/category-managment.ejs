@@ -33,19 +33,45 @@
                 <h1>Categories</h1>
 
                 <div class="table-controls">
-                    <div class="search-wrapper">
-                        <input type="text" placeholder="Search categories..." id="categorySearch">
-                    </div>
+                    <form method="GET" action="/admin/categories" class="search-wrapper">
+  <input 
+    type="text"
+    name="search"
+    placeholder="Search categories..."
+    value="<%= search || '' %>"
+  >
+  
+  <% if (search) { %>
+    <a href="/admin/categories" class="clear-btn">✖</a>
+  <% } %>
+</form>
+
                     <div class="filter-wrapper">
-                        <button class="btn-filter">Status ▼</button>
-                    </div>
+  <form method="GET" action="/admin/categories">
+    <select name="status" onchange="this.form.submit()" class="status-filter">
+      <option value="all" <%= selectedStatus === 'all' ? 'selected' : '' %>>
+        All
+      </option>
+      <option value="active" <%= selectedStatus === 'active' ? 'selected' : '' %>>
+        Active
+      </option>
+      <option value="blocked" <%= selectedStatus === 'blocked' ? 'selected' : '' %>>
+        Inactive
+      </option>
+    </select>
+
+    <% if (selectedStatus !== 'all') { %>
+      <a href="/admin/categories" class="clear-filter">Clear</a>
+    <% } %>
+  </form>
+</div>
+
                 </div>
 
                 <table class="admin-table">
                     <thead>
                         <tr>
                             <th>Category Name</th>
-                            <th>Description</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -55,7 +81,7 @@
                             <% categories.forEach(category => { %>
                                 <tr>
                                     <td><%= category.name %></td>
-                                    <td class="text-muted"><%= category.description %></td>
+                                    
                                     <td>
                                         <span class="status-badge <%= category.status.toLowerCase() %>">
                                             <%= category.status %>
@@ -63,9 +89,15 @@
                                     </td>
                                     <td class="action-links">
                                         <a href="/admin/categories/edit/<%= category._id %>">Edit</a> | 
-                                        <form action="/admin/categories/delete/<%= category._id %>?_method=DELETE" method="POST" style="display:inline;">
-                                            <button type="submit" class="btn-link">Delete</button>
-                                        </form>
+                                       <% if (category.status === 'active') { %>
+    <form action="/admin/categories/block/<%= category._id %>?_method=PATCH" method="POST" style="display:inline;">
+      <button class="action-btn block-btn">Block</button>
+    </form>
+  <% } else { %>
+    <form action="/admin/categories/unblock/<%= category._id %>?_method=PATCH" method="POST" style="display:inline;">
+      <button class="action-btn unblock-btn">Unblock</button>
+    </form>
+  <% } %>
                                     </td>
                                 </tr>
                             <% }); %>
@@ -77,15 +109,7 @@
                     </tbody>
                 </table>
 
-                <div class="pagination">
-                    <button class="pg-arrow">&lt;</button>
-                    <button class="pg-num active">1</button>
-                    <button class="pg-num">2</button>
-                    <button class="pg-num">3</button>
-                    <span class="pg-dots">...</span>
-                    <button class="pg-num">10</button>
-                    <button class="pg-arrow">&gt;</button>
-                </div>
+                
 
                 <footer class="admin-footer">
                     Wearify Admin ©

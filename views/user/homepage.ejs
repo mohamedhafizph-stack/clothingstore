@@ -10,12 +10,11 @@
   <header>
     <div class="logo"><strong>Wearify</strong></div>
     
-    <nav class="nav-links">
-        <a href="#">Shirts</a>
-        <a href="#">T-Shirts</a>
-        <a href="#">Pants</a>
-        <a href="#">Shorts</a>
-    </nav>
+    <% categories.forEach(category => { %>
+  <div class="category-card">
+    <h3><%= category.name %></h3>
+  </div>
+<% }) %>
 
     <div class="header-actions">
         <a href="/signup" class="btn-login">Login</a>
@@ -30,19 +29,7 @@
             </div>
         </section>
 
-        <section>
-            <h2>Categories</h2>
-            <div class="product-grid">
-                <% categories.forEach(cat => { %>
-                    <div class="product-card">
-                        <div class="img-container" style="background-color: <%= cat.bgColor %>;">
-                            <img src="<%= cat.image %>" alt="<%= cat.name %>">
-                        </div>
-                        <p><%= cat.name %></p>
-                    </div>
-                <% }) %>
-            </div>
-        </section>
+        
 
         <section>
             <h2>New Arrivals</h2>

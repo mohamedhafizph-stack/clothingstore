@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify Admin - Add Category</title>
+    <link rel="stylesheet" href="/css/add-category.css">
+</head>
+<body class="admin-body">
+
+    <header class="top-nav">
+        <div class="brand">
+            <span class="brand-icon"></span> Wearify Admin
+        </div>
+        <div class="user-controls">
+            <span class="nav-label">Add Category</span>
+            <img src="/path-to-avatar.png" alt="Admin" class="admin-avatar">
+        </div>
+    </header>
+
+    <main class="form-container">
+        <h1>Add Category</h1>
+
+        <form action="/admin/categories/add" method="POST" class="category-form">
+            <div class="form-group">
+                <label for="name">Category Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter category name" required>
+            </div>
+
+
+            <div class="form-actions">
+                <button type="submit" class="btn-save">Save Category</button>
+                <button type="button" class="btn-cancel" onclick="window.location.href='/admin/categories'">Cancel</button>
+            </div>
+        </form>
+    </main>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<% if (message) { %>
+<script>
+  Swal.fire({
+    icon: 'error',
+    title: 'Registration Error',
+    text: '<%= message %>'
+  });
+</script>
+<% } %>
+</body>
+</html>

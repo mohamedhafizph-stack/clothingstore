@@ -4,7 +4,8 @@ import authController from '../controllers/admin/admincontroller.js'
 import adminAuth from '../middlewares/adminAuth.js'
 import user from '../controllers/admin/customer.js'
 import { isLoggedIn } from '../middlewares/isloggedinAdmin.js';
-import { loadCategory } from '../controllers/admin/category-managment.js';
+import categoryController from '../controllers/admin/categoryController.js';
+
 
 
 router.get('/login',isLoggedIn,authController.loadLoginPage);
@@ -31,9 +32,14 @@ router.get('/users/status/:id',adminAuth,authController.toggleUserStatus)
 router.post('/users/block/:id',adminAuth,user.blockUser);
 router.post('/users/unblock/:id',adminAuth,user.unblockUser);
 
-router.get('/categories',adminAuth,loadCategory)
+router.get('/categories',adminAuth,categoryController.loadCategory)
+router.get('/categories/add',adminAuth,categoryController.loadaddCategory)
+router.post('/categories/add',adminAuth,categoryController.addCategory)
+router.get('/categories/edit/:id',adminAuth,categoryController.loadeditCategory)
+router.patch('/categories/edit/:id',adminAuth,categoryController.editCategory)
+router.patch('/categories/block/:id',adminAuth,categoryController.blockCategory)
+router.patch('/categories/unblock/:id',adminAuth,categoryController.unblockCategory)
 
-  
  
 router.get('/logout',(req,res)=>{
     req.session.destroy(()=>{

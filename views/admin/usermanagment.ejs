@@ -88,7 +88,7 @@
                                 <%= user.status %>
                             </span>
                         </td>
-                        <td><%= user.createdAt %></td>
+                        <td><%= user.createdAt.toLocaleString() %></td>
                         <td>
   <% if (user.status === 'active') { %>
     <form action="/admin/users/block/<%= user._id %>" method="POST" style="display:inline;">

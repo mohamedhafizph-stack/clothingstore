@@ -12,20 +12,19 @@
     <header class="main-header">
         <div class="logo"><strong>Wearify</strong></div>
         
-        <nav class="nav-links">
-            <a href="/shirts">Shirts</a>
-            <a href="/t-shirts">T-Shirts</a>
-            <a href="/pants">Pants</a>
-            <a href="/shorts">Shorts</a>
-        </nav>
+    
+        <% categories.forEach(category => { %>
+  <div class="category-card">
+    <h3><%= category.name %></h3>
+  </div>
+<% }) %>
+
 
         <div class="header-icons">
             <button class="icon-btn"><i class="ph ph-magnifying-glass"></i></button>
             <button class="icon-btn"><i class="ph ph-heart"></i></button>
             <button class="icon-btn"><i class="ph ph-shopping-bag"></i></button>
-            <!-- <div class="user-avatar">
-              <a href="/profile"><img src="/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png" alt="Profile"></a>  
-            </div> -->
+            
             <div class="user-profile">
   
 
@@ -48,19 +47,7 @@
             </div>
         </section>
 
-        <section class="section">
-            <h2 class="section-title">Categories</h2>
-            <div class="category-grid">
-                <% categories.forEach(cat => { %>
-                    <div class="category-item">
-                        <div class="cat-img-box" style="background-color: <%= cat.bgColor %>;">
-                            <img src="<%= cat.image %>" alt="<%= cat.name %>">
-                        </div>
-                        <p><%= cat.name %></p>
-                    </div>
-                <% }) %>
-            </div>
-        </section>
+       
 
         <section class="section">
             <h2 class="section-title">New Arrivals</h2>

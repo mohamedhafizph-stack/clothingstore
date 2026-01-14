@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify Admin - Edit Category</title>
+    <link rel="stylesheet" href="/css/edit-category.css">
+</head>
+<body class="admin-body">
+
+    <header class="admin-header">
+        <div class="header-left">
+            <span class="admin-icon">📁</span>
+            <span class="admin-title">Wearify Admin</span>
+        </div>
+    </header>
+
+    <main class="form-wrapper">
+        <h1 class="page-title">Edit Category</h1>
+
+        <form action="/admin/categories/edit/<%= category._id %>?_method=PATCH" method="POST" class="admin-form">
+            
+            <div class="input-block">
+                <label for="name">Category Name</label>
+                <input type="text" id="name" name="name" value="<%= category.name %>" required>
+            </div>
+
+           
+
+           
+
+            <div class="form-footer">
+                <button type="submit" class="btn-blue">Save Changes</button>
+                <button type="button" class="btn-grey" onclick="window.location.href='/admin/categories'">Cancel</button>
+            </div>
+        </form>
+
+        <footer class="footer-note">
+            Wearify Admin ©
+        </footer>
+    </main>
+
+</body>
+</html>

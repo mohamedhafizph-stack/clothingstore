@@ -4,6 +4,7 @@ import {sendOtp} from '../../utils/sendOtp.js'
 import bcrypt from 'bcryptjs'
 import {error} from 'console'
 import Address from '../../model/address.js'
+import Category from '../../model/category.js'
 
 
 export const generateOTP = () => {
@@ -12,12 +13,7 @@ export const generateOTP = () => {
 
 export const loadHome = async(req,res)=>{
    
-    const categories = [
-        { name: 'Shirts', image: '/images/Gemini_Generated_Image_akh47dakh47dakh4.png', bgColor: '#1c2e2a' },
-        { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#1c2e2a' },
-        { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#1c2e2a' },
-        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#1c2e2a' }
-    ];
+    const categories = await Category.find({status:"active"})
 
     const newArrivals = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
         { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },
@@ -178,7 +174,7 @@ const sessionOtp = String(req.session.otp).trim();
       name: req.session.tempUser.name,
       email: req.session.tempUser.email,
       password: hashedPassword,
-      isVerified: true
+      isVerified: true,
     });
 
     await user.save();
@@ -276,13 +272,8 @@ const userId = req.user?._id || req.session.user.id;
     else {
       return res.redirect('/login');
     }
+     const categories = await Category.find({status:"active"})
 
-const categories = [
-        { name: 'Shirts', image: '/images/Gemini_Generated_Image_akh47dakh47dakh4.png', bgColor: '#1c2e2a' },
-        { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#1c2e2a' },
-        { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#1c2e2a' },
-        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#1c2e2a' }
-    ];
 
     const newArrivals = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
         { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },

@@ -7,10 +7,11 @@ const categorySchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    isActive: {
-      type: Boolean,
-      default: true, 
-    },
+    status: { 
+    type: String, 
+    enum: ['active', 'blocked'], 
+    default: 'active' 
+  },
   },
   { timestamps: true }
 );
