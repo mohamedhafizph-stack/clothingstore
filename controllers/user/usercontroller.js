@@ -476,31 +476,30 @@ console.log(req.session.forgotUserId)
   res.redirect('/login');
 }; 
 
+
+
 export const uploadProfileImage = async (req, res) => {
   try {
-    
-    const userId =
-      req.user?._id ||
-      req.session.user?._id ||
-      req.session.user?.id;
-     
+    const userId = req.user?._id || req.session.user?._id || req.session.user?.id;
 
     if (!req.file) {
       return res.redirect('/profile');
     }
 
-    const imagePath = `/uploads/profile/${req.file.filename}`;
+    
+    const imagePath = req.file.path; 
 
-      const updatedUser = await User.findByIdAndUpdate(
+    
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       { profilePic: imagePath },
       { new: true }
     );
 
+    
+    if (req.session.user) {
       req.session.user = updatedUser;
-      if (req.session.user) {
-      req.session.user.profilePic = imagePath;
-    }  
+    }
 
     res.redirect('/profile');
 

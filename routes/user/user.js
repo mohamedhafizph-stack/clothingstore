@@ -3,7 +3,7 @@ const router = express.Router();
 import userController from '../../controllers/user/usercontroller.js'
 import {userAuth}  from '../../middlewares/userAuth.js'
 import { isLoggedIn } from '../../middlewares/isLoggedin.js';
-import upload from '../../config/multer.js'
+import {uploadProfilePic} from '../../config/multer.js'
 import productController from '../../controllers/user/products-list.js';
 
 
@@ -34,7 +34,7 @@ router.post('/reset-password', userController.resetPassword);
 router.get('/home',userAuth,userController.loadLoggedinHomepage) 
  
 router.get('/profile',userAuth,userController.loadProfile)  
-router.post('/profile/upload-image',userAuth,upload.single('profilePic'),userController.uploadProfileImage);
+router.post('/profile/upload-image',userAuth,uploadProfilePic,userController.uploadProfileImage);
 router.get('/profile/edit-profile',userAuth,userController.loadeditProfile)
 //router.post('/profile/edit-profile',userAuth,userController.editProfile)
 router.put('/profile',userAuth,userController.editProfile)

@@ -6,7 +6,8 @@ import user from '../controllers/admin/customer.js'
 import { isLoggedIn } from '../middlewares/isloggedinAdmin.js';
 import categoryController from '../controllers/admin/categoryController.js';
 import productController from '../controllers/admin/productController.js';
-import { uploadProductImages } from '../config/productMulter.js';
+//import { uploadProductImages } from '../config/productMulter.js';
+import upload from "../config/productMulter.js";
 
 
 router.get('/login',isLoggedIn,authController.loadLoginPage);
@@ -42,11 +43,11 @@ router.patch('/categories/block/:id',adminAuth,categoryController.blockCategory)
 router.patch('/categories/unblock/:id',adminAuth,categoryController.unblockCategory)
 router.get('/products',adminAuth,productController.loadProduct)
 router.get('/products/add',adminAuth,productController.loadaddProduct)
-router.post('/products/add',adminAuth,uploadProductImages,productController.addProduct)
+router.post('/products/add',adminAuth,upload.array("images",5),productController.addProduct)
 router.get('/products/manage-stock/:id',adminAuth,productController.getManageStock);
 router.post('/products/manage-stock/:id',adminAuth,productController.updateStock);
-router.get('/products/edit/:id',adminAuth,uploadProductImages,productController.loadeditProduct)
-router.patch('/products/edit/:id',adminAuth,uploadProductImages,productController.editProduct)
+router.get('/products/edit/:id',adminAuth,upload.array("images",5),productController.loadeditProduct)
+router.patch('/products/edit/:id',adminAuth,upload.array("images",5),productController.editProduct)
 router.patch('/products/status/:id',adminAuth,productController.productStatus)
 router.patch('/products/stock/:productId/:variantId',adminAuth,productController.removeStock)
 

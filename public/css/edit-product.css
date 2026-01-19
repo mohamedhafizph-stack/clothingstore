@@ -234,3 +234,10 @@ input:focus { border-color: var(--blue-btn); outline: none; }
 }
 
 .btn-save:hover { background: var(--blue-hover); }
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* aligns buttons to right */
+    gap: 10px;                  /* space between buttons */
+    margin-top: 20px;           /* space from image section */
+    flex-wrap: wrap;            /* allows responsive wrapping */
+}

@@ -1,28 +1,21 @@
-import multer from "multer";
-import path from "path";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/uploads/products");
-  },
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname)
-    );
+
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary.js";
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "wearify/products",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
+    transformation: [
+      { width: 800, height: 800, crop: "limit", quality: "auto" }
+    ],
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowed = /jpeg|jpg|png|webp/;
-  const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-  const mime = allowed.test(file.mimetype);
+const upload = multer({ storage });
 
-  if (ext && mime) cb(null, true);
-  else cb(new Error("Only images allowed"));
-};
+export default upload;
 
-export const uploadProductImages = multer({
-  storage,
-  fileFilter,
-}).array("images", 5); // max 5 images

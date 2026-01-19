@@ -1,26 +1,23 @@
 
-import multer from 'multer'
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
-import path from 'path'
 
-export const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/uploads/profile');
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + path.extname(file.originalname);
-    cb(null, uniqueName);
-  }
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-export const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only images allowed'), false);
-  }
-};
 
-export const upload = multer({ storage, fileFilter });
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "wearify/profiles", 
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    transformation: [{ width: 200, height: 200, crop: "fill" }] 
+  },
+});
 
-export default upload
+export const uploadProfilePic = multer({ storage }).single("profilePic"); 

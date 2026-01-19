@@ -41,7 +41,7 @@
   <div class="main-image">
     <img 
       id="mainProductImage"
-      src="/uploads/<%= product.images?.[0] %>"
+      src="<%= product.images?.[0] %>"
       alt="<%= product.name %>"
     >
   </div>
@@ -50,9 +50,9 @@
   <div class="thumbnail-list">
     <% (product.images || []).forEach((img, index) => { %>
       <img
-        src="/uploads/<%= img %>"
+        src="<%= img %>"
         class="thumbnail <%= index === 0 ? 'active' : '' %>"
-        onclick="changeImage('/uploads/<%= img %>', this)"
+        onclick="changeImage('<%= img %>', this)"
       >
     <% }) %>
   </div>
@@ -136,7 +136,7 @@
       <div class="related-grid">
         <% relatedProducts.forEach(item => { %>
           <div class="related-card">
-            <img src="/uploads/<%= item.images?.[0] %>" alt="image">
+            <img src="<%= item.images?.[0] %>" alt="image">
             <h4><%= item.productName %></h4>
             <p>₹<%= item.price %></p>
           </div>

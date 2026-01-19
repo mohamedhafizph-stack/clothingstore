@@ -30,6 +30,8 @@
             <section class="edit-section">
                 <h1>Edit Product: <%= product.name %></h1>
                 
+
+                
                 <form action="/admin/products/edit/<%= product._id %>?_method=PATCH" method="POST" enctype="multipart/form-data" id="editProductForm">
                     
                     <div class="form-group">
@@ -72,7 +74,7 @@
                                 <input type="hidden" name="existingImages" value="<%= product.images[0] || '' %>" id="existing0">
 
                                 <% if (product.images && product.images[0]) { %>
-                                    <img src="/uploads/<%= product.images[0] %>" id="preview0" class="preview-img" style="display:block;">
+                                    <img src="<%= product.images[0] %>" id="preview0" class="preview-img" style="display:block;">
                                     <div class="slot-content" id="content0" style="display:none;">
                                         <span class="upload-icon">📸</span>
                                         <p>Main Photo</p>
@@ -88,14 +90,14 @@
                                 <% } %>
                             </div>
 
-                            <div class="sub-slots-container">
+                            <!-- <div class="sub-slots-container">
                                 <% for(let i=1; i<4; i++) { %>
                                     <div class="upload-slot sub-slot" onclick="document.getElementById('input<%= i %>').click()">
                                         <input type="file" name="images" id="input<%= i %>" accept="image/*" hidden onchange="initCropper(this, <%= i %>)">
                                         <input type="hidden" name="existingImages" value="<%= product.images[i] || '' %>" id="existing<%= i %>">
 
                                         <% if (product.images && product.images[i]) { %>
-                                            <img src="/uploads/<%= product.images[i] %>" id="preview<%= i %>" class="preview-img" style="display:block;">
+                                            <img src=" product.images[0] %>" id="preview<%= i %>" class="preview-img" style="display:block;">
                                             <div class="slot-content" id="content<%= i %>" style="display:none;">
                                                 <span class="upload-icon">+</span>
                                             </div>
@@ -111,18 +113,60 @@
                                 <% } %>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
+                    <div class="sub-slots-container">
+  <% for (let i = 1; i < 4; i++) { %>
+    <div class="upload-slot sub-slot" onclick="document.getElementById('input<%= i %>').click()">
+
+      <input type="file" name="images" id="input<%= i %>" accept="image/*" hidden onchange="initCropper(this, <%= i %>)">
+      <input type="hidden" name="existingImages" value="<%= product.images[i] || '' %>" id="existing<%= i %>">
+
+      <% if (product.images && product.images[i]) { %>
+        <img 
+          src="<%= product.images[i] %>" 
+          id="preview<%= i %>" 
+          class="preview-img"
+          style="display:block;"
+        >
+        <div class="slot-content" id="content<%= i %>" style="display:none;">
+          <span class="upload-icon">+</span>
+        </div>
+        <button 
+          type="button" 
+          class="remove-btn" 
+          id="remove<%= i %>" 
+          style="display:flex;" 
+          onclick="removeImage(event, <%= i %>)"
+        >×</button>
+      <% } else { %>
+        <img src="" id="preview<%= i %>" class="preview-img" style="display:none;">
+        <div class="slot-content" id="content<%= i %>">
+          <span class="upload-icon">+</span>
+        </div>
+        <button 
+          type="button" 
+          class="remove-btn" 
+          id="remove<%= i %>" 
+          style="display:none;" 
+          onclick="removeImage(event, <%= i %>)"
+        >×</button>
+      <% } %>
+
+    </div>
+  <% } %>
+</div>
+
 
                    
+<div class="form-actions">
+    <button type="submit" class="btn-save">Save Changes</button>
+    <a href="/admin/products" class="btn-cancel">Cancel</a>
+</div>
+</form>
+</section>
+</main>
+</div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn-save">Save Changes</button>
-                        <a href="/admin/products" class="btn-cancel">Cancel</a>
-                    </div>
-                </form>
-            </section>
-        </main>
-    </div>
 
     <div id="cropperModal" class="modal-overlay">
         <div class="modal-card">
