@@ -1,0 +1,405 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+body.details-page {
+  background-color: #0f0f0f;
+  color: #eaeaea;
+}
+
+/* HEADER */
+.shop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  background: #141414;
+  border-bottom: 1px solid #222;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.nav-links a {
+  margin-left: 25px;
+  text-decoration: none;
+  color: #cfcfcf;
+  font-size: 15px;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #ffffff;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+/* BREADCRUMB */
+.breadcrumb {
+  font-size: 14px;
+  color: #999;
+  margin-bottom: 20px;
+}
+
+.breadcrumb a {
+  color: #aaa;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: #fff;
+}
+
+/* PRODUCT MAIN */
+.product-main {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 40px;
+}
+
+/* IMAGE GALLERY */
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.img-box {
+  background: #181818;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* SUMMARY */
+.product-summary h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.description {
+  color: #bdbdbd;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 25px;
+}
+
+/* SIZE OPTIONS */
+.size-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.size-btn {
+  padding: 10px 16px;
+  background: #1f1f1f;
+  border: 1px solid #333;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.size-btn:hover {
+  background: #ffffff;
+  color: #000;
+}
+
+.size-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* COLOR OPTIONS */
+.color-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.color-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #333;
+  cursor: pointer;
+}
+
+/* ACTIONS */
+.purchase-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.quantity-picker {
+  display: flex;
+  align-items: center;
+  background: #1b1b1b;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.quantity-picker button {
+  padding: 10px 14px;
+  background: #222;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.quantity-picker input {
+  width: 45px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  color: #fff;
+}
+
+/* BUTTONS */
+.btn-buy {
+  background: #ffffff;
+  color: #000;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cart {
+  background: #222;
+  color: #fff;
+  border: 1px solid #333;
+  padding: 12px 22px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn-wishlist {
+  background: transparent;
+  border: 1px solid #333;
+  color: #ff6b6b;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* REVIEWS */
+.reviews {
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid #222;
+}
+
+.reviews h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.review {
+  background: #161616;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 15px;
+}
+
+.review p {
+  color: #ccc;
+  margin-bottom: 5px;
+}
+
+.no-reviews {
+  color: #777;
+}
+
+/* RELATED PRODUCTS */
+.related {
+  margin-top: 60px;
+}
+
+.related h3 {
+  margin-bottom: 20px;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.related-card {
+  background: #161616;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.related-card:hover {
+  transform: translateY(-5px);
+}
+
+.related-card img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.related-card h4 {
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.related-card p {
+  color: #aaa;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .product-main {
+    grid-template-columns: 1fr;
+  }
+}
+/* IMAGE GALLERY */
+.image-gallery {
+  display: flex;
+  gap: 20px;
+}
+
+/* MAIN IMAGE */
+.main-image {
+  flex: 1;
+  background: var(--card-bg);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.main-image img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+}
+
+/* THUMBNAILS */
+.thumbnail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.thumbnail {
+  width: 70px;
+  height: 70px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  object-fit: contain;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 6px;
+  border: 2px solid transparent;
+}
+
+.thumbnail:hover {
+  opacity: 1;
+}
+
+.thumbnail.active {
+  opacity: 1;
+  border-color: var(--accent-green);
+}
+/* --- Layout Re-ordering --- */
+
+/* 1. Make the product-main a grid so we can position the title at the top */
+.product-main {
+  display: grid;
+  grid-template-areas: 
+    "title title"
+    "gallery summary";
+  grid-template-columns: 1.4fr 0.6fr;
+  gap: 30px;
+}
+
+/* 2. Target the H1 (The Name) and tell it to sit in the 'title' area */
+.product-main h1 {
+  grid-area: title;
+  font-size: 34px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+/* 3. Assign the Gallery and Summary to their respective areas */
+.image-gallery {
+  grid-area: gallery;
+}
+
+.product-summary {
+  grid-area: summary;
+  position: sticky;
+  top: 20px;
+}
+
+/* --- Mobile View Adjustments --- */
+@media (max-width: 1024px) {
+  .product-main {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* On mobile, H1 naturally stays on top of the gallery */
+  .product-main h1 {
+    order: 1;
+  }
+  .image-gallery {
+    order: 2;
+  }
+  .product-summary {
+    order: 3;
+  }
+}
+
+/* --- Keep the Reference Image Gallery Style --- */
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.img-box:nth-child(1) {
+  grid-column: span 2; /* Large hero image under the name */
+}
+
+.img-box img {
+  width: 100%;
+  border-radius: 4px;
+  display: block;
+}

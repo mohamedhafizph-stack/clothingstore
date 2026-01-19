@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs'
 import {error} from 'console'
 import Address from '../../model/address.js'
 import Category from '../../model/category.js'
+import Product from '../../model/Product.js'
 
 
 export const generateOTP = () => {
@@ -15,14 +16,9 @@ export const loadHome = async(req,res)=>{
    
     const categories = await Category.find({status:"active"})
 
-    const newArrivals = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
-        { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },
-        { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#314b5c' },
-        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }]; 
-    const bestSellers = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
-        { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },
-        { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#314b5c' },
-        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }];
+    const newArrivals = await Product.find({status:"Active"}).limit(4)
+
+    const bestSellers = await Product.find({status:"Active"}).limit(4)
 
 
     res.render('user/homepage', { 
@@ -255,7 +251,7 @@ export const VerifyLogin = async(req,res)=>{
 }
 
 export const loadLoggedinHomepage = async(req,res)=>{
-
+ const categories = await Category.find({status:"active"})
      let userData;
 const userId = req.user?._id || req.session.user.id;
    
@@ -269,21 +265,18 @@ const userId = req.user?._id || req.session.user.id;
       userData = await User.findById(userId);
     }
     
+    
     else {
       return res.redirect('/login');
     }
-     const categories = await Category.find({status:"active"})
 
+   const categoryData = await Category.find({status:"active"})
+   
+   const activeCategoryNames = categoryData.map(cat => cat.name);
 
-    const newArrivals = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
-        { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },
-        { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#314b5c' },
-        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }];
-    const bestSellers = [ { name: 'Shirts', image: '/images/Gemini_Generated_Image_1f58yn1f58yn1f58.png', bgColor: '#1c2e2a' },
-        { name: 'T-Shirts', image: '/images/Gemini_Generated_Image_x08oidx08oidx08o.png', bgColor: '#2a423d' },
-        { name: 'Pants', image: '/images/Gemini_Generated_Image_mwmaq9mwmaq9mwma.png', bgColor: '#314b5c' },
-        { name: 'Shorts', image: '/images/Gemini_Generated_Image_bofzy3bofzy3bofz.png', bgColor: '#ffffff' }];
+    const newArrivals = await Product.find({status:"Active",totalStock:{$gt:0},category:{$in:activeCategoryNames}}).limit(4)
 
+    const bestSellers = await Product.find({status:"Active",totalStock:{$gt:0},category:{$in:activeCategoryNames}}).limit(4)
     console.log(req.session.user)
     
    return res.render('user/loggedinHomepage',{

@@ -15,9 +15,13 @@
     
         <% categories.forEach(category => { %>
   <div class="category-card">
-    <h3><%= category.name %></h3>
+   <a href="/shop/<%= category.name%>">
+
+      <h3><%= category.name %></h3>
+    </a>
   </div>
 <% }) %>
+
 
 
         <div class="header-icons">
@@ -55,7 +59,7 @@
                 <% newArrivals.forEach(product => { %>
                     <div class="product-card">
                         <div class="product-img-box">
-                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                                <a href="/shop/details/<%=product._id%>"><img src="/uploads/<%= product.images[0] %>" alt="<%= product.name %>"></a> 
                         </div>
                         <p><%= product.name %></p>
                     </div>
@@ -69,7 +73,7 @@
                 <% bestSellers.forEach(product => { %>
                     <div class="product-card">
                         <div class="product-img-box">
-                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                           <a href="/shop/details/<%=product._id%>"><img src="/uploads/<%= product.images[0] %>" alt="<%= product.name %>"></a> 
                         </div>
                         <p><%= product.name %></p>
                     </div>

@@ -4,6 +4,7 @@ import userController from '../../controllers/user/usercontroller.js'
 import {userAuth}  from '../../middlewares/userAuth.js'
 import { isLoggedIn } from '../../middlewares/isLoggedin.js';
 import upload from '../../config/multer.js'
+import productController from '../../controllers/user/products-list.js';
 
 
 
@@ -47,14 +48,10 @@ router.get('/profile/adresses/add',userAuth,userController.loadAddAddressPage)
 router.post('/profile/adresses/add',userAuth,userController.Addaddress)
 router.get('/profile/adresses/edit/:id',userAuth,userController.LoadeditAdressPage)
 router.put('/profile/adresses/:id',userAuth,userController.updateAdress)
-
 router.delete('/profile/adresses/:id',userAuth,userController.deleteAdress)
-
 router.post('/profile/adresses/set-default/:id',userAuth,userController.setDefaultAdress)
-
-router.get('/test', (req, res) => {  
-  res.send('User routes working'); 
-});   
+router.get('/shop/:category',userAuth,productController.loadShirts)
+router.get('/shop/details/:id',userAuth,productController.loadProductDetails)
   
 
   

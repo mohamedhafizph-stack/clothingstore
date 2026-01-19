@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wearify Admin - Manage Stock</title>
+    <style>
+        /* FULL UNIFIED CSS FOR MANAGE STOCK */
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --border: #30363d;
+            --text-main: #e6edf3;
+            --blue-primary: #1f6feb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); padding: 40px; }
+
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        /* Product Info Card */
+        .product-brief {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .product-brief img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
+
+        /* Stock Table */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th { text-align: left; padding: 12px; color: #8b949e; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); }
+
+        /* Add Stock Form */
+        .add-stock-form {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; align-items: end; }
+        
+        input, select {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            padding: 10px;
+            color: #fff;
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+
+        .btn-add { background: var(--blue-primary); color: #fff; border: none; padding: 11px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-back { color: #8b949e; text-decoration: none; font-size: 14px; }
+        .btn-delete { color: #f85149; background: none; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Manage Stock</h1>
+            <a href="/admin/products" class="btn-back">← Back to Products</a>
+        </div>
+
+        <div class="product-brief">
+            <img src="/uploads/<%= product.images[0] %>" alt="">
+            <div>
+                <h2><%= product.name %></h2>
+                <p style="color: #8b949e;">Category: <%= product.category %> | Price: $<%= product.price %></p>
+            </div>
+        </div>
+
+        <h3>Current Inventory</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (product.variants && product.variants.length > 0) { %>
+                    <% product.variants.forEach(variant => { %>
+                        <tr>
+                            <td><strong><%= variant.size %></strong></td>
+                            <td><%= variant.stock %> units</td>
+                            <td>
+                                <form action="/admin/products/stock/<%= product._id %>/<%= variant._id %>?_method=PATCH" method="POST">
+    <button type="submit" class="btn-delete" onclick="return confirm('Remove this size variant?')">
+        Remove
+    </button>
+</form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr><td colspan="3" style="text-align: center; padding: 20px;">No stock added yet.</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+
+        <div class="add-stock-form">
+            <h3>Add New Size/Stock</h3>
+            <form action="/admin/products/manage-stock/<%= product._id %>" method="POST">
+                <div class="form-row">
+                    <div style="display: flex; flex-direction: column;">
+                        <label>Size</label>
+                        <select name="size" required>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <label>Quantity</label>
+                        <input type="number" name="stock" placeholder="0" min="0" required>
+                    </div>
+                    <button type="submit" class="btn-add">Add Stock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

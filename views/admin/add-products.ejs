@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wearify Admin - Detailed Add Product</title>
+    <link rel="stylesheet" href="/css/admin-common.css">
+    <link rel="stylesheet" href="/css/add-products.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+</head>
+<body class="admin-body">
+
+<div class="admin-layout">
+    <aside class="sidebar">
+        <div class="brand">Wearify Admin</div>
+        </aside>
+
+    <main class="main-content">
+        <h1>Add New Product</h1>
+
+        <form action="/admin/products/add" method="POST" enctype="multipart/form-data" id="productForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" name="name" required placeholder="e.g. Classic Black Hoodie">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" required>
+                        <option value="">Select category</option>
+                        <% categories.forEach(cat => { %>
+                            <option value="<%= cat.name %>"><%= cat.name %></option>
+                        <% }) %>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Price ($)</label>
+                    <input type="number" name="price" step="0.01" required placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Discount (%)</label>
+                    <input type="number" name="discount" placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Product Gallery (Square Aspect Ratio)</label>
+                <div class="image-upload-grid">
+                    
+                    <div class="upload-slot main-slot" onclick="document.getElementById('input0').click()">
+                        <input type="file" name="images" id="input0" accept="image/*" hidden onchange="initCropper(this, 0)">
+                        <div class="slot-content" id="content0">
+                            <span class="upload-icon">📸</span>
+                            <p>Main Photo</p>
+                        </div>
+                        <img src="" id="preview0" class="preview-img">
+                        <button type="button" class="remove-btn" id="remove0" onclick="removeImage(event, 0)">×</button>
+                    </div>
+
+                    <div class="sub-slots-container">
+                        <% for(let i=1; i<=3; i++) { %>
+                        <div class="upload-slot sub-slot" onclick="document.getElementById('input<%= i %>').click()">
+                            <input type="file" name="images" id="input<%= i %>" accept="image/*" hidden onchange="initCropper(this, <%= i %>)">
+                            <div class="slot-content" id="content<%= i %>">
+                                <span>+</span>
+                            </div>
+                            <img src="" id="preview<%= i %>" class="preview-img">
+                            <button type="button" class="remove-btn" id="remove<%= i %>" onclick="removeImage(event, <%= i %>)">×</button>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-save" type="submit">Publish Product</button>
+                <button class="btn-cancel" type="button" onclick="history.back()">Discard</button>
+            </div>
+        </form>
+    </main>
+</div>
+
+<div id="cropperModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>Adjust Image</h3>
+        <div class="crop-viewport">
+            <img id="imageToCrop" src="">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="button" class="btn-primary" id="saveCrop">Crop & Use</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script>
+let cropper;
+let currentIdx;
+
+function initCropper(input, index) {
+    if (input.files && input.files[0]) {
+        currentIdx = index;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            document.getElementById('imageToCrop').src = e.target.result;
+            document.getElementById('cropperModal').style.display = 'flex';
+            if(cropper) cropper.destroy();
+            cropper = new Cropper(document.getElementById('imageToCrop'), {
+                aspectRatio: 1,
+                viewMode: 1
+            });
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+document.getElementById('saveCrop').addEventListener('click', () => {
+    const canvas = cropper.getCroppedCanvas({ width: 600, height: 600 });
+    canvas.toBlob((blob) => {
+        const file = new File([blob], `img-${currentIdx}.jpg`, { type: 'image/jpeg' });
+        
+        // Update specific input
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        document.getElementById(`input${currentIdx}`).files = dataTransfer.files;
+
+        // Update UI
+        document.getElementById(`preview${currentIdx}`).src = URL.createObjectURL(blob);
+        document.getElementById(`preview${currentIdx}`).style.display = 'block';
+        document.getElementById(`content${currentIdx}`).style.display = 'none';
+        document.getElementById(`remove${currentIdx}`).style.display = 'flex';
+        
+        closeModal();
+    }, 'image/jpeg');
+});
+
+function removeImage(e, idx) {
+    e.stopPropagation();
+    document.getElementById(`input${idx}`).value = "";
+    document.getElementById(`preview${idx}`).style.display = 'none';
+    document.getElementById(`content${idx}`).style.display = 'block';
+    document.getElementById(`remove${idx}`).style.display = 'none';
+}
+
+function closeModal() { document.getElementById('cropperModal').style.display = 'none'; }
+</script>
+</body>
+</html>

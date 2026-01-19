@@ -5,7 +5,8 @@ import adminAuth from '../middlewares/adminAuth.js'
 import user from '../controllers/admin/customer.js'
 import { isLoggedIn } from '../middlewares/isloggedinAdmin.js';
 import categoryController from '../controllers/admin/categoryController.js';
-
+import productController from '../controllers/admin/productController.js';
+import { uploadProductImages } from '../config/productMulter.js';
 
 
 router.get('/login',isLoggedIn,authController.loadLoginPage);
@@ -39,6 +40,15 @@ router.get('/categories/edit/:id',adminAuth,categoryController.loadeditCategory)
 router.patch('/categories/edit/:id',adminAuth,categoryController.editCategory)
 router.patch('/categories/block/:id',adminAuth,categoryController.blockCategory)
 router.patch('/categories/unblock/:id',adminAuth,categoryController.unblockCategory)
+router.get('/products',adminAuth,productController.loadProduct)
+router.get('/products/add',adminAuth,productController.loadaddProduct)
+router.post('/products/add',adminAuth,uploadProductImages,productController.addProduct)
+router.get('/products/manage-stock/:id',adminAuth,productController.getManageStock);
+router.post('/products/manage-stock/:id',adminAuth,productController.updateStock);
+router.get('/products/edit/:id',adminAuth,uploadProductImages,productController.loadeditProduct)
+router.patch('/products/edit/:id',adminAuth,uploadProductImages,productController.editProduct)
+router.patch('/products/status/:id',adminAuth,productController.productStatus)
+router.patch('/products/stock/:productId/:variantId',adminAuth,productController.removeStock)
 
  
 router.get('/logout',(req,res)=>{
@@ -47,4 +57,4 @@ router.get('/logout',(req,res)=>{
     })
 })
  
-export default router
+export default router 

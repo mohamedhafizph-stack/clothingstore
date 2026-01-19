@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify Admin - Products</title>
+    <link rel="stylesheet" href="/css/product-managment.css">
+    
+</head>
+<body class="admin-body">
+
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="brand">Wearify Admin</div>
+            <nav class="side-nav">
+                <a href="/admin/dashboard" class="nav-item">Dashboard</a>
+                <a href="/admin/orders" class="nav-item">Orders</a>
+                <a href="/admin/products" class="nav-item active">Products</a>
+                <a href="/admin/categories" class="nav-item">Categories</a>
+                <a href="/admin/users" class="nav-item">Users</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="breadcrumb">Wearify Admin</div>
+                <a href="/admin/products/add" class="btn-add">Add Product</a>
+            </header>
+
+            <section class="content-card">
+                <h1>Products</h1>
+
+               <div class="table-tools">
+    <div class="search-box">
+        <input type="text" 
+               id="productSearch" 
+               placeholder="Search products..." 
+               value="<%= searchQuery || '' %>" 
+               autocomplete="off">
+    </div>
+
+    <form action="/admin/products" method="GET" id="filterForm">
+        <select name="category" id="categoryFilter" class="btn-filter">
+            <option value="">All Categories</option>
+            <% categories.forEach(cat => { %>
+                <option value="<%= cat.name %>" <%= selectedCategory === cat.name ? 'selected' : '' %>>
+                    <%= cat.name %>
+                </option>
+            <% }) %>
+        </select>
+    </form>
+</div>
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Total Stock</th>
+                            <th>Status</th>
+                            <th>Manage Stocks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (products && products.length > 0) { %>
+                            <% products.forEach(product => { %>
+                                <tr>
+                                    <td>
+                                        <div class="prod-img-box">
+                                           <img src="/uploads/<%= product.images[0] %>" alt="<%= product.name %>">
+                                        </div>
+                                    </td>
+                                    <td><%= product.name %></td>
+                                    <td><%= product.category %></td>
+                                    <td>$<%= product.price %></td>
+                                    <td>
+                                        <span class="stock-badge <%= product.totalStock > 0 ? product.totalStock : 'out-of-stock' %>">
+                                            <%= product.totalStock > 0 ?product.totalStock : 'Out of Stock' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="status-pill <%= product.status.toLowerCase() %>">
+                                            <%= product.status %>
+                                        </span>
+                                    </td>
+                                    <td class="action-btns">
+    
+    <a href="/admin/products/manage-stock/<%= product._id %>" class="btn-stock" style="color: #1f6feb;">Manage Stock</a> 
+   
+        
+    </form>
+</td>
+                                    <td class="action-btns">
+    <a href="/admin/products/edit/<%= product._id %>" class="btn-edit-text">Edit</a>
+    <span class="separator">|</span>
+    
+    <form action="/admin/products/status/<%= product._id %>?_method=PATCH" method="POST" style="display:inline;">
+        <% if (product.status === 'Active') { %>
+            <button type="submit" class="btn-status-toggle deactivate" onclick="return confirm('Are you sure you want to deactivate this product?')">
+                Deactivate
+            </button>
+        <% } else { %>
+            <button type="submit" class="btn-status-toggle activate" onclick="return confirm('Are you sure you want to activate this product?')">
+                Activate
+            </button>
+        <% } %>
+    </form>
+</td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="empty-row">No products found.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+    <% if (currentPage > 1) { %>
+        <a href="?page=<%= currentPage - 1 %><%= searchQuery ? '&search='+searchQuery : '' %><%= selectedCategory ? '&category='+selectedCategory : '' %>" class="pg-arrow">&lt;</a>
+    <% } %>
+
+    <% for(let i = 1; i <= totalPages; i++) { %>
+        <a href="?page=<%= i %><%= searchQuery ? '&search='+searchQuery : '' %><%= selectedCategory ? '&category='+selectedCategory : '' %>" 
+           class="pg-num <%= currentPage === i ? 'active' : '' %>">
+            <%= i %>
+        </a>
+    <% } %>
+
+    <% if (currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %><%= searchQuery ? '&search='+searchQuery : '' %><%= selectedCategory ? '&category='+selectedCategory : '' %>" class="pg-arrow">&gt;</a>
+    <% } %>
+</div>
+            </section>
+        </main>
+    </div>
+<script>
+    // Function to handle the redirection with all current filters
+function applyFilters() {
+    const searchVal = document.getElementById('productSearch').value;
+    const categoryVal = document.getElementById('categoryFilter').value;
+    
+    const params = new URLSearchParams();
+    
+    if (searchVal) params.append('search', searchVal);
+    if (categoryVal) params.append('category', categoryVal);
+    
+    // Redirect to the same page with updated query string
+    window.location.href = `/admin/products?${params.toString()}`;
+}
+
+// The Debounce Wrapper
+function debounce(func, timeout = 500) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
+
+// Initialize the debounced search
+const processChange = debounce(() => applyFilters());
+
+// Event Listeners
+document.getElementById('productSearch').addEventListener('keyup', processChange);
+
+document.getElementById('categoryFilter').addEventListener('change', () => {
+    // Category change should probably be instant, not debounced
+    applyFilters();
+});
+</script>
+<script>
+    window.onload = () => {
+    const searchInput = document.getElementById('productSearch');
+    if (searchInput.value !== "") {
+        // Puts focus back and moves cursor to the end
+        searchInput.focus();
+        const val = searchInput.value;
+        searchInput.value = '';
+        searchInput.value = val;
+    }
+};
+</script>
+</body>
+</html>

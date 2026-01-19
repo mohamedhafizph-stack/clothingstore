@@ -1,0 +1,236 @@
+/* --- Root Variables & Theme --- */
+:root {
+    --bg-dark: #0d1117;
+    --bg-card: #161b22;
+    --border: #30363d;
+    --text-main: #e6edf3;
+    --text-muted: #8b949e;
+    --blue-btn: #1f6feb;
+    --blue-hover: #388bfd;
+    --danger: #f85149;
+    --input-bg: #0d1117;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+body.admin-body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+}
+
+/* --- Layout --- */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background-color: var(--bg-dark);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    height: 100vh;
+    padding: 24px 0;
+}
+
+.brand {
+    font-size: 20px;
+    font-weight: 700;
+    padding: 0 24px 30px;
+    color: white;
+}
+
+.side-nav .nav-item {
+    display: block;
+    padding: 12px 24px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.side-nav .nav-item:hover, .side-nav .nav-item.active {
+    color: white;
+    background: #21262d;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 40px 60px;
+}
+
+/* --- Form Elements --- */
+.edit-section h1 {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    max-width: 700px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-main);
+}
+
+input, select, textarea {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: white;
+    font-size: 14px;
+}
+
+input:focus { border-color: var(--blue-btn); outline: none; }
+
+/* --- Detailed Image Grid --- */
+.images-section {
+    margin: 30px 0;
+}
+
+.image-upload-grid {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.upload-slot {
+    border: 2px dashed var(--border);
+    background: var(--bg-card);
+    border-radius: 8px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+    overflow: visible; /* Allows remove button to pop out */
+}
+
+.upload-slot:hover {
+    border-color: var(--blue-btn);
+}
+
+.main-slot {
+    width: 260px;
+    height: 260px;
+}
+
+.sub-slots-container {
+    display: grid;
+    grid-template-columns: repeat(2, 120px);
+    gap: 20px;
+}
+
+.sub-slot {
+    width: 120px;
+    height: 120px;
+}
+
+.slot-content {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.upload-icon {
+    font-size: 24px;
+    display: block;
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.remove-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none; /* Shown via JS */
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    z-index: 5;
+}
+
+/* --- Cropper Modal --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-card {
+    background: var(--bg-card);
+    width: 90%;
+    max-width: 500px;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.crop-viewport {
+    width: 100%;
+    height: 400px;
+    background: #000;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* --- Buttons --- */
+.btn-save, .btn-primary {
+    background: var(--blue-btn);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-cancel, .btn-secondary {
+    background: #21262d;
+    color: white;
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-save:hover { background: var(--blue-hover); }

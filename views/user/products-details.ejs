@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wearify - <%= product.productName %></title>
+  <link rel="stylesheet" href="/css/product-details.css">
+</head>
+
+<body class="details-page">
+
+<header class="shop-header">
+  <div class="logo">Wearify</div>
+  <nav class="nav-links">
+    <a href="/products?category=Shirts">Shirts</a>
+    <a href="/products?category=T-Shirts">T-Shirts</a>
+    <a href="/products?category=Pants">Pants</a>
+    <a href="/products?category=Shorts">Shorts</a>
+  </nav>
+</header>
+
+<main class="container">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a href="/">Men</a> /
+    <a href="/products?category=<%= product.category?.name || '' %>">
+      <%= product.category?.name || 'Products' %>
+    </a>
+  </nav>
+
+  <!-- PRODUCT MAIN -->
+  <section class="product-main">
+
+    <h1><%= product.name %></h1>
+
+    <!-- IMAGES -->
+<div class="image-gallery">
+
+  <!-- MAIN IMAGE -->
+  <div class="main-image">
+    <img 
+      id="mainProductImage"
+      src="/uploads/<%= product.images?.[0] %>"
+      alt="<%= product.name %>"
+    >
+  </div>
+
+  <!-- THUMBNAILS -->
+  <div class="thumbnail-list">
+    <% (product.images || []).forEach((img, index) => { %>
+      <img
+        src="/uploads/<%= img %>"
+        class="thumbnail <%= index === 0 ? 'active' : '' %>"
+        onclick="changeImage('/uploads/<%= img %>', this)"
+      >
+    <% }) %>
+  </div>
+
+</div>
+
+
+    <!-- SUMMARY -->
+    <div class="product-summary">
+
+      <p class="description"><%= product.description || '' %></p>
+      <h2 class="price">₹<%= product.price %></h2>
+
+      <!-- SIZE OPTIONS -->
+     <div class="size-options">
+  <% (product.variants || []).forEach(v => { %>
+    <button
+  type="button"
+  class="size-btn <%= v.quantity === 0 ? 'disabled' : '' %>"
+  data-size="<%= v.size %>"
+  data-stock="<%= v.quantity %>"
+  onclick="selectSize(this)"
+  <%= v.quantity === 0 ? 'disabled' : '' %>
+>
+  <%= v.size %>
+</button>
+
+  <% }) %>
+</div>
+
+
+      <!-- COLORS -->
+      <% if ((product.colors || []).length > 0) { %>
+        <div class="color-options">
+          <% product.colors.forEach(color => { %>
+            <span class="color-circle" style="background-color:<%= color %>"></span>
+          <% }) %>
+        </div>
+      <% } %>
+
+      <!-- ACTIONS -->
+      <div class="purchase-actions">
+        <div class="quantity-picker">
+  <button id="minusBtn" onclick="updateQty(-1)">−</button>
+  <input type="number" id="qty" value="1" readonly>
+  <button id="plusBtn" onclick="updateQty(1)">+</button>
+</div>
+
+
+        <button class="btn-buy">Buy Now</button>
+        <button class="btn-cart">Add to Cart</button>
+        <button class="btn-wishlist">❤️ Wishlist</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews">
+    <h3>Customer Reviews</h3>
+
+    <p><%= (product.reviews || []).length %> reviews</p>
+
+    <% if ((product.reviews || []).length === 0) { %>
+      <p class="no-reviews">No reviews yet</p>
+    <% } %>
+
+    <% (product.reviews || []).forEach(review => { %>
+      <div class="review">
+        <p><strong><%= review.user?.name || 'Anonymous' %></strong></p>
+        <p>Rating: <%= review.rating || 0 %> ⭐</p>
+        <p><%= review.comment || '' %></p>
+      </div>
+    <% }) %>
+  </section>
+
+  <!-- RELATED PRODUCTS -->
+  <% if ((relatedProducts || []).length > 0) { %>
+    <section class="related">
+      <h3>Related Products</h3>
+      <div class="related-grid">
+        <% relatedProducts.forEach(item => { %>
+          <div class="related-card">
+            <img src="/uploads/<%= item.images?.[0] %>" alt="image">
+            <h4><%= item.productName %></h4>
+            <p>₹<%= item.price %></p>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+</main>
+
+<footer></footer>
+
+<script>
+  function updateQty(val) {
+    const input = document.getElementById('qty');
+    let current = parseInt(input.value);
+    if (current + val >= 1) input.value = current + val;
+  }
+
+  function changeImage(src, el) {
+    document.getElementById('mainProductImage').src = src;
+
+    document.querySelectorAll('.thumbnail').forEach(t =>
+      t.classList.remove('active')
+    );
+
+    el.classList.add('active');
+  }
+</script>
+<script>
+  let selectedStock = 0;
+
+  function selectSize(btn) {
+    // remove active from all
+    document.querySelectorAll('.size-btn').forEach(b => {
+      b.classList.remove('active');
+    });
+
+    // set active
+    btn.classList.add('active');
+
+    // get stock from button
+    selectedStock = parseInt(btn.dataset.stock);
+
+    // reset quantity
+    document.getElementById('qty').value = 1;
+
+    updateButtons();
+  }
+
+  function updateQty(change) {
+    const input = document.getElementById('qty');
+    let value = parseInt(input.value);
+
+    value += change;
+
+    if (value < 1) value = 1;
+    if (value > selectedStock) value = selectedStock;
+
+    input.value = value;
+    updateButtons();
+  }
+
+  function updateButtons() {
+    const qty = parseInt(document.getElementById('qty').value);
+    const plusBtn = document.getElementById('plusBtn');
+    const minusBtn = document.getElementById('minusBtn');
+
+    plusBtn.disabled = qty >= selectedStock;
+    minusBtn.disabled = qty <= 1;
+  }
+</script>
+
+
+</body>
+</html>

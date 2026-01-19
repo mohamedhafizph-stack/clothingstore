@@ -37,7 +37,7 @@
                 <% newArrivals.forEach(product => { %>
                     <div class="product-card">
                         <div class="img-container">
-                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                            <img src="/uploads/<%=product.images[0] %>" alt="<%= product.name %>">
                         </div>
                         <p><%= product.name %></p>
                     </div>
@@ -51,7 +51,7 @@
                 <% bestSellers.forEach(product => { %>
                     <div class="product-card">
                         <div class="img-container">
-                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                            <img src="/uploads/<%= product.images[0] %>" alt="<%= product.name %>">
                         </div>
                         <p><%= product.name %></p>
                     </div>
