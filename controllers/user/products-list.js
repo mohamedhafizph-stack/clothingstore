@@ -94,8 +94,9 @@ const loadProductDetails = async (req,res) => {
     try{
         const {id}= req.params
         const product = await Product.findById(id)
+        const name = product.name
         const cat = product.category
-        const relatedProducts = await Product.find({status:"Active",category:cat}).limit(3)
+        const relatedProducts = await Product.find({status:"Active",category:cat,name:{$ne:name}}).limit(3)
      res.render('user/products-details',{product,relatedProducts})
     }catch(err){
         console.log(err)

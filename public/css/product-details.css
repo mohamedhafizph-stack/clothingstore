@@ -248,8 +248,8 @@ body.details-page {
 }
 
 .related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  grid-template-columns: repeat( minmax(200px, 1fr));
   gap: 20px;
 }
 
