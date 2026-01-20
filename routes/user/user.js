@@ -5,6 +5,7 @@ import {userAuth}  from '../../middlewares/userAuth.js'
 import { isLoggedIn } from '../../middlewares/isLoggedin.js';
 import {uploadProfilePic} from '../../config/multer.js'
 import productController from '../../controllers/user/products-list.js';
+import cartController from '../../controllers/user/cart-conroller.js';
 
 
 
@@ -52,6 +53,7 @@ router.delete('/profile/adresses/:id',userAuth,userController.deleteAdress)
 router.post('/profile/adresses/set-default/:id',userAuth,userController.setDefaultAdress)
 router.get('/shop/:category',userAuth,productController.loadShirts)
 router.get('/shop/details/:id',userAuth,productController.loadProductDetails)
+router.post('/shop/details/:product_id',userAuth,cartController.addtoCart)
   
 
   

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wearify - <%= product.productName %></title>
   <link rel="stylesheet" href="/css/product-details.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="details-page">
@@ -71,11 +72,11 @@
   <% (product.variants || []).forEach(v => { %>
     <button
   type="button"
-  class="size-btn <%= v.quantity === 0 ? 'disabled' : '' %>"
+  class="size-btn <%= v.stock === 0 ? 'disabled' : '' %>"
   data-size="<%= v.size %>"
-  data-stock="<%= v.quantity %>"
+  data-stock="<%= v.stock %>"
   onclick="selectSize(this)"
-  <%= v.quantity === 0 ? 'disabled' : '' %>
+  <%= v.stock === 0 ? 'disabled' : '' %>
 >
   <%= v.size %>
 </button>
@@ -170,22 +171,17 @@
   let selectedStock = 0;
 
   function selectSize(btn) {
-    // remove active from all
-    document.querySelectorAll('.size-btn').forEach(b => {
-      b.classList.remove('active');
+    // ONLY target buttons inside the size-options container
+    const sizeContainer = document.querySelector('.size-options');
+    sizeContainer.querySelectorAll('.size-btn').forEach(b => {
+        b.classList.remove('active');
     });
-
-    // set active
     btn.classList.add('active');
-
-    // get stock from button
     selectedStock = parseInt(btn.dataset.stock);
-
-    // reset quantity
     document.getElementById('qty').value = 1;
-
     updateButtons();
-  }
+    // This logic ensures '.color-circle' elements are never touched
+}
 
   function updateQty(change) {
     const input = document.getElementById('qty');
@@ -208,6 +204,69 @@
     plusBtn.disabled = qty >= selectedStock;
     minusBtn.disabled = qty <= 1;
   }
+document.querySelector('.btn-cart').addEventListener('click', async () => {
+    const activeSizeBtn = document.querySelector('.size-btn.active');
+    
+    // 1. Alert if no size is selected
+    if (!activeSizeBtn) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Select Size',
+            text: 'Please choose a size before adding to cart.',
+            background: '#161b22',
+            color: '#fff',
+            confirmButtonColor: '#2f81f7'
+        });
+        return;
+    }
+
+    const productId = "<%= product._id %>";
+    const size = activeSizeBtn.dataset.size;
+    const quantity = document.getElementById('qty').value;
+
+    try {
+        const response = await fetch(`/shop/details/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, size, quantity })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // 2. Success Message
+            Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart!',
+                text: data.message,
+                background: '#161b22',
+                color: '#fff',
+                showConfirmButton: false,
+                timer: 2000,
+                iconColor: '#2ea043'
+            });
+        } else {
+            // 3. Server Error Message (e.g., Out of Stock)
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message,
+                background: '#161b22',
+                color: '#fff',
+                confirmButtonColor: '#2f81f7'
+            });
+        }
+    } catch (error) {
+        // 4. Connection Error
+        Swal.fire({
+            icon: 'error',
+            title: 'Connection Failed',
+            text: 'Could not connect to the server. Please try again later.',
+            background: '#161b22',
+            color: '#fff'
+        });
+    }
+});
 </script>
 
 

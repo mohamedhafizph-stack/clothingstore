@@ -403,3 +403,30 @@ body.details-page {
   border-radius: 4px;
   display: block;
 }
+
+/* Specific styling for active size */
+/* Update this in your product-details.css */
+.size-btn.active {
+    background-color: var(--blue) !important;
+    border-color: var(--accent-blue) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 10px rgba(47, 129, 247, 0.4);
+}
+
+/* Ensure color circles stay visible regardless of size selection */
+.color-options {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 10px 0;
+}
+
+.color-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--bg-dark);
+    outline: 1px solid var(--border-color);
+    display: inline-block; /* Ensure they don't collapse */
+}
