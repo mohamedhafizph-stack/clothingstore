@@ -68,7 +68,7 @@ if (req.query.sizes) {
         sortQuery.popularity = -1;
     }
 
-    
+    const categories = await Category.find()
     const products = await Product.find(query).populate('category').sort(sortQuery).skip(skip).limit(limit);
 
       console.log(products)
@@ -77,6 +77,7 @@ if (req.query.sizes) {
     const totalPages = Math.ceil(totalProducts / limit);
 
     res.render('user/products', {
+      categories,
       products,
       currentPage: page,
       totalPages,

@@ -10,12 +10,14 @@
 
     <header class="shop-header">
         <div class="logo">Wearify</div>
-        <nav class="nav-links">
-            <a href="#">Shirts</a>
-            <a href="#">T-Shirts</a>
-            <a href="#">Pants</a>
-            <a href="#">Shorts</a>
-        </nav>
+         <% categories.forEach(category => { %>
+  <div class="category-card">
+   <a href="/shop/<%= category.name%>">
+
+      <h3><%= category.name %></h3>
+    </a>
+  </div>
+<% }) %>
         <div class="header-tools">
             <div class="search-bar">
                 <input type="text" id="shopSearch" placeholder="Search products..." value="<%= selectedFilters.search || '' %>">
