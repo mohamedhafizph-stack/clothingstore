@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const cartItemSchema = new mongoose.Schema({
   product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
   size: { type: String, enum: ["S", "M", "L", "XL", "XXL"], required: true },
-  quantity: { type: Number, required: true, min: 1 }
+  quantity: { type: Number, required: true, min: 1 },
+  price: { type: Number, required: true }
 });
 
 const cartSchema = new mongoose.Schema({

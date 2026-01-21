@@ -3,12 +3,10 @@ import Category from "../../model/category.js";
 import Cart from "../../model/cart.js";
 import User from "../../model/User.js";
 
-
-
  const addtoCart = async (req, res) => {
     try {
         const { productId, size, quantity } = req.body;
-        const userId = req.session.user||req.user;
+        const userId = req.session.user?._id||req.user;
         const requestedQty = parseInt(quantity);
         const MAX_LIMIT = 4;
 
@@ -61,6 +59,95 @@ import User from "../../model/User.js";
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+const loadCart = async (req, res) => {
+    try {
+        const userId = req.session.user?._id|| req.user;
 
-const cartController = {addtoCart}
+        if (!userId) {
+            return res.redirect('/login');
+        }
+
+        
+        let cart = await Cart.findOne({ user: userId }).populate('items.product');
+
+       
+        if (!cart) {
+            return res.render('user/Cart', { cart: { items: [], totalPrice: 0 } });
+        }
+
+        const subtotal = cart.items.reduce((acc, item) => {
+            return acc + (item.price * item.quantity);
+        }, 0);
+
+        
+        cart.totalPrice = subtotal;
+
+        res.render('user/Cart', { cart });
+        
+
+    } catch (err) {
+        console.error("Load Cart Error:", err);
+        res.status(500).send("Internal Server Error");
+    }
+}
+ const updateCartQuantity = async (req, res) => {
+    try {
+        const { productId, size, change } = req.body;
+        const userId = req.session.user?._id||req.user;
+
+        const [cart, product] = await Promise.all([
+            Cart.findOne({ user: userId }),
+            Product.findById(productId)
+        ]);
+
+        if (!cart || !product) {
+            return res.status(404).json({ success: false, message: "Resource not found" });
+        }
+
+        const sizeVariant = product.variants.find(v => v.size === size);
+        
+        if (!sizeVariant) {
+            return res.status(400).json({ success: false, message: "Size not found for this product." });
+        }
+
+        const availableStock = sizeVariant.stock;
+
+        const itemIndex = cart.items.findIndex(
+            item => item.product.toString() === productId && item.size === size
+        );
+
+        if (itemIndex > -1) {
+            const currentQty = Number(cart.items[itemIndex].quantity);
+            const newQuantity = currentQty + Number(change);
+
+            if (change > 0) {
+                if (newQuantity > availableStock) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: `Only ${availableStock} items left in size ${size}.` 
+                    });
+                }
+                if (newQuantity > 4) {
+                    return res.status(400).json({ success: false, message: "Maximum limit is 4 units." });
+                }
+            }
+
+            if (newQuantity <= 0) {
+                cart.items.splice(itemIndex, 1);
+            } else {
+                cart.items[itemIndex].quantity = newQuantity;
+            }
+
+            cart.totalPrice = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+            await cart.save();
+            return res.json({ success: true });
+        }
+    } catch (error) {
+        console.error("Update Error:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
+const cartController = {addtoCart,loadCart,updateCartQuantity}
 export default cartController

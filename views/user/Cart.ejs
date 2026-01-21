@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify - Your Cart</title>
+    <link rel="stylesheet" href="/css/cart.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="cart-page">
+
+<header class="shop-header">
+    <div class="header-left">
+        <div class="logo">Wearify</div>
+        <nav class="nav-links">
+            <a href="/products?category=Shirts">Shirts</a>
+            <a href="/products?category=T-Shirts">T-Shirts</a>
+            <a href="/products?category=Pants">Pants</a>
+            <a href="/products?category=Shorts">Shorts</a>
+        </nav>
+    </div>
+    <div class="header-right">
+        <div class="search-bar">
+            <i data-lucide="search"></i>
+            <input type="text" placeholder="Search">
+        </div>
+        <button class="icon-btn"><i data-lucide="heart"></i></button>
+        <button class="icon-btn"><i data-lucide="shopping-bag"></i></button>
+    </div>
+</header>
+
+<main class="container">
+    <h1 class="page-title">Your Cart</h1>
+
+    <div class="cart-layout">
+        
+        <section class="cart-items">
+    <% if (cart && cart.items.length > 0) { %>
+        <% cart.items.forEach(item => { %>
+            <div class="item-card">
+                
+                <div class="item-image">
+                    <% if (item.product.images && item.product.images.length > 0) { %>
+                        <img src="<%= item.product.images[0] %>" 
+                             alt="<%= item.product.name %>" 
+                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                    <% } else { %>
+                        <div style="width: 80px; height: 80px; background: #1e293b; border-radius: 8px;"></div>
+                    <% } %>
+                </div>
+
+                <div class="item-info">
+                    <h3><%= item.product.name %></h3>
+                    <p class="item-meta">
+                        Size: <strong><%= item.size %></strong> | 
+                        Price: <strong>₹<%= item.product.price %></strong>
+                    </p>
+                </div>
+
+               <div class="item-actions">
+    <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty('<%= item.product._id %>', '<%= item.size %>', -1)">-</button>
+        <span class="qty-number"><%= item.quantity %></span>
+        <button class="qty-btn" onclick="changeQty('<%= item.product._id %>', '<%= item.size %>', 1)">+</button>
+    </div>
+    <button class="delete-btn" onclick="changeQty('<%= item.product._id %>', '<%= item.size %>', -<%= item.quantity %>)">
+        <i data-lucide="trash-2"></i>
+    </button>
+</div>
+
+            </div>
+            <% }) %>
+    <% } else { %>
+        <div class="empty-cart-container">
+            <p class="empty-msg">Your cart is empty.</p>
+            <a href="/shop" class="continue-link">Go to Shop</a>
+        </div>
+    <% } %>
+</section>
+        <aside class="order-summary">
+            <h2>Order Summary</h2>
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹<%= cart ? cart.totalPrice : 0 %></span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span class="free">Free</span>
+            </div>
+            <div class="summary-row">
+                
+                
+            </div>
+            <hr>
+            <div class="summary-row total">
+                <span>Total</span>
+                 <span>₹<%= cart ? cart.totalPrice : 0 %></span>
+            </div>
+
+            <button class="btn-checkout">Proceed to Checkout</button>
+            <a href="/home" class="continue-link">Continue Shopping</a>
+        </aside>
+    </div>
+</main>
+
+<script>
+    lucide.createIcons(); 
+    
+    async function changeQty(productId, size, change) {
+        
+    }
+    async function changeQty(productId, size, change) {
+    try {
+        const response = await fetch('/home/cart/update', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, size, change })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+           
+            window.location.reload(); 
+        } else {
+           
+            Swal.fire({
+                icon: 'warning',
+                title: 'Note',
+                text: data.message,
+                background: '#161b22',
+                color: '#fff'
+            });
+        }
+    } catch (error) {
+        console.error("Error updating quantity:", error);
+    }
+}
+</script>
+</body>
+</html>

@@ -54,6 +54,8 @@ router.post('/profile/adresses/set-default/:id',userAuth,userController.setDefau
 router.get('/shop/:category',userAuth,productController.loadShirts)
 router.get('/shop/details/:id',userAuth,productController.loadProductDetails)
 router.post('/shop/details/:product_id',userAuth,cartController.addtoCart)
+router.get('/home/cart',userAuth,cartController.loadCart)
+router.patch('/home/cart/update',userAuth,cartController.updateCartQuantity)
   
 
   
