@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details | Wearify</title>
+    <link rel="stylesheet" href="/css/order-details.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="/" class="logo"><i class="fas fa-square"></i> Wearify</a>
+                <div class="nav-links">
+                    <a href="/shop?category=Shirts">Shirts</a>
+                    <a href="/shop?category=T-Shirts">T-Shirts</a>
+                    <a href="/shop?category=Pants">Pants</a>
+                    <a href="/shop?category=Shorts">Shorts</a>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+                <a href="/wishlist"><i class="far fa-heart"></i></a>
+                <a href="/cart"><i class="fas fa-shopping-bag"></i></a>
+                <a href="/profile"><img src="/images/user-avatar.png" alt="Profile" class="nav-avatar"></a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="item-details-container">
+        <div class="breadcrumb">
+            <a href="/user/profile">Profile</a> / <a href="/user/orders">Orders</a> / <span>Order Details</span>
+        </div>
+
+        <h1 class="order-id-title">Order #<%= order.orderId %></h1>
+        
+        <div class="order-status-banner">
+            <p>Status: <span class="status-badge"><%= order.status %></span></p>
+            <p>Placed on: <%= new Date(order.createdAt).toLocaleDateString() %></p>
+        </div>
+
+        <% order.items.forEach(item => { %>
+            <section class="item-section-card">
+                <div class="item-header">
+                    <div class="item-info">
+                        <h2><%= item.product ? item.product.name    : "Product No Longer Available" %></h2>
+                        <p class="specs">
+                            Size: <%= item.size %> | 
+                            Quantity: <%= item.quantity %>
+                        </p>
+                        <a href="/product/<%= item.product ? item.product._id : '#' %>" class="btn-outline">View Product</a>
+                    </div>
+                    <div class="item-image">
+                        <% if (item.product && item.product.images && item.product.images.length > 0) { %>
+                            <img src="<%= item.product.images[0] %>" alt="Product Image">
+                        <% } else { %>
+                            <div class="image-placeholder">No Image</div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <label>Unit Price</label>
+                        <span>$<%= item.price.toFixed(2) %></span>
+                    </div>
+                    <div class="stat-box">
+                        <label>Item Total</label>
+                        <span>$<%= (item.price * item.quantity).toFixed(2) %></span>
+                    </div>
+                </div>
+            </section>
+        <% }) %>
+        <section class="info-section">
+            <h3>Shipping Address</h3>
+            <div class="address-details">
+                <p><strong><%= order.shippingAddress.fullName %></strong></p>
+                <p><%= order.shippingAddress.addressLine %></p>
+                <p><%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> - <%= order.shippingAddress.pincode %></p>
+                <p>Phone: <%= order.shippingAddress.phone %></p>
+            </div>
+        </section>
+
+        <div class="order-summary-footer">
+            <div class="summary-line">
+                <span>Payment Method:</span>
+                <span><%= order.paymentMethod %></span>
+            </div>
+            <div class="summary-line total">
+                <span>Grand Total:</span>
+                <span>$<%= order.totalPrice.toFixed(2) %></span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/order/download-invoice/<%= order.orderId %>" class="btn-invoice">
+                <i class="fas fa-file-download"></i> Download Invoice
+            </a>
+            <button class="btn-dark">Contact Support</button>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/about">About Us</a>
+            <a href="/contact">Contact</a>
+            <a href="/faq">FAQ</a>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+        </div>
+        <div class="footer-social">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+        </div>
+        <div class="action-footer">
+    <% if (order.status === 'Delivered') { %>
+        <a href="/user/orders/return/<%= order._id %>" class="btn-return">
+            <i class="fas fa-undo"></i> Return Order
+        </a>
+    <% } %>
+    
+    </div>
+        <p class="copyright">© 2026 Wearify. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

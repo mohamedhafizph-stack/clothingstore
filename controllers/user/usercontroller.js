@@ -679,7 +679,8 @@ export const loadAdressPage = async(req,res)=>{
 }
 
 export const loadAddAddressPage = async(req,res)=>{
-  res.render('user/addAdress')
+  const returnTo = req.query.returnTo || "";
+  res.render('user/addAdress',{returnTo})
 }
 
 export const Addaddress = async(req,res)=>{
@@ -689,7 +690,7 @@ export const Addaddress = async(req,res)=>{
 
      const user = currentUser._id || currentUser.id
     
-     const {fullName,phone,addressLine,city,state,pincode,country} = req.body
+     const {fullName,phone,addressLine,city,state,pincode,country,returnTo} = req.body
      console.log(req.body)
       
      const adress = new Address({
@@ -704,6 +705,10 @@ export const Addaddress = async(req,res)=>{
      })
 
      await adress.save()
+     console.log(returnTo)
+     if (returnTo) {
+    return res.redirect(returnTo);
+}
 
      res.redirect('/profile/adresses')
 

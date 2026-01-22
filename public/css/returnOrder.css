@@ -1,0 +1,90 @@
+:root {
+    --card-bg: #161b22;
+    --bg-dark: #0f1115;
+    --border: #30363d;
+    --text-dim: #8b949e;
+    --accent-blue: #3b82f6;
+}
+
+.breadcrumb { margin-bottom: 20px; color: var(--text-dim); font-size: 14px; }
+.breadcrumb a { color: var(--text-dim); text-decoration: none; }
+.breadcrumb span { color: white; }
+
+.return-header { margin-bottom: 30px; }
+.status-note { color: #10b981; font-size: 14px; margin-top: 5px; }
+
+.return-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.order-summary-card, .return-form-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 25px;
+    border-radius: 12px;
+}
+
+.summary-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.summary-item img { width: 60px; height: 70px; object-fit: cover; border-radius: 4px; }
+.item-info h4 { margin: 0; font-size: 15px; }
+.item-info p { margin: 5px 0 0; font-size: 13px; color: var(--text-dim); }
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; color: var(--text-dim); margin-bottom: 8px; font-size: 14px; }
+
+select, textarea {
+    width: 100%;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    color: white;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+textarea { height: 120px; resize: none; }
+
+.policy-notice {
+    display: flex;
+    gap: 10px;
+    background: rgba(59, 130, 246, 0.1);
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+}
+
+.policy-notice i { color: var(--accent-blue); margin-top: 3px; }
+.policy-notice p { margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+.btn-submit-return {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-secondary { color: var(--text-dim); text-decoration: none; margin-left: 20px; font-size: 14px; }
+
+@media (max-width: 768px) {
+    .return-grid { grid-template-columns: 1fr; }
+}

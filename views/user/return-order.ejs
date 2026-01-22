@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Order | Wearify</title>
+    <link rel="stylesheet" href="/css/myOrders.css">
+    <link rel="stylesheet" href="/css/returnOrder.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">Wearify</div>
+            <div class="nav-links">
+                <a href="#">Shirts</a><a href="#">T-Shirts</a><a href="#">Pants</a><a href="#">Shorts</a>
+            </div>
+            <div class="nav-actions">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search"></div>
+                <i class="far fa-heart"></i><i class="fas fa-shopping-bag"></i>
+                <img src="/images/user.jpg" class="profile-img">
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="breadcrumb">
+            <a href="/user/orders">My Orders</a> / 
+            <a href="/user/orders/<%= order._id %>">Order Details</a> / 
+            <span>Return Request</span>
+        </div>
+
+        <div class="return-header">
+            <h1 class="page-title">Return Order #<%= order.orderId %></h1>
+            <p class="status-note">Delivered on <%= new Date(order.deliveredAt || order.updatedAt).toLocaleDateString() %></p>
+        </div>
+
+        <div class="return-grid">
+            <div class="order-summary-card">
+                <h3>Items in this Return</h3>
+                <div class="item-list">
+                    <% order.items.forEach(item => { %>
+                        <div class="summary-item">
+                            <img src="/uploads/<%= item.product.productImage[0] %>" alt="Product">
+                            <div class="item-info">
+                                <h4><%= item.product.productName %></h4>
+                                <p>Qty: <%= item.quantity %> | Size: <%= item.size %></p>
+                                <p class="price">$<%= item.price.toFixed(2) %></p>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+                <div class="total-row">
+                    <span>Total Refund Amount:</span>
+                    <span class="total-price">$<%= order.totalPrice.toFixed(2) %></span>
+                </div>
+            </div>
+
+            <div class="return-form-card">
+                <h3>Return Details</h3>
+                <form id="returnForm" onsubmit="submitReturnRequest(event)">
+                    <input type="hidden" name="orderId" id="orderId" value="<%= order._id %>">
+                    
+                    <div class="form-group">
+                        <label>Reason for Return</label>
+                        <select name="reasonCategory" id="reasonCategory" required>
+                            <option value="" disabled selected>Select a reason</option>
+                            <option value="Damaged product">Product arrived damaged</option>
+                            <option value="Wrong item">Received the wrong item</option>
+                            <option value="Size issue">Size doesn't fit correctly</option>
+                            <option value="Quality issue">Quality not as expected</option>
+                            <option value="Other">Other (Please specify below)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Additional Comments</label>
+                        <textarea name="reason" id="reason" placeholder="Please provide more details about the issue..." required></textarea>
+                    </div>
+
+                    <div class="policy-notice">
+                        <i class="fas fa-info-circle"></i>
+                        <p>By submitting, you agree to our return policy. Refunds are processed after the item is picked up and inspected by our team.</p>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit-return">Submit Request</button>
+                        <a href="/user/orders/<%= order._id %>" class="btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        async function submitReturnRequest(event) {
+            event.preventDefault();
+            
+            const orderId = document.getElementById('orderId').value;
+            const category = document.getElementById('reasonCategory').value;
+            const comments = document.getElementById('reason').value;
+            const fullReason = `${category}: ${comments}`;
+
+            const result = await Swal.fire({
+                title: 'Submit Return?',
+                text: "Once submitted, the order status will change to Return Requested.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3b82f6',
+                background: '#161b22',
+                color: '#fff'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch('/user/orders/return/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ orderId, reason: fullReason })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        await Swal.fire({ icon: 'success', title: 'Requested!', text: data.message, background: '#161b22', color: '#fff' });
+                        window.location.href = '/user/orders/' + orderId;
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                } catch (err) {
+                    Swal.fire('Error', 'Something went wrong', 'error');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

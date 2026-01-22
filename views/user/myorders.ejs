@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | Wearify</title>
+    <link rel="stylesheet" href="/css/myOrders.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">Wearify</div>
+            <div class="nav-links">
+                <a href="#">Shirts</a><a href="#">T-Shirts</a><a href="#">Pants</a><a href="#">Shorts</a>
+            </div>
+            <div class="nav-actions">
+              <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input type="text" id="orderSearch" placeholder="Search by Order ID..." oninput="debouncedSearch(this.value)">
+</div>
+                <img src="/images/user.jpg" class="profile-img">
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1 class="page-title">My Orders</h1>
+        <div class="table-container">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Order Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    <% if (orders && orders.length > 0) { %>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td>#<%= order.orderId %></td>
+                                <td><%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></td>
+                                <td><%= order.items.length %></td>
+                                <td>$<%= order.totalPrice.toFixed(2) %></td>
+                                <td><span class="status-btn"><%= order.status %></span></td>
+                                <td class="action-cell">
+                                    <div class="action-wrapper">
+                                        <a href="/user/orders/<%= order._id %>" class="view-link">View Details</a>
+                                        
+                                        <% if (order.status === 'Pending' || order.status === 'Processing') { %>
+                                            <button class="btn-cancel-table" onclick="confirmCancel('<%= order._id %>')">
+    Cancel Order
+</button>
+                                        <% } %>
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 50px; color: #8b949e;">No orders found.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-links"><a href="#">About</a><a href="#">Contact</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+        <div class="social-icons"><i class="fab fa-twitter"></i><i class="fab fa-instagram"></i><i class="fab fa-facebook"></i></div>
+        <p>© 2026 Wearify. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+async function confirmCancel(orderId) {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you really want to cancel this order? This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        background: '#161b22', // Matches your card background
+        color: '#ffffff',
+        confirmButtonColor: '#ef4444', // Red for danger
+        cancelButtonColor: '#334155',
+        confirmButtonText: 'Yes, cancel it!',
+        cancelButtonText: 'No, keep it'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            // Send the PATCH request to your controller
+            const response = await fetch(`/user/orders/cancel/${orderId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    title: 'Cancelled!',
+                    text: data.message,
+                    icon: 'success',
+                    background: '#161b22',
+                    color: '#ffffff'
+                });
+                location.reload(); // Refresh the table to show updated status
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: data.message,
+                    icon: 'error',
+                    background: '#161b22',
+                    color: '#ffffff'
+                });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire('Error!', 'Something went wrong while cancelling.', 'error');
+        }
+    }
+
+}
+let debounceTimer;
+
+function debouncedSearch(value) {
+    // Clear the previous timer
+    clearTimeout(debounceTimer);
+
+    // Set a new timer for 500ms
+    debounceTimer = setTimeout(() => {
+        performSearch(value);
+    }, 500);
+}
+
+function performSearch(query) {
+    // Redirect to the same page with the search query parameter
+    // This maintains your pagination and filter logic
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('search', query);
+    currentUrl.searchParams.set('page', 1); // Reset to page 1 on search
+    
+    window.location.href = currentUrl.toString();
+}
+</script>
+
+</body>
+</html>

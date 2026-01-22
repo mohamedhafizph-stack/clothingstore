@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | Wearify</title>
+    <link rel="stylesheet" href="/css/order-success.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="/" class="logo">
+                    <i class="fas fa-square"></i> Wearify
+                </a>
+                <div class="nav-links">
+                    <a href="/shop?category=Shirts">Shirts</a>
+                    <a href="/shop?category=T-Shirts">T-Shirts</a>
+                    <a href="/shop?category=Pants">Pants</a>
+                    <a href="/shop?category=Shorts">Shorts</a>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+                <a href="/wishlist"><i class="far fa-heart"></i></a>
+                <a href="/cart"><i class="fas fa-shopping-bag"></i></a>
+                <a href="/profile">
+                    <img src="/images/user-avatar.png" alt="Profile" class="nav-avatar">
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="success-page">
+        <div class="success-card">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h1 class="success-title">Order Confirmed!</h1>
+            <p class="success-subtitle">Thank you for your purchase! Your order has been successfully placed.</p>
+            
+            <div class="order-summary">
+                <p class="order-id-text">Order ID: <strong>#<%= order.orderId %></strong></p>
+                <p class="total-text">Total Amount: <strong>$<%= order.totalPrice.toFixed(2) %></strong></p>
+                <p class="delivery-note">Estimated Delivery: 3-5 business days</p>
+            </div>
+
+            <div class="btn-group">
+                <a href="/user/orders/<%= order._id %>" class="btn btn-blue">
+                    <i class="fas fa-eye"></i> View Order Details
+                </a>
+                
+                <a href="/order/download-invoice/<%= order.orderId %>" class="btn btn-invoice">
+    <i class="fas fa-file-download"></i> Download Invoice
+</a>
+                
+                <a href="/shop" class="btn btn-dark">
+                    Continue Shopping
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/about">About Us</a>
+            <a href="/contact">Contact</a>
+            <a href="/faq">FAQ</a>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+        </div>
+        <div class="footer-social">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+        </div>
+        <p class="copyright">© 2026 Wearify. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

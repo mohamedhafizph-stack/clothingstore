@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Wearify</title>
+    <link rel="stylesheet" href="/css/checkout.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo">Wearify</div>
+            <nav>
+                <a href="/shop/shirts">Shirts</a>
+                <a href="/shop/tshirts">T-Shirts</a>
+                <a href="/shop/pants">Pants</a>
+                <a href="/shop/shorts">Shorts</a>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <div class="search-bar">
+                <i data-lucide="search"></i>
+                <input type="text" placeholder="Search">
+            </div>
+            <i data-lucide="heart"></i>
+            <i data-lucide="shopping-bag"></i>
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=<%= user.name %>" class="profile-img">
+        </div>
+    </header>
+
+    <main class="checkout-container">
+        <div class="checkout-grid">
+            
+            <div class="shipping-details">
+                <h1>Checkout</h1>
+                <form id="checkoutForm" action="/order/place" method="POST">
+                    <section class="form-section">
+                        <div class="section-header">
+                            <h3>Shipping Address</h3>
+                            <a href="/profile/adresses/add?returnTo=/cart/checkout" class="add-new-link">+ Add New</a>
+                        </div>
+                        
+                        <div class="address-grid">
+                            <% if (addresses && addresses.length > 0) { %>
+                                <% addresses.forEach((addr, index) => { %>
+                                    <label class="address-card">
+                                        <input type="radio" name="addressId" value="<%= addr._id %>" <%= index === 0 ? 'checked' : '' %>>
+                                        <div class="address-content">
+                                            <strong><%= addr.fullName %></strong>
+                                            <span class="addr-type"><%= addr.addressLine %></span>
+                                            <p> <%= addr.city %>,<%= addr.state %></p>
+                                            <p><%= addr.pincode %>, <%= addr.country %></p>
+                                            <p class="addr-phone">Phone: <%= addr.phone %></p>
+                                        </div>
+                                    </label>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="empty-address">
+                                    <p>No saved addresses found.</p>
+                                    <a href="/profile/adresses/add?returnTo=/cart/checkout" class="btn-secondary">Create your first address</a>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        
+                    </section>
+                </form>
+            </div>
+
+            <aside class="order-summary">
+                <div class="summary-card">
+                    <h3>Order Summary</h3>
+                    
+                    <div class="item-list">
+                        <% cart.items.forEach(item => { %>
+                            <div class="product-item">
+                                <img src="<%= item.product.images[0] %>" alt="Product">
+                                <div class="product-info">
+                                    <p class="name"><%= item.product.name %></p>
+                                    <p class="qty">Quantity: <%= item.quantity %></p>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span>Subtotal</span>
+                            <span>$<%= (totalPrice || 0).toFixed(2) %></span>
+                        </div>
+                        <div class="price-row">
+                            <span>Shipping</span>
+                            <span class="free-text">FREE</span>
+                        </div>
+                        <div class="price-row">
+                         
+                        </div>
+                        <div class="price-row total">
+                            <span>Total</span>
+                            <span>$<%= (totalPrice || 0).toFixed(2) %></span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="placeOrder()" class="btn-place-order">
+    Place Order
+</button>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+        async function placeOrder() {
+    const addressId = document.querySelector('input[name="addressId"]:checked')?.value;
+    
+    if (!addressId) {
+        return Swal.fire({
+            icon: 'warning',
+            title: 'Address Required',
+            text: 'Please select a shipping address before placing your order.',
+            confirmButtonColor: '#2563eb'
+        });
+    }
+
+    // Show a loading spinner so the user doesn't click multiple times
+    Swal.fire({
+        title: 'Processing Order...',
+        text: 'Please wait while we verify stock and prepare your order.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    try {
+        const response = await fetch('/order/place', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ addressId })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Success! Show a quick success message then redirect
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Your order has been placed successfully.',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = `/cart/checkout/success/${result.orderId}`;
+            });
+        } else {
+            // ERROR: This catches your "Insufficient stock" or "Product Blocked" messages
+            Swal.fire({
+                icon: 'error',
+                title: 'Order Failed',
+                text: result.message || 'Something went wrong while placing your order.',
+                confirmButtonColor: '#2563eb'
+            });
+        }
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Server Error',
+            text: 'We are having trouble connecting to the server. Please try again later.',
+            confirmButtonColor: '#2563eb'
+        });
+    }
+}
+    </script>
+</body>
+</html>

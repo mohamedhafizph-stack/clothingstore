@@ -6,7 +6,8 @@ import { isLoggedIn } from '../../middlewares/isLoggedin.js';
 import {uploadProfilePic} from '../../config/multer.js'
 import productController from '../../controllers/user/products-list.js';
 import cartController from '../../controllers/user/cart-conroller.js';
-
+import checkoutController from '../../controllers/user/checkout-controller.js';
+import orderController from '../../controllers/user/order-controller.js';
 
 
 
@@ -56,6 +57,17 @@ router.get('/shop/details/:id',userAuth,productController.loadProductDetails)
 router.post('/shop/details/:product_id',userAuth,cartController.addtoCart)
 router.get('/home/cart',userAuth,cartController.loadCart)
 router.patch('/home/cart/update',userAuth,cartController.updateCartQuantity)
+router.get('/cart/checkout',userAuth,checkoutController.loadCheckoutpage)
+router.get('/cart/checkout/add',userAuth,userController.loadAddAddressPage)
+router.post('/cart/checkout/add',userAuth,userController.Addaddress)
+router.post('/order/place', userAuth, orderController.placeOrder);
+router.get('/cart/checkout/success/:orderId', userAuth, orderController.loadOrderSuccess);
+router.get('/order/download-invoice/:orderId', userAuth, orderController.downloadInvoice);
+router.get('/user/orders/:id', userAuth, orderController.getOrderDetails);
+router.get('/user/orders', userAuth, orderController.getMyOrders);
+router.patch('/user/orders/cancel/:orderId', userAuth, orderController.cancelOrder);
+router.get('/user/orders/return/:id', userAuth, orderController.getReturnPage);
+router.post('/user/orders/return/submit', userAuth, orderController.submitReturnRequest);
   
 
   

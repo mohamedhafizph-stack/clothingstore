@@ -6,7 +6,7 @@ import User from "../../model/User.js";
  const addtoCart = async (req, res) => {
     try {
         const { productId, size, quantity } = req.body;
-        const userId = req.session.user?._id||req.user;
+        const userId = req.session.user?.id||req.user;
         const requestedQty = parseInt(quantity);
         const MAX_LIMIT = 4;
 
@@ -61,7 +61,7 @@ import User from "../../model/User.js";
 };
 const loadCart = async (req, res) => {
     try {
-        const userId = req.session.user?._id|| req.user;
+        const userId = req.session.user?.id|| req.user;
 
         if (!userId) {
             return res.redirect('/login');
@@ -93,7 +93,7 @@ const loadCart = async (req, res) => {
  const updateCartQuantity = async (req, res) => {
     try {
         const { productId, size, change } = req.body;
-        const userId = req.session.user?._id||req.user;
+        const userId = req.session.user?.id||req.user;
 
         const [cart, product] = await Promise.all([
             Cart.findOne({ user: userId }),
@@ -103,7 +103,9 @@ const loadCart = async (req, res) => {
         if (!cart || !product) {
             return res.status(404).json({ success: false, message: "Resource not found" });
         }
-
+         if(product.status!=="Active"){
+           return res.status(400).json({ success: false, message: "product not found" });
+         }
         const sizeVariant = product.variants.find(v => v.size === size);
         
         if (!sizeVariant) {
