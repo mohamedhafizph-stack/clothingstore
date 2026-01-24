@@ -33,7 +33,7 @@
   
 
   <div class="profile-dropdown">
-    <a href="/profile"><img src="<%= user && user.profilePic ? user.profilePic : '/images/default-avatar.png' %>" 
+    <a href="/profile"><img src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
   alt="Profile" alt="Profile"class="avatar"></a>
 
     
