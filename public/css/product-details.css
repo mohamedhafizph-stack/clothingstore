@@ -430,3 +430,21 @@ body.details-page {
     outline: 1px solid var(--border-color);
     display: inline-block; /* Ensure they don't collapse */
 }
+.main-image {
+    position: relative;
+    overflow: hidden;
+    cursor: zoom-in;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+}
+
+#mainProductImage {
+    transition: transform 0.3s ease;
+    width: 100%;
+    display: block;
+}
+
+/* When hovering, the image scales up */
+.main-image:hover #mainProductImage {
+    transform: scale(2); /* Adjust zoom level here */
+}

@@ -39,7 +39,7 @@
 <div class="image-gallery">
 
   <!-- MAIN IMAGE -->
-  <div class="main-image">
+  <div class="main-image" id="zoom-container">
     <img 
       id="mainProductImage"
       src="<%= product.images?.[0] %>"
@@ -319,6 +319,24 @@ document.getElementById('buyNowBtn').addEventListener('click', async () => {
             color: '#fff'
         });
     }
+});
+const container = document.getElementById('zoom-container');
+const img = document.getElementById('mainProductImage');
+
+container.addEventListener('mousemove', (e) => {
+    const x = e.clientX - e.target.offsetLeft;
+    const y = e.clientY - e.target.offsetTop;
+
+    // Calculate position in percentage
+    const xPercent = (x / container.offsetWidth) * 100;
+    const yPercent = (y / container.offsetHeight) * 100;
+
+    // Move the transform-origin so it zooms into the cursor point
+    img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+});
+
+container.addEventListener('mouseleave', () => {
+    img.style.transformOrigin = 'center';
 });
 </script>
 
