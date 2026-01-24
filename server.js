@@ -10,7 +10,7 @@ import { dirname } from "path";
 
 import connectDB from "./db/connectDB.js";
 import "./config/passport.js"; 
-
+import errorHandler from "./middlewares/errorhandler.js";
 import adminRoutes from "./routes/admin.js";
 import userRoutes from "./routes/user/user.js";
 import authRoutes from "./routes/auth.js";
@@ -50,7 +50,7 @@ app.use((req, res, next) => {
   next();
 });
 
-
+app.use(errorHandler)
 app.use("/admin", adminRoutes);
 app.use("/auth", authRoutes);
 app.use("/", userRoutes);

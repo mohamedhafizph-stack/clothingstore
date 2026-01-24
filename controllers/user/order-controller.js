@@ -18,30 +18,26 @@ export const placeOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: "Cart is empty" });
         }
 
-        // 1. Map items and handle Price/Size
         const orderItems = cart.items.map(item => {
-            // We use the price already stored in the cart
+           
             const itemPrice = Number(item.price);
             
             return {
                 product: item.product._id,
                 quantity: item.quantity,
-                price: itemPrice, // Matches your Order schema required field
-                size: item.size    // Matches your Order schema required field
+                price: itemPrice, 
+                size: item.size    
             };
         });
 
-        // 2. Calculate Total Amount
         const totalAmount = orderItems.reduce((acc, item) => {
             return acc + (item.price * item.quantity);
         }, 0);
 
-        // Safety check for NaN
         if (isNaN(totalAmount)) {
             return res.status(400).json({ success: false, message: "Error calculating total price." });
         }
 
-        // 3. Create Order
         const newOrder = new Order({
             user: userId,
             items: orderItems,
@@ -60,7 +56,6 @@ export const placeOrder = async (req, res) => {
 
         await newOrder.save();
 
-        // 4. Update Stock & Clear Cart
         for (const item of cart.items) {
             await Product.findByIdAndUpdate(item.product._id, {
                 $inc: { quantity: -item.quantity }
@@ -244,6 +239,16 @@ export const cancelOrder = async (req, res) => {
             });
         }
         order.status = 'Cancelled';
+        order.items.forEach(item => {
+            // Only restore stock and refund if the item wasn't already cancelled
+            if (item.status !== 'Cancelled') {
+                // Restore Stock
+                Product.findByIdAndUpdate(item.product, { $inc: { quantity: item.quantity } }).exec();
+                
+                // Mark item as cancelled
+                item.status = 'Cancelled';
+            }
+        });
         await order.save();
 
         res.json({ 
@@ -267,21 +272,170 @@ export const getReturnPage = async (req, res) => {
         res.redirect('/user/orders');
     }
 };
-export const submitReturnRequest = async (req, res) => {
+export const requestReturn = async (req, res) => {
     try {
-        const { orderId, reason } = req.body;
-        await Order.findByIdAndUpdate(orderId, {
-            status: 'Return Requested',
-            returnReason: reason
-        });
-        res.redirect('/user/orders/' + orderId);
+        const { orderId, reason, comment } = req.body;
+
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        
+        if (order.status !== 'Delivered') {
+            return res.status(400).json({ success: false, message: "Order must be delivered to request return" });
+        }
+
+        order.status = 'Return Requested';
+        order.returnDetails = {
+            reason: reason,
+            comment: comment,
+            requestDate: new Date()
+        };
+
+        await order.save();
+
+        res.status(200).json({ success: true, message: "Return requested successfully" });
+
     } catch (error) {
-        res.status(500).send("Error submitting return request");
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+export const requestItemReturn = async (req, res) => {
+    try {
+        const { orderId, itemId, reason } = req.body;
+        
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
 
+        const item = order.items.id(itemId);
+        if (!item) {
+            return res.status(404).json({ success: false, message: "Item not found" });
+        }
+
+        item.status = 'Return Requested';
+        item.returnReason = reason;
+
+        
+        order.status = 'Return Requested';
+
+        await order.save();
+
+        res.json({ success: true, message: "Return request submitted successfully" });
+
+    } catch (error) {
+        console.error("Return Request Error:", error);
+        res.status(500).json({ success: false, message: "Server error occurred" });
+    }
+};
+export const cancelSingleItem = async (req, res) => {
+    console.log("!!! THE REQUEST REACHED THE CONTROLLER !!!");
+    try {
+        const { orderId, itemId } = req.body;
+        console.log("Cancel Request Received:", { orderId, itemId });
+
+        const order = await Order.findById(orderId);
+        if(order.status=="Shipped"){
+             return res.status(400).json({ success: false, message: "Item cannot be cancelled as it is shipped" });
+        }
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+        const item = order.items.id(itemId);
+
+        if (!item) {
+            console.log("Item ID not found in Order items array");
+            return res.status(404).json({ success: false, message: "Product not found in this order" });
+        }
+
+        if (item.status === 'Cancelled') {
+            return res.status(400).json({ success: false, message: "Item is already cancelled" });
+        }
+
+        if (item.product) {
+            await Product.findByIdAndUpdate(item.product, {
+                $inc: { quantity: item.quantity }
+            });
+        }
+
+        const isPrepaid = ['Paid', 'Online Payment', 'Wallet'].includes(order.paymentStatus) || order.paymentMethod === 'Wallet';
+        
+        if (isPrepaid) {
+            const refundAmount = item.price * item.quantity;
+            await User.findByIdAndUpdate(order.user, {
+                $inc: { wallet: refundAmount },
+                $push: {
+                    walletHistory: {
+                        amount: refundAmount,
+                        type: 'Credit',
+                        reason: `Cancelled: ${item.productName || 'Product'}`,
+                        date: new Date()
+                    }
+                }
+            });
+        }
+        const itemTotal = item.price * item.quantity;
+         order.totalPrice -= itemTotal;
+        
+        item.status = 'Cancelled';
+
+        await order.save();
+      
+item.status = 'Cancelled';
+
+const areAllItemsCancelled = order.items.every(item => item.status === 'Cancelled');
+
+if (areAllItemsCancelled) {
+    order.status = 'Cancelled';
+    console.log(`Order ${order._id} fully cancelled because all items are cancelled.`);
+}
+
+
+await order.save();
+
+        res.json({ success: true, message: "Item cancelled and refund processed" });
+
+    } catch (error) {
+        console.error("DETAILED ERROR:", error); 
+        res.status(500).json({ success: false, message: "Internal Server Error: " + error.message });
+    }
+};
+export const requestFullOrderReturn = async (req, res) => {
+    try {
+        const { orderId, reason, comment } = req.body;
+        const order = await Order.findById(orderId);
+
+        if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+        // Flag every 'Delivered' item for return
+        let itemsFlagged = 0;
+        order.items.forEach(item => {
+            if (item.status === 'Delivered') {
+                item.status = 'Return Requested';
+                item.returnReason = reason;
+                item.returnComment = comment;
+                itemsFlagged++;
+            }
+        });
+
+        if (itemsFlagged === 0) {
+            return res.status(400).json({ success: false, message: "No eligible items to return" });
+        }
+
+        order.status = 'Return Requested';
+        await order.save();
+
+        res.json({ success: true, message: "Full order return request submitted" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 const orderController = {placeOrder,loadOrderSuccess,downloadInvoice,getOrderDetails,getMyOrders,getItemDetails,cancelOrder,getReturnPage
-    ,submitReturnRequest
+    ,requestReturn,requestItemReturn,cancelSingleItem,requestFullOrderReturn
 }
 
 export default orderController

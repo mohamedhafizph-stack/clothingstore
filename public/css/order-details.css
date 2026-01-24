@@ -65,3 +65,139 @@ body {
 .footer-links a { color: #64748b; text-decoration: none; font-size: 0.85rem; }
 .footer-social { display: flex; justify-content: center; gap: 20px; color: #64748b; margin-bottom: 20px; }
 .copyright { color: #475569; font-size: 0.8rem; }
+.btn-return {
+    background: #1e293b;
+    color: #ef4444; /* Bright Red Text */
+    border: 1px solid #ef4444;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-return:hover {
+    background: #ef4444;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.status-msg {
+    font-size: 13px;
+    font-weight: 500;
+}
+.status-msg.warning { color: #f59e0b; }
+.status-msg.success { color: #10b981; }
+.tracking-container {
+    padding: 40px 20px;
+    background: #161b22;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border: 1px solid #30363d;
+}
+
+.tracking-track {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+/* The connecting line */
+.tracking-track::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 50px;
+    right: 50px;
+    height: 4px;
+    background: #30363d;
+    z-index: 1;
+}
+
+.step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    width: 100px;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    background: #0d1117;
+    border: 3px solid #30363d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    color: #8b949e;
+    transition: 0.3s;
+}
+
+.step-text {
+    font-size: 0.85rem;
+    color: #8b949e;
+}
+
+/* Active State */
+.step.active .step-icon {
+    border-color: #58a6ff;
+    color: #58a6ff;
+    background: #161b22;
+    box-shadow: 0 0 15px rgba(88, 166, 255, 0.3);
+}
+
+.step.active .step-text {
+    color: #f0f6fc;
+    font-weight: 600;
+}
+/* Layout & Grid */
+.item-details-container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+.details-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; align-items: start; }
+
+/* Header Styling */
+.order-header { border-bottom: 1px solid #30363d; padding-bottom: 20px; margin-bottom: 30px; }
+.header-main { display: flex; align-items: center; gap: 15px; }
+.header-main h1 { font-size: 24px; margin: 0; }
+.order-date { color: #8b949e; margin-top: 5px; }
+
+/* Status Pills */
+.status-pill { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+.status-delivered { background: rgba(35, 134, 54, 0.2); color: #3fb950; }
+.status-pending { background: rgba(139, 148, 158, 0.2); color: #8b949e; }
+
+/* Neat Item Cards */
+.item-card-neat { 
+    display: flex; gap: 20px; background: #161b22; 
+    padding: 15px; border-radius: 10px; margin-bottom: 15px;
+    border: 1px solid #30363d; transition: 0.2s;
+}
+.item-card-neat:hover { border-color: #58a6ff; }
+.item-thumb { width: 60px; height: 60px; background: #0d1117; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 20px; color: #30363d; }
+.item-details { flex: 1; }
+.item-details h4 { margin: 0 0 5px 0; font-size: 16px; }
+.item-sub { font-size: 13px; color: #8b949e; margin-bottom: 10px; }
+.item-footer-actions { display: flex; justify-content: space-between; align-items: center; }
+
+/* Tracking Bar - Neater Version */
+.tracking-wrapper { position: relative; padding: 40px 0; margin-bottom: 40px; }
+.tracking-line { position: absolute; top: 58px; left: 5%; right: 5%; height: 2px; background: #30363d; z-index: 1; }
+.tracking-steps { display: flex; justify-content: space-between; position: relative; z-index: 2; }
+.step-item { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 20%; }
+.step-dot { width: 36px; height: 36px; background: #0d1117; border: 2px solid #30363d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #8b949e; transition: 0.3s; }
+.step-item.active .step-dot { background: #58a6ff; border-color: #58a6ff; color: #fff; box-shadow: 0 0 15px rgba(88, 166, 255, 0.4); }
+.step-label { font-size: 12px; color: #8b949e; font-weight: 500; }
+.step-item.active .step-label { color: #f0f6fc; }
+
+/* Glass Cards for Info */
+.glass-card { background: #161b22; border: 1px solid #30363d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+.section-label { font-size: 14px; text-transform: uppercase; color: #8b949e; letter-spacing: 1px; margin-bottom: 15px; }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+.total-row { border-top: 1px solid #30363d; padding-top: 10px; font-weight: bold; color: #fff; font-size: 16px; }
+
+/* Buttons */
+.link-btn { background: none; border: none; color: #58a6ff; cursor: pointer; font-size: 13px; font-weight: 600; }
+.link-btn-danger { background: none; border: none; color: #f85149; cursor: pointer; font-size: 13px; font-weight: 600; }
+.btn-full-return { width: 100%; padding: 12px; background: #21262d; border: 1px solid #30363d; color: #f85149; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.btn-full-return:hover { background: #da3633; color: #fff; }

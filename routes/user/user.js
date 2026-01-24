@@ -8,6 +8,8 @@ import productController from '../../controllers/user/products-list.js';
 import cartController from '../../controllers/user/cart-conroller.js';
 import checkoutController from '../../controllers/user/checkout-controller.js';
 import orderController from '../../controllers/user/order-controller.js';
+import user from '../../controllers/admin/customer.js';
+import adminAuth from '../../middlewares/adminAuth.js';
 
 
 
@@ -67,8 +69,10 @@ router.get('/user/orders/:id', userAuth, orderController.getOrderDetails);
 router.get('/user/orders', userAuth, orderController.getMyOrders);
 router.patch('/user/orders/cancel/:orderId', userAuth, orderController.cancelOrder);
 router.get('/user/orders/return/:id', userAuth, orderController.getReturnPage);
-router.post('/user/orders/return/submit', userAuth, orderController.submitReturnRequest);
-  
+router.post('/user/orders/return-request', userAuth, orderController.requestReturn);
+router.post('/orders/return-item', userAuth, orderController.requestItemReturn);
+router.post('/orders/cancel-item', userAuth, orderController.cancelSingleItem)
+router.post('/orders/return-full-order', userAuth, orderController.requestFullOrderReturn);
 
   
 

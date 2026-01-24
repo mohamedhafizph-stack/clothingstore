@@ -103,7 +103,7 @@
 </div>
 
 
-        <button class="btn-buy">Buy Now</button>
+      <button id="buyNowBtn" class="btn-buy">Buy Now</button>
         <button class="btn-cart">Add to Cart</button>
         <button class="btn-wishlist">❤️ Wishlist</button>
       </div>
@@ -262,6 +262,59 @@ document.querySelector('.btn-cart').addEventListener('click', async () => {
             icon: 'error',
             title: 'Connection Failed',
             text: 'Could not connect to the server. Please try again later.',
+            background: '#161b22',
+            color: '#fff'
+        });
+    }
+});
+document.getElementById('buyNowBtn').addEventListener('click', async () => {
+    const activeSizeBtn = document.querySelector('.size-btn.active');
+    
+    // 1. Validation: Check if size is selected
+    if (!activeSizeBtn) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Select Size',
+            text: 'Please choose a size before buying.',
+            background: '#161b22',
+            color: '#fff',
+            confirmButtonColor: '#2f81f7'
+        });
+        return;
+    }
+
+    const productId = "<%= product._id %>";
+    const size = activeSizeBtn.dataset.size;
+    const quantity = document.getElementById('qty').value;
+
+    try {
+        // 2. Add to cart first (Backend logic)
+        const response = await fetch(`/shop/details/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, size, quantity })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // 3. Redirect to checkout page on success
+            window.location.href = '/cart/checkout'; 
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message,
+                background: '#161b22',
+                color: '#fff'
+            });
+        }
+    } catch (error) {
+        console.error("Buy Now Error:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong. Please try again.',
             background: '#161b22',
             color: '#fff'
         });

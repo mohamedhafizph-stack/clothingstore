@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Management | Wearify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary-accent: #3b82f6;
+            --bg-dark: #0f1115;
+            --bg-card: #161b22;
+            --bg-input: #0d1117;
+            --text-main: #f0f6fc;
+            --text-dim: #8b949e;
+            --border-color: #30363d;
+            --sidebar-hover: #21262d;
+            
+            /* Payment Colors */
+            --paid-green: #10b981;
+            --pending-yellow: #f59e0b;
+            --failed-red: #ef4444;
+            --unpaid-grey: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { display: flex; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            padding: 25px 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 0 25px 35px;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu { list-style: none; flex-grow: 1; }
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            padding: 14px 25px;
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        .menu-item a:hover, .menu-item.active a { color: var(--text-main); background: var(--sidebar-hover); }
+        .menu-item.active a { border-left: 3px solid var(--primary-accent); background: linear-gradient(90deg, rgba(59,130,246,0.1) 0%, transparent 100%); }
+
+        /* Main Content */
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 40px;
+        }
+
+        .content-header { margin-bottom: 35px; }
+        .content-header h1 { font-size: 32px; font-weight: 700; }
+        .content-header p { color: var(--text-dim); margin-top: 8px; }
+
+        /* Controls */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .search-container { position: relative; flex: 1; max-width: 400px; }
+        .search-container i { position: absolute; left: 15px; top: 14px; color: var(--text-dim); }
+        .search-container input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+
+        .filter-group select {
+            padding: 12px 20px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+
+        /* Table */
+        .table-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .admin-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 1000px; }
+        .admin-table th {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 18px 25px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .admin-table td { padding: 20px 25px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+        .admin-table tr:hover { background: rgba(255, 255, 255, 0.01); }
+
+        /* Payment Status Badges */
+        .payment-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .payment-status.paid { color: var(--paid-green); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .payment-status.pending { color: var(--pending-yellow); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .payment-status.failed { color: var(--failed-red); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .payment-status.unpaid { color: var(--unpaid-grey); border: 1px solid var(--border-color); }
+
+        /* Order Status Dropdown */
+        .status-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 160px;
+        }
+        .status-select.pending { color: #f59e0b; }
+        .status-select.shipped { color: #3b82f6; }
+        .status-select.delivered { color: #10b981; }
+        .status-select.cancelled { color: #ef4444; }
+
+        .btn-view {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 40px; }
+        .page-btn {
+            padding: 10px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-dim);
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        .page-btn.active { background: var(--primary-accent); color: white; border-color: var(--primary-accent); }
+    </style>
+</head>
+<body>
+
+    <aside class="admin-sidebar">
+        <a href="/admin/dashboard" class="sidebar-brand"><i class="fas fa-bolt" style="color: var(--primary-accent);"></i> Wearify</a>
+        <ul class="sidebar-menu">
+            <li class="menu-item"><a href="/admin/dashboard"><i class="fas fa-chart-line"></i> Analytics</a></li>
+            <li class="menu-item active"><a href="/admin/orders"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+            <li class="menu-item"><a href="/admin/products"><i class="fas fa-box-open"></i> Inventory</a></li>
+            <li class="menu-item"><a href="/admin/users"><i class="fas fa-user-shield"></i> Users</a></li>
+        </ul>
+        <div class="menu-item" style="border-top: 1px solid var(--border-color); padding-top: 10px;">
+            <a href="/admin/logout"><i class="fas fa-power-off"></i> Sign Out</a>
+        </div>
+    </aside>
+
+    <main class="admin-content">
+        <header class="content-header">
+            <h1>Order Hub</h1>
+            <p>Monitor transactions, track deliveries, and manage returns.</p>
+        </header>
+
+        <section class="controls-row">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="orderSearch" placeholder="Search Order ID..." value="<%= searchTerm %>" oninput="handleSearch(this.value)">
+            </div>
+            <div class="filter-group">
+                <select id="statusFilter" onchange="filterStatus(this.value)">
+                    <option value="All" <%= currentStatus === 'All' ? 'selected' : '' %>>All Statuses</option>
+                    <option value="Pending" <%= currentStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="Delivered" <%= currentStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                    <option value="Return Requested" <%= currentStatus === 'Return Requested' ? 'selected' : '' %>>Return Requested</option>
+                </select>
+            </div>
+        </section>
+
+        <div class="table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Order Ref</th>
+                        <th>Customer</th>
+                        <th>Total</th>
+                        <th>Payment Status</th>
+                        <th>Delivery Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (orders && orders.length > 0) { %>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td style="color: var(--primary-accent); font-weight: bold;">#<%= order.orderId %></td>
+                                <td>
+                                    <div style="font-weight: 600;"><%= order.user?.name %></div>
+                                    <div style="font-size: 12px; color: var(--text-dim);"><%= order.user?.email %></div>
+                                </td>
+                                <td style="font-weight: bold;">$<%= order.totalPrice.toFixed(2) %></td>
+                                <td>
+                                    <span class="payment-status <%= order.paymentStatus.toLowerCase() %>">
+                                        <i class="fas <%= order.paymentStatus === 'Paid' ? 'fa-check-circle' : 'fa-clock' %>"></i>
+                                        <%= order.paymentStatus %>
+                                    </span>
+                                </td>
+                               <td class="items-status-column">
+    <% order.items.forEach(item => { %>
+        <div class="item-status-row" style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">
+                <%= item.product?.name %> (<%= item.size %>)
+            </div>
+            
+            <select class="status-select-mini <%= item.status.toLowerCase().replace(/\s/g, '-') %>" 
+                    onchange="updateItemStatus('<%= order._id %>', '<%= item._id %>', this.value)"
+                    style="width: 100%; padding: 5px; font-size: 11px; background: var(--bg-input); border: 1px solid var(--border-color); color: white; border-radius: 4px;">
+                
+                <option value="Pending" <%= item.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                <option value="Delivered" <%= item.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                <option value="Cancelled" <%= item.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                
+                <% if(item.status === 'Return Requested') { %>
+                    <option value="Return Requested" selected disabled>Return Requested</option>
+                    <option value="Returned">Approve Return</option>
+                <% } %>
+                
+                <option value="Returned" <%= item.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+            </select>
+        </div>
+    <% }) %>
+</td>
+                                <td>
+                                    <a href="/admin/orders/<%= order._id %>" class="btn-view">Details</a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-dim);">No orders found.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <% for(let i=1; i<=totalPages; i++) { %>
+                <a href="?page=<%= i %>&status=<%= currentStatus %>&search=<%= searchTerm %>" 
+                   class="page-btn <%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+            <% } %>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let timer;
+        function handleSearch(val) {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                window.location.href = `/admin/orders?status=<%= currentStatus %>&search=${val}`;
+            }, 700);
+        }
+
+        function filterStatus(status) {
+            window.location.href = `/admin/orders?status=${status}&search=<%= searchTerm %>`;
+        }
+
+        async function updateStatus(orderId, newStatus) {
+    // 1. Alert the Admin for confirmation
+    const result = await Swal.fire({
+        title: 'Change Status?',
+        text: `Are you sure you want to change this order to "${newStatus}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        background: '#161b22',
+        color: '#fff',
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#30363d',
+        confirmButtonText: 'Yes, update it!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            // 2. Send request to backend
+            const response = await fetch('/admin/orders/update-status', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, status: newStatus })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // 3. Success Toast
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Status Updated',
+                    text: data.message,
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: '#161b22',
+                    color: '#fff'
+                });
+                
+                // Reload to update badge colors and stock counts
+                location.reload();
+            } else {
+                Swal.fire('Error', data.message, 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Network error or server down', 'error');
+        }
+    } else {
+        // Reset the dropdown if user cancels
+        location.reload();
+    }
+}
+async function updateItemStatus(orderId, itemId, newStatus) {
+    const result = await Swal.fire({
+        title: 'Update Item?',
+        text: `Change status of this product to "${newStatus}"?`,
+        icon: 'question',
+        showCancelButton: true,
+        background: '#161b22',
+        color: '#fff',
+        confirmButtonColor: '#3b82f6'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch('/admin/orders/update-item-status', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, itemId, status: newStatus })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                Swal.fire({ icon: 'success', title: 'Updated', background: '#161b22', color: '#fff', timer: 1000, showConfirmButton: false });
+                setTimeout(() => location.reload(), 1000);
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Server Communication Failed', 'error');
+        }
+    }
+}
+    </script>
+</body>
+</html>

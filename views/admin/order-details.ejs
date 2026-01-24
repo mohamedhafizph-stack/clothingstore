@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details | Wearify Admin</title>
+    <link rel="stylesheet" href="/css/orders-details.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo"><i class="fas fa-square"></i> Wearify Admin</div>
+            <nav>
+                <a href="/admin/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/admin/orders" class="active"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="/admin/products"><i class="fas fa-box"></i> Products</a>
+                <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Order #<%= order.orderId %></h1>
+                <a href="/admin/orders" class="btn-back"><i class="fas fa-arrow-left"></i> Back to List</a>
+            </header>
+
+            <div class="details-grid">
+                <section class="details-card">
+                    <h3 class="card-title">General Info</h3>
+                    <div class="info-row">
+                        <span class="label">Date:</span>
+                        <span class="value"><%= new Date(order.createdAt).toLocaleDateString() %></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="status-pill <%= order.status.toLowerCase() %>"><%= order.status %></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Payment:</span>
+                        <span class="value"><%= order.paymentMethod %></span>
+                    </div>
+                </section>
+
+                <section class="details-card">
+                    <h3 class="card-title">Customer Details</h3>
+                    <div class="info-row">
+                        <span class="label">Name:</span>
+                        <span class="value"><%= order.user.name %></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Email:</span>
+                        <span class="value"><%= order.user.email %></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Address:</span>
+                        <span class="value"><%= order.shippingAddress.addressLine %>, <%= order.shippingAddress.city %></span>
+                    </div>
+                </section>
+            </div>
+
+            <section class="details-card full-width">
+                <h3 class="card-title">Ordered Items</h3>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% order.items.forEach(item => { %>
+                        <tr>
+                            <td>
+                                <div class="item-info">
+                                    <img src="<%= item.product.images[0] %>" width="40">
+                                    <span><%= item.product.name %></span>
+                                </div>
+                            </td>
+                            <td>$<%= item.price.toFixed(2) %></td>
+                            <td><%= item.quantity %></td>
+                            <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </section>
+
+           
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        async function updateStatus(orderId) {
+            const { value: newStatus } = await Swal.fire({
+                title: 'Update Order Status',
+                input: 'select',
+                inputOptions: {
+                    'Pending': 'Pending',
+                    'Processing': 'Processing',
+                    'Shipped': 'Shipped',
+                    'Delivered': 'Delivered',
+                    'Cancelled': 'Cancelled'
+                },
+                background: '#161b22',
+                color: '#fff',
+                showCancelButton: true
+            });
+
+            if (newStatus) {
+                // Add your fetch call here to update the DB
+                console.log("Updating to:", newStatus);
+            }
+        }
+    </script>
+</body>
+</html>

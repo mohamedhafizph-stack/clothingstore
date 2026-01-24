@@ -85,7 +85,7 @@
 
                     <div class="form-actions">
                         <button type="submit" class="btn-submit-return">Submit Request</button>
-                        <a href="/user/orders/<%= order._id %>" class="btn-secondary">Cancel</a>
+                        <a href="/orders/<%= order._id %>" class="btn-secondary">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -114,7 +114,7 @@
 
             if (result.isConfirmed) {
                 try {
-                    const response = await fetch('/user/orders/return/submit', {
+                    const response = await fetch('/orders/return/submit', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ orderId, reason: fullReason })
@@ -123,7 +123,7 @@
                     const data = await response.json();
                     if (data.success) {
                         await Swal.fire({ icon: 'success', title: 'Requested!', text: data.message, background: '#161b22', color: '#fff' });
-                        window.location.href = '/user/orders/' + orderId;
+                        window.location.href = '/orders/' + orderId;
                     } else {
                         Swal.fire('Error', data.message, 'error');
                     }

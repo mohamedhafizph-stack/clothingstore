@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Management | Wearify Admin</title>
+    <link rel="stylesheet" href="/css/returns.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo"><i class="fas fa-square"></i> Wearify Admin</div>
+            <nav>
+                <a href="/admin/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/admin/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="/admin/products"><i class="fas fa-box"></i> Products</a>
+                <a href="/admin/returns" class="active"><i class="fas fa-undo"></i> Return Management</a>
+                </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Return Management</h1>
+               <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input type="text" id="returnSearch" value="<%= searchQuery %>" placeholder="Search by Return ID or Customer Name">
+</div>
+            </header>
+
+            <section class="table-container">
+                <table class="returns-table">
+                    <thead>
+                        <tr>
+                            <th>Return ID</th>
+                            <th>Order ID</th>
+                            <th>Customer name</th>
+                            <th>Request date</th>
+                            <th>Reason for return</th>
+                            <th>Requested refund amount</th>
+                            <th>Return status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                                <% order.items.forEach(item => { %>
+                                    <% if (item.status === 'Return Requested' || item.status === 'Returned') { %>
+                                        <tr>
+                                            <td>RTN<%= item._id.toString().slice(-5).toUpperCase() %></td>
+                                            <td>ORD<%= order.orderId %></td>
+                                            <td><%= order.user.name %></td>
+                                            <td><%= new Date(order.updatedAt).toISOString().split('T')[0] %></td>
+                                            <td><%= item.returnReason %></td>
+                                            <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+                                            <td>
+                                                <span class="status-badge <%= item.status.toLowerCase().replace(' ', '-') %>">
+                                                    <%= item.status === 'Return Requested' ? 'Pending' : item.status %>
+                                                </span>
+                                            </td>
+                                            <td class="action-links">
+                                                <a href="/admin/orders/<%= order._id %>">View Details</a>
+                                                <% if (item.status === 'Return Requested') { %>
+                                                    | <button onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'Approve')" class="btn-text approve">Approve</button>
+                                                    | <button onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'Reject')" class="btn-text reject">Reject</button>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                <% }) %>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 2rem;">No return requests found.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </section>
+
+            <footer class="pagination">
+    <% if (currentPage > 1) { %>
+        <button class="page-arrow" onclick="changePage(<%= currentPage - 1 %>)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    <% } %>
+
+    <% for(let i = 1; i <= totalPages; i++) { %>
+        <button 
+            class="page-num <%= currentPage === i ? 'active' : '' %>" 
+            onclick="changePage(<%= i %>)">
+            <%= i %>
+        </button>
+    <% } %>
+
+    <% if (currentPage < totalPages) { %>
+        <button class="page-arrow" onclick="changePage(<%= currentPage + 1 %>)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    <% } %>
+</footer>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        async function handleReturnAction(orderId, itemId, action) {
+            const result = await Swal.fire({
+                title: `Confirm ${action}?`,
+                text: `Are you sure you want to ${action.toLowerCase()} this return request?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: action === 'Approve' ? '#10b981' : '#ef4444',
+                background: '#161b22',
+                color: '#fff'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch('/admin/returns/handle', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ orderId, itemId, action })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        location.reload();
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+        const searchInput = document.getElementById('returnSearch');
+let debounceTimer;
+
+searchInput.addEventListener('input', function() {
+    // Clear the timer every time the user types
+    clearTimeout(debounceTimer);
+
+    // Set a new timer to wait 500ms after the last keystroke
+    debounceTimer = setTimeout(() => {
+        const searchValue = this.value.trim();
+        const currentUrl = new URL(window.location.href);
+        
+        // If search is empty, remove the param, otherwise set it
+        if (searchValue) {
+            currentUrl.searchParams.set('search', searchValue);
+        } else {
+            currentUrl.searchParams.delete('search');
+        }
+        
+        // Use window.location.href to reload the page with new data
+        window.location.href = currentUrl.toString();
+    }, 500); // 500ms delay is usually the "sweet spot"
+});
+
+// To keep focus on the search bar after page reload
+window.onload = () => {
+    if (searchInput.value !== "") {
+        searchInput.focus();
+        // Move cursor to the end of the text
+        const val = searchInput.value;
+        searchInput.value = '';
+        searchInput.value = val;
+    }
+};
+function changePage(pageNumber) {
+    const currentUrl = new URL(window.location.href);
+    
+    // Set the new page parameter
+    currentUrl.searchParams.set('page', pageNumber);
+    
+    // Redirect to the new URL
+    window.location.href = currentUrl.toString();
+}
+    </script>
+</body>
+</html>

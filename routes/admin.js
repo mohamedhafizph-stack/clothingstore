@@ -8,7 +8,8 @@ import categoryController from '../controllers/admin/categoryController.js';
 import productController from '../controllers/admin/productController.js';
 //import { uploadProductImages } from '../config/productMulter.js';
 import upload from "../config/productMulter.js";
-
+import orderController from '../controllers/admin/order-managment.js';
+import returnController from '../controllers/admin/return-controller.js';
 
 router.get('/login',isLoggedIn,authController.loadLoginPage);
 router.post('/login',isLoggedIn,authController.logingIn);
@@ -50,8 +51,14 @@ router.get('/products/edit/:id',adminAuth,upload.array("images",5),productContro
 router.patch('/products/edit/:id',adminAuth,upload.array("images",5),productController.editProduct)
 router.patch('/products/status/:id',adminAuth,productController.productStatus)
 router.patch('/products/stock/:productId/:variantId',adminAuth,productController.removeStock)
-
- 
+router.get('/orders', adminAuth, orderController.getAdminOrders);
+router.patch('/orders/update-status', adminAuth, orderController.updateOrderStatus);
+router.patch('/orders/update-item-status', adminAuth, orderController.updateItemStatus)
+router.patch('/orders/handle-return', adminAuth, orderController.handleReturnStatus);
+router.get('/returns', adminAuth, returnController.getReturnRequests);
+router.patch('/returns/handle', adminAuth, returnController.handleReturnAction);
+router.patch('/returns/approve-order', adminAuth, returnController.approveFullOrderReturn);
+router.get('/orders/:id', adminAuth,orderController.getorderDetails);
 router.get('/logout',(req,res)=>{
     req.session.destroy(()=>{
         res.redirect('/admin/login',{error:null})
