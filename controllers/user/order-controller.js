@@ -4,6 +4,82 @@ import Address from '../../model/address.js';
 import Product from '../../model/Product.js';
 import PDFDocument from 'pdfkit';
 
+// export const placeOrder = async (req, res) => {
+//     try {
+//         const userId = req.session.user?.id || req.user;
+//         const { addressId } = req.body;
+
+//         const [cart, selectedAddress] = await Promise.all([
+//             Cart.findOne({ user: userId }).populate('items.product'),
+//             Address.findById(addressId)
+//         ]);
+
+//         if (!cart || cart.items.length === 0) {
+//             return res.status(400).json({ success: false, message: "Cart is empty" });
+//         }
+
+//         const orderItems = cart.items.map(item => {
+           
+//             const itemPrice = Number(item.price);
+            
+//             return {
+//                 product: item.product._id,
+//                 quantity: item.quantity,
+//                 price: itemPrice, 
+//                 size: item.size    
+//             };
+//         });
+
+//         const totalAmount = orderItems.reduce((acc, item) => {
+//             return acc + (item.price * item.quantity);
+//         }, 0);
+
+//         if (isNaN(totalAmount)) {
+//             return res.status(400).json({ success: false, message: "Error calculating total price." });
+//         }
+
+//         const newOrder = new Order({
+//             user: userId,
+//             items: orderItems,
+//             shippingAddress: {
+//                 fullName: selectedAddress.fullName,
+//                 addressLine: selectedAddress.addressLine,
+//                 city: selectedAddress.city,
+//                 state: selectedAddress.state,
+//                 pincode: selectedAddress.pincode,
+//                 phone: selectedAddress.phone
+//             },
+//             totalPrice: totalAmount,
+//             paymentMethod: 'COD',
+//             status: 'Pending'
+//         });
+
+//         await newOrder.save();
+
+// for (const item of cart.items) {
+//     await Product.findOneAndUpdate(
+//         { 
+//             _id: item.product._id, 
+//             "variants.size": item.size 
+//         },
+//         { 
+//             $inc: { 
+//                 "variants.$.stock": -item.quantity, // Minus from size
+//                 "totalStock": -item.quantity        // Minus from total
+//             } 
+//         }
+//     );
+// }
+
+//         await Cart.findOneAndDelete({ user: userId });
+
+//         res.json({ success: true, orderId: newOrder.orderId });
+
+//     } catch (error) {
+//         console.error("Order Placement Error:", error);
+//         res.status(500).json({ success: false, message: "Server error during order placement" });
+//     }
+// };
 export const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user?.id || req.user;
@@ -18,10 +94,21 @@ export const placeOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: "Cart is empty" });
         }
 
-        const orderItems = cart.items.map(item => {
-           
-            const itemPrice = Number(item.price);
+        // --- STEP 1: STOCK CHECK ---
+        for (const item of cart.items) {
+            // Find the specific variant for the selected size
+            const variant = item.product.variants.find(v => v.size === item.size);
             
+            if (!variant || variant.stock < item.quantity) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `Stock unavailable for ${item.product.name} (Size: ${item.size}). Only ${variant ? variant.stock : 0} left.` 
+                });
+            }
+        }
+
+        const orderItems = cart.items.map(item => {
+            const itemPrice = Number(item.price);
             return {
                 product: item.product._id,
                 quantity: item.quantity,
@@ -54,14 +141,30 @@ export const placeOrder = async (req, res) => {
             status: 'Pending'
         });
 
+        // Save the order
         await newOrder.save();
 
-        for (const item of cart.items) {
-            await Product.findByIdAndUpdate(item.product._id, {
-                $inc: { quantity: -item.quantity }
-            });
-        }
+        // --- STEP 2: UPDATE STOCK (OPTION A) ---
+        // Using positional operator $ to target the specific size variant
+        const stockUpdates = cart.items.map(item => {
+            return Product.findOneAndUpdate(
+                { 
+                    _id: item.product._id, 
+                    "variants.size": item.size 
+                },
+                { 
+                    $inc: { 
+                        "variants.$.stock": -item.quantity, 
+                        "totalStock": -item.quantity 
+                    } 
+                }
+            );
+        });
 
+        // Run all stock updates
+        await Promise.all(stockUpdates);
+
+        // --- STEP 3: CLEAR CART ---
         await Cart.findOneAndDelete({ user: userId });
 
         res.json({ success: true, orderId: newOrder.orderId });
