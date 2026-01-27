@@ -6,6 +6,7 @@
     <title>Wearify | My Profile</title>
     <link rel="stylesheet" href="/css/userprofile.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
 </head>
 <body>
 
@@ -28,7 +29,7 @@
             <button class="icon-btn"><i class="ph ph-heart"></i></button>
             <button class="icon-btn"><i class="ph ph-shopping-bag"></i></button>
            <img 
-  src="<%= user?.profilePic || '/images/default-avatar.png' %>" 
+  src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
   alt="Avatar"
   style="width:80px;height:80px;border-radius:50%;object-fit:cover;"
 >
@@ -58,7 +59,7 @@
 
             <div class="profile-image-section">
     <img 
-      src="<%= user.profilePic %>" 
+     src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
       alt="Profile Image"
       class="profile-image-large"
     >

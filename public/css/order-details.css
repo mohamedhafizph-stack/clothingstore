@@ -201,3 +201,46 @@ body {
 .link-btn-danger { background: none; border: none; color: #f85149; cursor: pointer; font-size: 13px; font-weight: 600; }
 .btn-full-return { width: 100%; padding: 12px; background: #21262d; border: 1px solid #30363d; color: #f85149; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
 .btn-full-return:hover { background: #da3633; color: #fff; }
+.item-footer-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-item-cancel {
+    background: #21262d;
+    color: #f85149;
+    border: 1px solid #30363d;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-item-cancel:hover {
+    background: #f85149;
+    color: white;
+}
+
+.btn-item-return {
+    background: #21262d;
+    color: #3fb950;
+    border: 1px solid #30363d;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-item-return:hover {
+    background: #3fb950;
+    color: white;
+}
+
+.status-notice {
+    color: #8b949e;
+    font-size: 0.85rem;
+    font-style: italic;
+}
