@@ -131,3 +131,27 @@ body.auth-page {
 .auth-footer a:hover {
     color: var(--accent-green);
 }
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 45px; /* Ensures text doesn't overlap the icon */
+}
+
+.toggle-icon {
+    position: absolute;
+    right: 15px;
+    color: #666;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.toggle-icon:hover {
+    color: #ffffff;
+    transform: scale(1.1);
+}

@@ -155,3 +155,78 @@ td { padding: 15px; border-bottom: 1px solid var(--border-color); }
   border-radius: 50% !important;
   object-fit: cover !important;
 }
+:root {
+    --sidebar-bg: #000000;
+    --sidebar-width: 260px;
+    --accent-blue: #3b82f6;
+    --text-muted: #888888;
+    --hover-bg: #111111;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid #1a1a1a;
+    padding: 2rem 1.5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Brand Heading */
+.sidebar h2 {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin-bottom: 2.5rem;
+    padding-left: 0.75rem;
+}
+
+/* Navigation Container */
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Nav Items */
+.nav-item {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+/* Hover State */
+.nav-item:hover {
+    color: #ffffff;
+    background-color: var(--hover-bg);
+}
+
+/* Active State - "The Glow" */
+.nav-item.active {
+    color: #ffffff;
+    background-color: rgba(59, 130, 246, 0.1); /* Subtle blue tint */
+    border-left: 4px solid var(--accent-blue);
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
+
+/* Sidebar Footer (Optional) */
+.sidebar::after {
+    content: "V 1.0.4";
+    margin-top: auto;
+    font-size: 0.7rem;
+    color: #333;
+    padding-left: 0.75rem;
+}

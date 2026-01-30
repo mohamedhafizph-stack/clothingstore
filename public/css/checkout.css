@@ -287,3 +287,122 @@ nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
 .input-group { display: flex; flex-direction: column; margin-top: 20px; }
 label { font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted); }
 textarea { background: var(--card-dark); border: 1px solid var(--border-grey); border-radius: 8px; padding: 12px; color: white; resize: none; min-height: 100px; }
+.payment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.payment-card {
+    cursor: pointer;
+    position: relative;
+}
+
+.payment-card input {
+    position: absolute;
+    opacity: 0;
+}
+
+.payment-content {
+    background: #0d0d0d;
+    border: 1px solid #1a1a1a;
+    padding: 20px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s ease;
+    text-align: center;
+}
+
+.payment-content i { color: #888; width: 24px; height: 24px; }
+.payment-content span { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #888; }
+.wallet-bal { font-size: 10px; color: #555; }
+
+/* Active State */
+.payment-card input:checked + .payment-content {
+    border-color: #fff;
+    background: #111;
+}
+
+.payment-card input:checked + .payment-content i,
+.payment-card input:checked + .payment-content span {
+    color: #fff;
+}
+/* Navbar Container */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 5%;
+    background-color: #000000;
+    border-bottom: 1px solid #1a1a1a;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Logo Styling */
+.logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+/* Nav Right Section */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Spacing between icons and avatar */
+}
+
+/* Lucide Icon Styling */
+.nav-right [data-lucide] {
+    width: 22px;
+    height: 22px;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.nav-right [data-lucide]:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* Profile Avatar */
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #222;
+    transition: all 0.3s ease;
+    display: block; /* Removes baseline gap */
+}
+
+.avatar:hover {
+    border-color: #ffffff;
+    transform: scale(1.05);
+}
+
+/* Link Reset */
+.nav-right a {
+    text-decoration: none;
+    line-height: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .navbar {
+        padding: 0.8rem 1.2rem;
+    }
+    .nav-right {
+        gap: 1rem;
+    }
+}

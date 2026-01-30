@@ -164,3 +164,26 @@ body.admin-body {
 .status-badge.pending { background: #3d3d3d; color: #fff; }
 .status-badge.returned { background: #238636; color: #fff; } /* Green */
 .status-badge.delivered { background: #1f6feb; color: #fff; } /* Blue (for Rejects) */
+/* Add this to returns.css if it's missing */
+.main-content-wrapper {
+    margin-left: 260px; /* Adjust if your sidebar width is different */
+    width: calc(100% - 260px);
+    padding: 40px;
+    box-sizing: border-box;
+}
+/* Apply to the wrapper in your Returns page */
+.main-content-wrapper {
+    margin-left: 260px !important; /* Pushes content exactly past the sidebar */
+    width: calc(100% - 260px) !important; /* Takes up only the remaining space */
+    padding: 40px;
+    min-height: 100vh;
+    display: block;
+    box-sizing: border-box; /* Crucial: includes padding in width calculation */
+    background-color: #0f1115; /* Contrast color to see the workspace */
+}
+
+/* Ensure the container doesn't restrict the main-content */
+.admin-container {
+    width: 100%;
+    display: block; /* Remove flex if it's causing squashing */
+}

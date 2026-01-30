@@ -13,22 +13,14 @@
     <header class="navbar">
         <div class="nav-left">
             <div class="logo">Wearify</div>
-            <nav>
-                <a href="/shop/shirts">Shirts</a>
-                <a href="/shop/tshirts">T-Shirts</a>
-                <a href="/shop/pants">Pants</a>
-                <a href="/shop/shorts">Shorts</a>
-            </nav>
+           
         </div>
         <div class="nav-right">
-            <div class="search-bar">
-                <i data-lucide="search"></i>
-                <input type="text" placeholder="Search">
-            </div>
+            
             <i data-lucide="heart"></i>
-            <i data-lucide="shopping-bag"></i>
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=<%= user.name %>" class="profile-img">
-        </div>
+            <a href="/home/cart"><i data-lucide="shopping-bag"></i></a>
+<a href="/profile"><img src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
+  alt="Profile" alt="Profile"class="avatar"></a>        </div>
     </header>
 
     <main class="checkout-container">
@@ -68,6 +60,38 @@
                         
                     </section>
                 </form>
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<section class="form-section payment-section">
+    <div class="section-header">
+        <h3>Payment Method</h3>
+    </div>
+    <div class="payment-grid">
+        <label class="payment-card">
+            <input type="radio" name="paymentMethod" value="COD" checked>
+            <div class="payment-content">
+                <i data-lucide="truck"></i>
+                <span>Cash on Delivery</span>
+            </div>
+        </label>
+
+        <label class="payment-card">
+            <input type="radio" name="paymentMethod" value="Razorpay">
+            <div class="payment-content">
+                <i data-lucide="credit-card"></i>
+                <span>Online Payment</span>
+            </div>
+        </label>
+
+        <label class="payment-card">
+            <input type="radio" name="paymentMethod" value="Wallet">
+            <div class="payment-content">
+                <i data-lucide="wallet"></i>
+                <span>Wallet Balance</span>
+                        </div>
+        </label>
+    </div>
+</section>
             </div>
 
             <aside class="order-summary">
@@ -114,67 +138,65 @@
 
     <script>
         lucide.createIcons();
-        async function placeOrder() {
+       async function placeOrder() {
     const addressId = document.querySelector('input[name="addressId"]:checked')?.value;
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
     
     if (!addressId) {
-        return Swal.fire({
-            icon: 'warning',
-            title: 'Address Required',
-            text: 'Please select a shipping address before placing your order.',
-            confirmButtonColor: '#2563eb'
-        });
+        return Swal.fire({ icon: 'warning', title: 'Address Required', text: 'Please select a shipping address.', confirmButtonColor: '#000' });
     }
 
-    // Show a loading spinner so the user doesn't click multiple times
     Swal.fire({
         title: 'Processing Order...',
-        text: 'Please wait while we verify stock and prepare your order.',
         allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
+        didOpen: () => { Swal.showLoading(); }
     });
 
     try {
         const response = await fetch('/order/place', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ addressId })
+            body: JSON.stringify({ addressId, paymentMethod })
         });
 
         const result = await response.json();
 
         if (result.success) {
-            // Success! Show a quick success message then redirect
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'Your order has been placed successfully.',
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
-                window.location.href = `/cart/checkout/success/${result.orderId}`;
-            });
+            if (paymentMethod === 'Razorpay') {
+                // Initializing Razorpay
+                const options = {
+                    "key": result.rzpKey, // Sent from backend
+                    "amount": result.amount, 
+                    "currency": "INR",
+                    "name": "Wearify",
+                    "description": "Streetwear Purchase",
+                    "order_id": result.rzpOrderId, 
+                    "handler": async function (response) {
+                        // Verify Payment on Backend
+                        window.location.href = `/order/verify?orderId=${result.orderId}&paymentId=${response.razorpay_payment_id}`;
+                    },
+                    "theme": { "color": "#000000" }
+                };
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+                Swal.close();
+            } else {
+                // Success for COD or Wallet
+                Swal.fire({
+                    icon: 'success', title: 'Order Placed!', text: 'Thank you for shopping with Wearify.', timer: 2000, showConfirmButton: false
+                }).then(() => {
+                    window.location.href = `/cart/checkout/success/${result.orderId}`;
+                });
+            }
         } else {
-            // ERROR: This catches your "Insufficient stock" or "Product Blocked" messages
-            Swal.fire({
-                icon: 'error',
-                title: 'Order Failed',
-                text: result.message || 'Something went wrong while placing your order.',
-                confirmButtonColor: '#2563eb'
-            });
+            Swal.fire({ icon: 'error', title: 'Failed', text: result.message, confirmButtonColor: '#000' });
         }
     } catch (error) {
-        console.error("Fetch Error:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Server Error',
-            text: 'We are having trouble connecting to the server. Please try again later.',
-            confirmButtonColor: '#2563eb'
-        });
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Connection failed.' });
     }
 }
+
     </script>
+
 </body>
 </html>

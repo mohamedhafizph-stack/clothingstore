@@ -726,7 +726,8 @@ export const LoadeditAdressPage = async(req,res)=>{
   
   const currentUser = req.user || req.session.user
   
-  const user = currentUser._id || currentUser.id
+  const users= currentUser._id || currentUser.id
+  const user = await User.findById(users)
 
   const address = await Address.findById(req.params.id)
 

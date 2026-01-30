@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wearify | Login</title>
     <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 </head>
 <body class="auth-page">
 
@@ -26,9 +27,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                </div>
+    <label for="password">Password</label>
+    <div class="password-wrapper">
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        <i class="ph ph-eye" id="togglePassword"></i>
+    </div>
+</div>
 
                 <div class="forgot-link">
                     <a href="/forgot-password">Forgot Password?</a>
@@ -62,6 +66,21 @@
   });
 </script>
 <% } %>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+const passwordInput = document.querySelector('#password');
+
+togglePassword.addEventListener('click', function () {
+    // Toggle the type attribute
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    
+    // Toggle the icon class
+    this.classList.toggle('ph-eye');
+    this.classList.toggle('ph-eye-slash');
+});
+</script>
 
 
 </body>

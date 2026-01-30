@@ -9,7 +9,7 @@
 <body class="shop-page">
 
     <header class="shop-header">
-        <div class="logo">Wearify</div>
+        <a href="/home"><div class="logo">Wearify</div></a>
          <% categories.forEach(category => { %>
   <div class="category-card">
    <a href="/shop/<%= category.name%>">
@@ -25,7 +25,7 @@
             <div class="icons">
                 <span class="icon">❤️</span>
                 <span class="icon">🛒</span>
-                <img src="/images/user-profile.jpg" class="profile-thumb" alt="User">
+              
             </div>
         </div>
     </header>

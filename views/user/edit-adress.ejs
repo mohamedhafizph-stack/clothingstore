@@ -9,24 +9,15 @@
 <body>
 
     <header class="navbar">
-        <div class="logo-section">
-            <span class="logo-icon">L</span>
+        <div class="logo">
             <span class="logo-text">Wearify</span>
         </div>
-        <nav>
-            <a href="#">Shirts</a>
-            <a href="#">T-Shirts</a>
-            <a href="#">Pants</a>
-            <a href="#">Shorts</a>
-        </nav>
+        
         <div class="header-right">
-            <div class="search-container">
-                <input type="text" placeholder="Search">
-            </div>
+            
             <div class="icon-group">
-                <button class="icon-btn">♡</button>
-                <button class="icon-btn">🛒</button>
-                <img src="/images/user-avatar.png" alt="Profile" class="user-avatar">
+                 <a href="/profile"><img src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
+  alt="Profile" alt="Profile"class="avatar"></a>
             </div>
         </div>
     </header>

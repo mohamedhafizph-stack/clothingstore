@@ -10,20 +10,12 @@
 
     <header class="navbar">
         <div class="logo">Wearify</div>
-        <nav>
-            <a href="/shirts">Shirts</a>
-            <a href="/t-shirts">T-Shirts</a>
-            <a href="/pants">Pants</a>
-            <a href="/shorts">Shorts</a>
-        </nav>
+       
         <div class="header-right">
-            <div class="search-bar">
-                <input type="text" placeholder="Search">
-            </div>
             <div class="icon-group">
-                <span class="icon">♡</span>
-                <span class="icon">🛒</span>
-                <img src="<%= user && user.profilePic ? user.profilePic : '/images/default-avatar.png' %>" alt="Profile" class="profile-thumb">
+               
+               <a href="/profile"><img src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
+  alt="Profile" alt="Profile"class="avatar"></a>
             </div>
         </div>
     </header>

@@ -59,7 +59,7 @@ router.get('/shop/details/:id',userAuth,productController.loadProductDetails)
 router.post('/shop/details/:product_id',userAuth,cartController.addtoCart)
 router.get('/home/cart',userAuth,cartController.loadCart)
 router.patch('/home/cart/update',userAuth,cartController.updateCartQuantity)
-router.get('/cart/checkout',userAuth,checkoutController.loadCheckoutpage)
+router.get('/cart/checkout',userAuth,checkoutController.loadCheckoutpage)   
 router.get('/cart/checkout/add',userAuth,userController.loadAddAddressPage)
 router.post('/cart/checkout/add',userAuth,userController.Addaddress)
 router.post('/order/place', userAuth, orderController.placeOrder);

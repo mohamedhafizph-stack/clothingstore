@@ -212,3 +212,103 @@ h1 { font-size: 32px; margin-bottom: 20px; }
   gap: 8px;
   align-items: center;
 }
+:root {
+    --sidebar-width: 260px;
+    --sidebar-bg: #000000;
+    --item-hover: #111111;
+    --accent-blue: #3b82f6;
+    --text-dim: #888888;
+    --text-bright: #ffffff;
+    --sidebar-border: #1a1a1a;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 0;
+    z-index: 1000;
+}
+
+/* Brand Heading */
+.sidebar h2 {
+    color: var(--text-bright);
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1.5px;
+    padding: 0 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+/* Navigation List */
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Individual Nav Item */
+.nav-item {
+    padding: 0.8rem 1.5rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 3px solid transparent;
+}
+
+/* Hover Effect */
+.nav-item:hover {
+    background-color: var(--item-hover);
+    color: var(--text-bright);
+    padding-left: 1.8rem; /* Subtle slide effect */
+}
+
+/* Active State */
+.nav-item.active {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+    color: var(--text-bright);
+    border-left: 3px solid var(--accent-blue);
+    font-weight: 600;
+}
+
+/* Optional: Scrollbar for many links */
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: #222;
+} 
+main.admin-content {
+    margin-left: 260px; /* Same as sidebar width */
+    padding: 40px;
+    width: calc(100% - 260px);
+}
+/* This ensures the main content starts where the sidebar ends */
+.admin-content {
+    margin-left: 260px; /* Must match your sidebar width */
+    width: calc(100% - 260px); /* Ensures it doesn't overflow horizontally */
+    padding: 40px;
+    min-height: 100vh;
+    background-color: var(--bg-dark);
+}
+
+/* Ensure the sidebar has a fixed width */
+.sidebar {
+    width: 260px;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+}

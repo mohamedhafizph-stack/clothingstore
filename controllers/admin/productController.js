@@ -226,8 +226,27 @@ export const removeStock = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
+
+const editStock = async (req, res) => {
+    try {
+        const { productId, variantId } = req.params;
+        const { stock } = req.body;
+
+        await Product.updateOne(
+            { _id: productId, "variants._id": variantId },
+            { 
+                $set: { "variants.$.stock": parseInt(stock) } 
+            }
+        );
+
+        res.redirect(`/admin/products/manage-stock/${productId}`);
+    } catch (error) {
+        console.error("Error updating stock:", error);
+        res.status(500).send("Internal Server Error");
+    }
+};
 const productController = {
     loadProduct,loadaddProduct,addProduct,getManageStock,updateStock,
-    loadeditProduct,editProduct,productStatus,removeStock
+    loadeditProduct,editProduct,productStatus,removeStock,editStock
 }
 export default productController

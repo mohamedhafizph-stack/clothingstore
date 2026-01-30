@@ -101,3 +101,19 @@ input[type="email"] {
     color: #b0b3b8;
     font-size: 13px;
 }
+.logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #f5f5f5; /* slightly lighter white */
+}

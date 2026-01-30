@@ -1,0 +1,194 @@
+<style>
+:root {
+    --sidebar-w: 260px;
+    --sidebar-bg: #000000;
+    --nav-hover: #111111;
+    --accent: #3b82f6;
+    --text-muted: #71717a;
+}
+
+body {
+    margin: 0;
+    background-color: #09090b; /* Deep dark background for the whole app */
+    font-family: 'Inter', sans-serif;
+}
+
+.sidebar {
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--sidebar-bg);
+    border-right: 1px solid #1a1a1a;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.sidebar-header { padding: 2rem 1.5rem; }
+.sidebar-header h2 { color: #fff; font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; margin: 0; }
+.sidebar-header span { color: var(--accent); font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; }
+
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 0.8rem;
+    scrollbar-width: none; 
+}
+.sidebar-nav::-webkit-scrollbar { display: none; }
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+}
+
+.nav-item i { width: 20px; margin-right: 12px; font-size: 1.1rem; text-align: center; }
+.nav-item:hover { background: var(--nav-hover); color: #fff; }
+
+.nav-item.active {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.sidebar-footer { padding: 1rem 0.8rem; border-top: 1px solid #1a1a1a; }
+.nav-item.logout { color: #ef4444; }
+
+/* THE CRITICAL ALIGNMENT FIX */
+.main-content-wrapper {
+    margin-left: var(--sidebar-w); /* Pushes content away from sidebar */
+    width: calc(100% - var(--sidebar-w));
+    min-height: 100vh;
+    padding: 40px;
+    box-sizing: border-box; /* Essential for padding calculation */
+}
+
+@media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); transition: 0.3s; }
+    .main-content-wrapper { margin-left: 0; width: 100%; padding: 20px; }
+}
+* {
+    box-sizing: border-box; /* Crucial: padding won't increase width */
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    overflow-x: hidden; /* Prevents horizontal shaking */
+    width: 100%;
+}
+</style>
+<style>
+    /* Force consistent box model for everything */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    :root {
+        --sidebar-w: 260px;
+        --sidebar-bg: #000000;
+        --accent: #3b82f6;
+    }
+
+    /* Fixed Sidebar - Force height and width */
+    .sidebar {
+        width: var(--sidebar-w) !important; /* Force width */
+        min-width: var(--sidebar-w) !important;
+        height: 100vh !important;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        background: var(--sidebar-bg);
+        border-right: 1px solid #1a1a1a;
+        display: flex;
+        flex-direction: column;
+        z-index: 9999; /* Ensure it stays on top */
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Header height should be fixed so it doesn't change per page */
+    .sidebar-header {
+        height: 100px; 
+        padding: 2rem 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 0.8rem;
+    }
+
+    /* Prevent text shrinking or growing on different pages */
+    .nav-item {
+        height: 45px;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        font-size: 14px !important; /* Fixed font size */
+        line-height: 1;
+        text-decoration: none;
+        color: #71717a;
+        margin-bottom: 4px;
+    }
+
+    /* THE WRAPPER FIX - This must be on the main tag of both pages */
+    .main-content-wrapper {
+        margin-left: var(--sidebar-w) !important;
+        width: calc(100% - var(--sidebar-w)) !important;
+        min-height: 100vh;
+        display: block;
+    }
+</style>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>WEARIFY</h2>
+        <span>ADMIN PANEL</span>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <a href="/admin/dashboard" class="nav-item <%= activePage === 'dashboard' ? 'active' : '' %>">
+            <i class="fas fa-grid-2"></i> Dashboard
+        </a>
+        <a href="/admin/orders" class="nav-item <%= activePage === 'orders' ? 'active' : '' %>">
+            <i class="fas fa-shopping-cart"></i> Orders
+        </a>
+        <a href="/admin/products" class="nav-item <%= activePage === 'products' ? 'active' : '' %>">
+            <i class="fas fa-tshirt"></i> Products
+        </a>
+        <a href="/admin/categories" class="nav-item <%= activePage === 'categories' ? 'active' : '' %>">
+            <i class="fas fa-tags"></i> Categories
+        </a>
+        <a href="/admin/users" class="nav-item <%= activePage === 'users' ? 'active' : '' %>">
+            <i class="fas fa-user-friends"></i> Users
+        </a>
+        <a href="/admin/returns" class="nav-item <%= activePage === 'returns' ? 'active' : '' %>">
+            <i class="fas fa-undo-alt"></i> Returns
+        </a>
+        <a href="/admin/payments" class="nav-item <%= activePage === 'payments' ? 'active' : '' %>">
+            <i class="fas fa-credit-card"></i> Payments
+        </a>
+        <a href="/admin/reports" class="nav-item <%= activePage === 'reports' ? 'active' : '' %>">
+            <i class="fas fa-chart-bar"></i> Reports
+        </a>
+        <a href="/admin/settings" class="nav-item <%= activePage === 'settings' ? 'active' : '' %>">
+            <i class="fas fa-cog"></i> Settings
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="/admin/logout" class="nav-item logout">
+            <i class="fas fa-power-off"></i> Logout
+        </a>
+    </div>
+</div>

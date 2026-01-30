@@ -59,9 +59,10 @@ router.get('/returns', adminAuth, returnController.getReturnRequests);
 router.patch('/returns/handle', adminAuth, returnController.handleReturnAction);
 router.patch('/returns/approve-order', adminAuth, returnController.approveFullOrderReturn);
 router.get('/orders/:id', adminAuth,orderController.getorderDetails);
+router.patch('/products/stock-update/:productId/:variantId',adminAuth, productController.editStock);
 router.get('/logout',(req,res)=>{
     req.session.destroy(()=>{
-        res.redirect('/admin/login',{error:null})
+        res.redirect('/admin/login')
     })
 })
  

@@ -93,12 +93,15 @@ if (req.query.sizes) {
 
 const loadProductDetails = async (req,res) => {
     try{
+       const userId = req.session.user?.id || req.user
         const {id}= req.params
         const product = await Product.findById(id)
+         const categories = await Category.find()
         const name = product.name
         const cat = product.category
         const relatedProducts = await Product.find({status:"Active",category:cat,name:{$ne:name}}).limit(3)
-     res.render('user/products-details',{product,relatedProducts})
+        const user = await User.findById(userId)
+     res.render('user/products-details',{product,relatedProducts,categories,user})
     }catch(err){
         console.log(err)
     }

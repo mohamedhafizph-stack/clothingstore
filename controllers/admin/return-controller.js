@@ -66,20 +66,32 @@ export const getReturnRequests = async (req, res) => {
 
 export const handleReturnAction = async (req, res) => {
     try {
-        const { orderId, itemId, action } = req.body; 
-        const order = await Order.findById(orderId);
+        const { orderId, itemId, action } = req.body;
         
+        const order = await Order.findById(orderId);
         if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
-        const item = order.items.id(itemId);
+        const item = order.items.find(i => i._id.toString() === itemId);
         if (!item) return res.status(404).json({ success: false, message: "Item not found" });
 
         if (action === 'Approve') {
-       
+           
             item.status = 'Returned';
-
-          
             const refundAmount = item.price * item.quantity;
+
+            await Product.updateOne(
+                { 
+                    _id: item.product, 
+                    "variants.size": item.size 
+                },
+                { 
+                    $inc: { 
+                        "variants.$.stock": item.quantity, 
+                        "totalStock": item.quantity 
+                    }
+                }
+            );
+
             await User.findByIdAndUpdate(order.user, {
                 $inc: { wallet: refundAmount },
                 $push: { 
@@ -92,16 +104,9 @@ export const handleReturnAction = async (req, res) => {
                 }
             });
 
-            
-            await Product.findByIdAndUpdate(item.product, {
-                $inc: { quantity: item.quantity }
-            });
-
-           
             order.totalPrice -= refundAmount;
 
         } else if (action === 'Reject') {
-           
             item.status = 'Delivered';
         }
 
@@ -112,11 +117,11 @@ export const handleReturnAction = async (req, res) => {
         if (remainingActiveItems.length === 0) {
             order.status = 'Returned';
         } else {
-            
             order.status = 'Delivered';
         }
 
         await order.save();
+        
         res.json({ success: true, message: `Return ${action}ed successfully` });
 
     } catch (error) {
@@ -128,18 +133,30 @@ export const approveFullOrderReturn = async (req, res) => {
     try {
         const { orderId } = req.body;
         const order = await Order.findById(orderId);
+        
+        if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
         let totalRefund = 0;
 
         for (let item of order.items) {
-            if (item.status === 'Return Requested') {
+            if (item.status === 'Return Requested' || item.status === 'Delivered') {
                 item.status = 'Returned';
                 
                 const itemTotal = item.price * item.quantity;
                 totalRefund += itemTotal;
 
-                await Product.findByIdAndUpdate(item.product, {
-                    $inc: { quantity: item.quantity }
-                });
+                await Product.updateOne(
+                    { 
+                        _id: item.product, 
+                        "variants.size": item.size 
+                    },
+                    { 
+                        $inc: { 
+                            "variants.$.stock": item.quantity, 
+                            "totalStock": item.quantity 
+                        }
+                    }
+                );
             }
         }
 
@@ -149,20 +166,22 @@ export const approveFullOrderReturn = async (req, res) => {
                 $push: { walletHistory: { 
                     amount: totalRefund, 
                     type: 'Credit', 
-                    reason: `Full Return Approved: ORD${order.orderId}` 
+                    reason: `Full Return Approved: ORD${order.orderId}`,
+                    date: new Date()
                 }}
             });
+            
             order.totalPrice -= totalRefund;
         }
 
         order.status = 'Returned';
         await order.save();
 
-        res.json({ success: true, message: "Full order return processed and refunded" });
+        res.json({ success: true, message: "Full order return processed and refunded to wallet" });
     } catch (error) {
+        console.error("Full Return Error:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
 const returnController = { getReturnRequests,handleReturnAction,approveFullOrderReturn}
 export default returnController

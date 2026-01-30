@@ -200,3 +200,126 @@ body {
   border-radius: 50%;
   object-fit: cover;
 }
+/* Profile Header Container */
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 4%;
+    background-color: #000000;
+    border-bottom: 1px solid #1a1a1a;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Left Section: Logo & Nav */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #888;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #ffffff;
+}
+
+/* Right Section: Search & Icons */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+/* Sleek Search Bar */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #111;
+    border: 1px solid #222;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    gap: 0.5rem;
+}
+
+.search-bar i {
+    color: #555;
+    font-size: 1.1rem;
+}
+
+.search-bar input {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 0.9rem;
+    outline: none;
+    width: 150px;
+    transition: width 0.3s ease;
+}
+
+.search-bar input:focus {
+    width: 200px;
+}
+
+/* Icon Buttons */
+.icon-btn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.icon-btn:hover {
+    color: #888;
+}
+
+/* Profile Avatar Overrides */
+/* Note: Removing inline width/height from HTML and using CSS is cleaner */
+.profile-header .header-right img {
+    width: 40px !important; /* Overriding your 80px for a standard header size */
+    height: 40px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #222;
+    transition: border-color 0.3s ease;
+}
+
+.profile-header .header-right img:hover {
+    border-color: #ffffff;
+}
+
+/* Mobile Responsive */
+@media (max-width: 850px) {
+    .nav-links {
+        display: none; /* Recommended for clean mobile look */
+    }
+    .search-bar input {
+        width: 80px;
+    }
+}

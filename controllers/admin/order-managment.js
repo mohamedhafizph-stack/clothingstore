@@ -39,37 +39,29 @@ export const getAdminOrders = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
     try {
-        const { orderId, status } = req.body;
-        
-        console.log("Update Request Received:", { orderId, status });
-
-        if (!orderId || !status) {
-            return res.status(400).json({ success: false, message: "Missing Order ID or Status" });
-        }
+        const { orderId } = req.params;
+        const { newStatus } = req.body;
 
         const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({ success: false, message: "Order not found in database" });
+        if (!order) return res.status(404).json({ message: "Order not found" });
+
+        const terminalStates = ['Cancelled', 'Returned', 'Delivered'];
+
+        if (terminalStates.includes(order.status)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `This order is already ${order.status} and cannot be changed.` 
+            });
         }
 
-        if (['Cancelled', 'Returned'].includes(status) && !['Cancelled', 'Returned'].includes(order.status)) {
-            for (const item of order.items) {
-                await Product.findByIdAndUpdate(item.product, {
-                    $inc: { quantity: item.quantity }
-                });
-            }
-        }
-
-        order.status = status;
+        order.status = newStatus;
         await order.save();
 
         res.json({ success: true, message: "Status updated successfully" });
-
     } catch (error) {
-        console.error("SERVER ERROR:", error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({ message: "Internal server error" });
     }
-}; 
+};
 export const updateItemStatus = async (req, res) => {
     try {
         const { orderId, itemId, status } = req.body;

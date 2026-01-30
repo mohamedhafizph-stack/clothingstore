@@ -448,3 +448,86 @@ body.details-page {
 .main-image:hover #mainProductImage {
     transform: scale(2); /* Adjust zoom level here */
 }
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #f5f5f5; /* slightly lighter white */
+}
+/* Header Container */
+/* Header Container */
+.shop-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 5%;
+    background-color: #121212; /* Deep matte black */
+    border-bottom: 1px solid #2a2a2a; /* Subtle separator */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Logo Styling */
+.logo {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+}
+
+.shop-header a {
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+/* Category Navigation */
+.category-card {
+    margin: 0 12px;
+}
+
+.category-card h3 {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #a0a0a0; /* Muted gray text */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Hover State for Categories */
+.category-card:hover h3 {
+    color: #ffffff; /* Pop of white on hover */
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Avatar/Profile Picture */
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #333;
+    background-color: #1a1a1a;
+    transition: all 0.3s ease;
+}
+
+.avatar:hover {
+    border-color: #ffffff;
+    transform: scale(1.05);
+}
+
+/* Small screen adjustments */
+@media (max-width: 768px) {
+    .shop-header {
+        padding: 1rem 3%;
+    }
+    .category-card {
+        margin: 0 8px;
+    }
+    .category-card h3 {
+        font-size: 0.8rem;
+    }
+}

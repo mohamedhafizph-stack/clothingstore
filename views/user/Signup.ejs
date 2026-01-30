@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wearify | Create Account</title>
   <link rel="stylesheet" href="/css/userSignup.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 </head>
 <body class="auth-page">
 
@@ -35,14 +36,20 @@
       
 
       <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" novalidate>
-      </div>
+  <label for="password">Password</label>
+  <div class="password-wrapper">
+    <input type="password" id="password" name="password" placeholder="Enter your password" novalidate>
+    <i class="ph ph-eye toggle-icon" id="togglePassword"></i>
+  </div>
+</div>
 
-      <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" novalidate>
-      </div>
+<div class="form-group">
+  <label for="confirmPassword">Confirm Password</label>
+  <div class="password-wrapper">
+    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" novalidate>
+    <i class="ph ph-eye toggle-icon" id="toggleConfirmPassword"></i>
+  </div>
+</div>
 
       <button type="submit" class="btn-primary">SEND OTP</button>
     </form>
@@ -64,6 +71,26 @@
   });
 </script>
 <% } %>
+<script>
+  // Function to handle toggle logic
+function setupPasswordToggle(toggleId, inputId) {
+    const toggle = document.querySelector(toggleId);
+    const input = document.querySelector(inputId);
+
+    toggle.addEventListener('click', () => {
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        
+        // Toggle icon classes
+        toggle.classList.toggle('ph-eye');
+        toggle.classList.toggle('ph-eye-slash');
+    });
+}
+
+// Initialize for both fields
+setupPasswordToggle('#togglePassword', '#password');
+setupPasswordToggle('#toggleConfirmPassword', '#confirmPassword');
+</script>
 
 </body>
 </html>

@@ -145,3 +145,72 @@ h3 { margin: 0 0 10px 0; font-size: 18px; }
     object-fit: cover;
     background-color: #3e414d;
 }
+/* Minimalist Navbar Container */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 5%;
+    background-color: #000000; /* Deep black */
+    border-bottom: 1px solid #1a1a1a;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Logo Styling */
+.logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+    cursor: default;
+}
+
+/* Header Right & Icon Group */
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.icon-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Avatar Styling */
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #333; /* Dark border */
+    background-color: #111;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Avatar Hover Effect */
+.avatar:hover {
+    border-color: #ffffff; /* Glows white on hover */
+    transform: scale(1.1); /* Subtle pop */
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+/* Handle link decoration */
+.icon-group a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+    .navbar {
+        padding: 0.8rem 1.2rem;
+    }
+    .logo {
+        font-size: 1.3rem;
+    }
+}

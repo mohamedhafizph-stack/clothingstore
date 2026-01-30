@@ -1,3 +1,18 @@
+<style>
+    .admin-container {
+    display: flex;
+    width: 100%;
+}
+
+.main-content-wrapper {
+    margin-left: 260px; /* This MUST match your sidebar width exactly */
+    width: calc(100% - 260px);
+    padding: 40px;
+    min-height: 100vh;
+    background-color: #09090b; /* A slightly different black to see the difference */
+    box-sizing: border-box;
+}
+</style>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,11 +21,12 @@
     <title>Return Management | Wearify Admin</title>
     <link rel="stylesheet" href="/css/returns.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+   
 </head>
 <body class="admin-body">
-
     <div class="admin-container">
-        <aside class="sidebar">
+        <%- include('../partials/sidebar', { activePage: 'returns' }) %>
+        <!-- <aside class="sidebar">
             <div class="logo"><i class="fas fa-square"></i> Wearify Admin</div>
             <nav>
                 <a href="/admin/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
@@ -18,9 +34,9 @@
                 <a href="/admin/products"><i class="fas fa-box"></i> Products</a>
                 <a href="/admin/returns" class="active"><i class="fas fa-undo"></i> Return Management</a>
                 </nav>
-        </aside>
+        </aside> -->
 
-        <main class="main-content">
+        <main class="main-content-wrapper">
             <header class="content-header">
                 <h1>Return Management</h1>
                <div class="search-box">

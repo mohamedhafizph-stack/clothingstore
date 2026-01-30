@@ -4,82 +4,6 @@ import Address from '../../model/address.js';
 import Product from '../../model/Product.js';
 import PDFDocument from 'pdfkit';
 
-// export const placeOrder = async (req, res) => {
-//     try {
-//         const userId = req.session.user?.id || req.user;
-//         const { addressId } = req.body;
-
-//         const [cart, selectedAddress] = await Promise.all([
-//             Cart.findOne({ user: userId }).populate('items.product'),
-//             Address.findById(addressId)
-//         ]);
-
-//         if (!cart || cart.items.length === 0) {
-//             return res.status(400).json({ success: false, message: "Cart is empty" });
-//         }
-
-//         const orderItems = cart.items.map(item => {
-           
-//             const itemPrice = Number(item.price);
-            
-//             return {
-//                 product: item.product._id,
-//                 quantity: item.quantity,
-//                 price: itemPrice, 
-//                 size: item.size    
-//             };
-//         });
-
-//         const totalAmount = orderItems.reduce((acc, item) => {
-//             return acc + (item.price * item.quantity);
-//         }, 0);
-
-//         if (isNaN(totalAmount)) {
-//             return res.status(400).json({ success: false, message: "Error calculating total price." });
-//         }
-
-//         const newOrder = new Order({
-//             user: userId,
-//             items: orderItems,
-//             shippingAddress: {
-//                 fullName: selectedAddress.fullName,
-//                 addressLine: selectedAddress.addressLine,
-//                 city: selectedAddress.city,
-//                 state: selectedAddress.state,
-//                 pincode: selectedAddress.pincode,
-//                 phone: selectedAddress.phone
-//             },
-//             totalPrice: totalAmount,
-//             paymentMethod: 'COD',
-//             status: 'Pending'
-//         });
-
-//         await newOrder.save();
-
-// for (const item of cart.items) {
-//     await Product.findOneAndUpdate(
-//         { 
-//             _id: item.product._id, 
-//             "variants.size": item.size 
-//         },
-//         { 
-//             $inc: { 
-//                 "variants.$.stock": -item.quantity, // Minus from size
-//                 "totalStock": -item.quantity        // Minus from total
-//             } 
-//         }
-//     );
-// }
-
-//         await Cart.findOneAndDelete({ user: userId });
-
-//         res.json({ success: true, orderId: newOrder.orderId });
-
-//     } catch (error) {
-//         console.error("Order Placement Error:", error);
-//         res.status(500).json({ success: false, message: "Server error during order placement" });
-//     }
-// };
 export const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user?.id || req.user;
@@ -94,9 +18,7 @@ export const placeOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: "Cart is empty" });
         }
 
-        // --- STEP 1: STOCK CHECK ---
         for (const item of cart.items) {
-            // Find the specific variant for the selected size
             const variant = item.product.variants.find(v => v.size === item.size);
             
             if (!variant || variant.stock < item.quantity) {
@@ -141,11 +63,9 @@ export const placeOrder = async (req, res) => {
             status: 'Pending'
         });
 
-        // Save the order
+        
         await newOrder.save();
 
-        // --- STEP 2: UPDATE STOCK (OPTION A) ---
-        // Using positional operator $ to target the specific size variant
         const stockUpdates = cart.items.map(item => {
             return Product.findOneAndUpdate(
                 { 
@@ -161,10 +81,10 @@ export const placeOrder = async (req, res) => {
             );
         });
 
-        // Run all stock updates
+        
         await Promise.all(stockUpdates);
 
-        // --- STEP 3: CLEAR CART ---
+        
         await Cart.findOneAndDelete({ user: userId });
 
         res.json({ success: true, orderId: newOrder.orderId });
@@ -195,63 +115,112 @@ export const loadOrderSuccess = async (req, res) => {
 export const downloadInvoice = async (req, res) => {
     try {
         const { orderId } = req.params;
-        
         const order = await Order.findOne({ orderId }).populate('items.product');
 
-        if (!order) {
-            return res.status(404).send("Order not found");
-        }
+        if (!order) return res.status(404).send("Order not found");
 
-        const doc = new PDFDocument({ margin: 50 });
-        const filename = `Invoice_${order.orderId}.pdf`;
+        const doc = new PDFDocument({ margin: 50, size: 'A4' });
+        const filename = `WEARIFY_INV_${order.orderId}.pdf`;
+
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
-
         doc.pipe(res);
 
-        doc.fillColor('#444444').fontSize(20).text('WEARIFY RETAILS', 50, 50);
-        doc.fontSize(10).text('123 Fashion Street, Kerala, India', 50, 80);
-        doc.text('Support: support@wearify.com', 50, 95);
-        doc.moveDown();
+        // --- BRANDING HEADER ---
+        // Black sidebar/topbar accent
+        doc.rect(0, 0, 612, 40).fill('#000000'); 
+        
+        doc.fillColor('#ffffff')
+           .fontSize(14)
+           .text('OFFICIAL PURCHASE INVOICE', 50, 15, { characterSpacing: 2 });
 
-        doc.fillColor('#000000').fontSize(12).text(`Invoice Number: ${order.orderId}`, 400, 50);
-        doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 400, 65);
-        doc.moveDown();
+        // Logo and Company Info
+        doc.fillColor('#000000')
+           .fontSize(24)
+           .text('WEARIFY', 50, 70, { bold: true, characterSpacing: 1 });
+        
+        doc.fontSize(9)
+           .fillColor('#777777')
+           .text('WEARIFY RETAILS PVT LTD', 50, 100)
+           .text('123 Fashion Street, Cyber Park, Kerala, IN')
+           .text('GSTIN: 32AAAAA0000A1Z5');
 
-        doc.fontSize(14).text('Bill To:', 50, 130, { underline: true });
-        doc.fontSize(10).text(order.shippingAddress.fullName, 50, 150);
-        doc.text(order.shippingAddress.addressLine, 50, 165);
-        doc.text(`${order.shippingAddress.city}, ${order.shippingAddress.pincode}`, 50, 180);
-        doc.text(`Phone: ${order.shippingAddress.phone}`, 50, 195);
+        // Invoice Meta Info (Right Aligned)
+        doc.fillColor('#000000')
+           .fontSize(10)
+           .text(`INVOICE ID: #${order.orderId}`, 400, 75, { align: 'right' })
+           .text(`DATE: ${new Date(order.createdAt).toLocaleDateString()}`, 400, 90, { align: 'right' })
+           .text(`STATUS: ${order.paymentStatus.toUpperCase()}`, 400, 105, { align: 'right' });
 
-        const tableTop = 250;
-        doc.fontSize(10).text('Item Description', 50, tableTop, { bold: true });
-        doc.text('Size', 250, tableTop);
-        doc.text('Qty', 320, tableTop);
-        doc.text('Price', 400, tableTop);
-        doc.text('Total', 480, tableTop);
-        doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+        doc.moveTo(50, 130).lineTo(550, 130).strokeColor('#eeeeee').stroke();
+
+        // --- CLIENT & SHIPPING SECTION ---
+        doc.fillColor('#000000').fontSize(10).text('BILL TO:', 50, 150, { bold: true });
+        doc.fillColor('#444444')
+           .text(order.shippingAddress.fullName, 50, 165)
+           .text(order.shippingAddress.addressLine)
+           .text(`${order.shippingAddress.city}, ${order.shippingAddress.state}`)
+           .text(`PIN: ${order.shippingAddress.pincode}`)
+           .text(`PH: ${order.shippingAddress.phone}`);
+
+        // --- TABLE SECTION ---
+        const tableTop = 260;
+        
+        // Table Header Background
+        doc.rect(50, tableTop, 500, 20).fill('#f9f9f9');
+        doc.fillColor('#000000').fontSize(9);
+        
+        doc.text('DESCRIPTION', 60, tableTop + 6);
+        doc.text('SIZE', 280, tableTop + 6);
+        doc.text('QTY', 340, tableTop + 6);
+        doc.text('UNIT PRICE', 400, tableTop + 6);
+        doc.text('TOTAL', 480, tableTop + 6, { align: 'right' });
 
         let i = 0;
+        doc.fillColor('#444444');
+
         order.items.forEach(item => {
-            const y = tableTop + 30 + (i * 25);
-            doc.text(item.product.productName, 50, y);
-            doc.text(item.size, 250, y);
-            doc.text(item.quantity.toString(), 320, y);
+            const y = tableTop + 35 + (i * 35);
+            const productName = item.product ? (item.product.name || item.product.productName) : "Archived Item";
+            
+            // Draw thin line between items
+            if(i > 0) {
+                doc.moveTo(50, y - 10).lineTo(550, y - 10).strokeColor('#f0f0f0').lineWidth(0.5).stroke();
+            }
+
+            doc.text(productName.toUpperCase(), 60, y, { width: 200 });
+            doc.text(item.size, 280, y);
+            doc.text(item.quantity.toString(), 340, y);
             doc.text(`$${item.price.toFixed(2)}`, 400, y);
-            doc.text(`$${(item.price * item.quantity).toFixed(2)}`, 480, y);
+            doc.text(`$${(item.price * item.quantity).toFixed(2)}`, 50, y, { align: 'right' });
+            
             i++;
         });
 
-        const footerTop = tableTop + 40 + (i * 25);
-        doc.moveTo(350, footerTop).lineTo(550, footerTop).stroke();
-        doc.fontSize(15).text(`Grand Total: $${order.totalPrice.toFixed(2)}`, 350, footerTop + 20, { color: '#2563eb' });
+        // --- SUMMARY SECTION ---
+        const footerTop = tableTop + 60 + (i * 35);
+        
+        doc.rect(350, footerTop, 200, 80).fill('#f9f9f9');
+        
+        doc.fillColor('#777777').fontSize(10).text('SUBTOTAL', 370, footerTop + 15);
+        doc.text(`$${order.totalPrice.toFixed(2)}`, 370, footerTop + 15, { align: 'right' });
+        
+        doc.text('SHIPPING', 370, footerTop + 30);
+        doc.text('FREE', 370, footerTop + 30, { align: 'right' });
+
+        doc.fillColor('#000000').fontSize(12).text('TOTAL PAID', 370, footerTop + 55, { bold: true });
+        doc.text(`$${order.totalPrice.toFixed(2)}`, 370, footerTop + 55, { align: 'right', bold: true });
+
+        // --- FOOTER NOTES ---
+        doc.fontSize(8).fillColor('#aaaaaa')
+           .text('Thank you for choosing WEARIFY. Goods once sold can be returned within 7 days in original condition.', 50, 750, { align: 'center' })
+           .text('This is a computer generated invoice and does not require a physical signature.', 50, 765, { align: 'center' });
 
         doc.end();
 
     } catch (error) {
-        console.error("Invoice Error:", error);
-        res.status(500).send("Error generating invoice");
+        console.error("PDF Gen Error:", error);
+        res.status(500).send("Critical error during PDF generation.");
     }
 };
 export const getOrderDetails = async (req, res) => {
@@ -341,17 +310,28 @@ export const cancelOrder = async (req, res) => {
                 $inc: { quantity: item.quantity } 
             });
         }
-        order.status = 'Cancelled';
-        order.items.forEach(item => {
-            // Only restore stock and refund if the item wasn't already cancelled
-            if (item.status !== 'Cancelled') {
-                // Restore Stock
-                Product.findByIdAndUpdate(item.product, { $inc: { quantity: item.quantity } }).exec();
-                
-                // Mark item as cancelled
-                item.status = 'Cancelled';
+       // Restore stock for all items that aren't already cancelled
+for (const item of order.items) {
+    if (item.status !== 'Cancelled') {
+        await Product.findOneAndUpdate(
+            { 
+                _id: item.product, 
+                "variants.size": item.size 
+            },
+            { 
+                $inc: { 
+                    "variants.$.stock": item.quantity, 
+                    "totalStock": item.quantity 
+                } 
             }
-        });
+        );
+        // Mark the individual item as cancelled
+        item.status = 'Cancelled';
+    }
+}
+
+// Mark the whole order as cancelled
+order.status = 'Cancelled';
         await order.save();
 
         res.json({ 
@@ -459,11 +439,21 @@ export const cancelSingleItem = async (req, res) => {
             return res.status(400).json({ success: false, message: "Item is already cancelled" });
         }
 
-        if (item.product) {
-            await Product.findByIdAndUpdate(item.product, {
-                $inc: { quantity: item.quantity }
-            });
+       if (item.product) {
+    // We need the size from the order item to know WHICH variant to increment
+    await Product.findOneAndUpdate(
+        { 
+            _id: item.product, 
+            "variants.size": item.size 
+        },
+        { 
+            $inc: { 
+                "variants.$.stock": item.quantity, // Increment the specific size
+                "totalStock": item.quantity        // Increment the total global stock
+            } 
         }
+    );
+}
 
         const isPrepaid = ['Paid', 'Online Payment', 'Wallet'].includes(order.paymentStatus) || order.paymentMethod === 'Wallet';
         
