@@ -1,98 +1,66 @@
-
-import Admin from '../../model/Admin.js'
-
-import User from '../../model/User.js'
-
-import bcrypt from "bcryptjs";
-
-
+import * as adminService from '../../services/admin/adminService.js';
 
 export const loadLoginPage = (req, res) => {
-  res.render('admin/login',{error:null});
+    res.render('admin/login', { error: null });
 };
 
-
 export const logingIn = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
+        const admin = await adminService.authenticateAdmin(email, password);
 
-    const admin = await Admin.findOne({ email });
-    if (!admin) {
-      return res.render('admin/login', { error: 'Invalid email or password' });
-     console.log(req.body)
+        if (!admin) {
+            return res.render('admin/login', { error: 'Invalid email or password' });
+        }
+
+        req.session.admin = admin._id;
+        res.redirect('/admin/dashboard');
+    } catch (error) {
+        console.error("Login Error:", error);
+        res.render('admin/login', { error: 'An internal server error occurred.' });
     }
-
-    const isMatch = await bcrypt.compare(password, admin.password);
-    if (!isMatch) {
-      return res.render('admin/login', { error: 'Invalid email or password' });
-      console.log(req.body)
-    }
-
-    req.session.admin = admin._id;
-    res.redirect('/admin/dashboard');
-    console.log(req.body)
-
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 export const loadUserList = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = 5;
-    const skip = (page - 1) * limit;
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const search = req.query.search || '';
 
-    const search = req.query.search || '';
-    let query = {};
+        const { users, totalPages } = await adminService.fetchUserListData(search, page, limit);
 
-    if (search) {
-      query = {
-        $or: [
-          { name: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } }
-        ]
-      };
+        res.render('admin/usermanagment', {
+            users,
+            currentPage: page,
+            totalPages,
+            search,count:null
+        });
+    } catch (error) {
+        console.error("User List Error:", error);
+        res.status(500).send('Error loading users');
     }
-
-    const totalUsers = await User.countDocuments(query);
-
-    const users = await User.find(query)
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    const totalPages = Math.ceil(totalUsers / limit);
-
-    res.render('admin/usermanagment', {
-      users,
-      currentPage: page,
-      totalPages,
-      search
-    });
-
-  } catch (error) {
-    console.log(error);
-    res.send('Error loading users');
-  }
 };
-
-
 
 export const toggleUserStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await User.findById(id);
+    try {
+        const { id } = req.params;
+        const updatedUser = await adminService.toggleBlockStatus(id);
 
-    if (!user) return res.redirect('/admin/users');
+        if (!updatedUser) {
+            return res.status(404).send('User not found');
+        }
 
-    user.status = user.status === 'active' ? 'blocked' : 'active';
-    await user.save();
-    res.redirect('/admin/users');
-  } catch (error) {
-    console.log(error);
-    res.send('Error updating user status');
-  }
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.json({ success: true, status: updatedUser.status });
+        }
+
+        res.redirect('/admin/users');
+    } catch (error) {
+        console.error("Toggle Status Error:", error);
+        res.status(500).send('Error updating status');
+    }
 };
-const authController={loadLoginPage,logingIn,loadUserList,toggleUserStatus}
-export default authController
+
+
+const authController = { loadLoginPage, logingIn, loadUserList, toggleUserStatus };
+export default authController;

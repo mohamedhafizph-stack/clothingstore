@@ -1,115 +1,80 @@
-import Category from "../../model/category.js"
+import * as categoryService from "../../services/admin/categoryService.js";
 
-const loadCategory = async(req,res)=>{
-    try{
-        const {status,search} = req.query
-        let filter={}
-        if(search){
-            filter.name = {$regex:search,$options:"i"}
-        }
-        if(status&&status!== "all"){
-            filter.status=status
-        }
-        const categories = await Category.find(filter).sort({createdAt:-1}).lean()
-        res.render('admin/category-managment',{categories,selectedStatus:status||"all",search})
-    
-    }
-    catch(err){
-       console.log(err)
-    }
-}
-
-const loadaddCategory = async (req,res)=>{
-    try{
+const loadCategory = async (req, res) => {
+    try {
+        const { status, search } = req.query;
+        const categories = await categoryService.getCategories(search, status);
         
-         res.render('admin/add-category',{message:""})
+        res.render('admin/category-managment', { 
+            categories, 
+            selectedStatus: status || "all", 
+            search 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
     }
-    catch(err){
-        console.log(err)
-    }
-}
+};
 
-const addCategory = async (req,res)=>{
-    try{
-        const {name} = req.body
-        const totalCategory = await Category.countDocuments({status:"active"})
-        const limit = 4
-        console.log(totalCategory)
-        if(totalCategory>=limit){
-         return res.render('admin/add-category',{message:"max limit"})
-        }
+const loadaddCategory = async (req, res) => {
+    res.render('admin/add-category', { message: "" });
+};
 
-        if(!name||name.trim()==""){
-           return res.render('admin/add-category',{message:"enter a valid name"})
-        }
-        
-        const exist = await Category.findOne({name:name.trim()})
+const addCategory = async (req, res) => {
+    try {
+        const { name } = req.body;
+        await categoryService.createCategory(name);
+        res.redirect('/admin/categories');
+    } catch (err) {
+        res.render('admin/add-category', { message: err.message });
+    }
+};
 
-        if(exist){
-            res.render('admin/add-category',{message:"Category already exist"})
-        }
-    
-        await Category.create({
-            name:name.trim()
-        })
-      return  res.redirect('/admin/categories')
+const loadeditCategory = async (req, res) => {
+    try {
+        const category = await categoryService.getCategoryById(req.params.id);
+        res.render('admin/edit-category', { category, message: "" });
+    } catch (err) {
+        res.redirect('/admin/categories');
     }
-    catch(err){
-        console.log(err)
-    }
-}
+};
 
-const loadeditCategory = async (req,res)=>{
-    try{
-       const {id} = req.params
-      const   category = await Category.findById(id)
-       res.render('admin/edit-category',{category})
+const editCategory = async (req, res) => {
+    try {
+        const { name } = req.body;
+        const { id } = req.params;
+        await categoryService.updateCategory(id, name);
+        res.redirect('/admin/categories');
+    } catch (err) {
+        const category = await categoryService.getCategoryById(req.params.id);
+        res.render('admin/edit-category', { category, message: err.message });
     }
-    catch(err){
-        console.log(err)
-    }
-}
+};
 
-const editCategory = async (req,res)=>{
-   try{
-    const {name} = req.body
-    const {id} = req.params
-    const category = await Category.findById(id)
-    if(category.name==name){
-        return res.render('admin/edit-category',{message:"Category already exist"})
+const blockCategory = async (req, res) => {
+    try {
+        await categoryService.updateCategoryStatus(req.params.id, "blocked");
+        res.redirect('/admin/categories');
+    } catch (err) {
+        console.error(err);
+        res.redirect('/admin/categories');
     }
-    await Category.findByIdAndUpdate(id,{
-        name:name.trim()
-    })
-    res.redirect('/admin/categories')
-   }
-   catch(error){
-    console.log(error)
-   }
-}
+};
 
-const blockCategory = async (req,res)=>{
-    try{
-        const {id} = req.params
-        await Category.findByIdAndUpdate(id,{ status:"blocked"})
-        res.redirect('/admin/categories')
-    }catch(err){
-        console.log(err)
+const unblockCategory = async (req, res) => {
+    try {
+        await categoryService.updateCategoryStatus(req.params.id, "active");
+        res.redirect('/admin/categories');
+    } catch (err) {
+        console.error(err);
+        res.redirect('/admin/categories');
     }
-}
+};
 
-const unblockCategory = async (req,res)=>{
-    try{
-        const {id} = req.params
-        await Category.findByIdAndUpdate(id,{status:"active"})
-        res.redirect('/admin/categories')
-    }catch(err){
-
-    }
-}
 const categoryController = {
-    loadCategory,loadaddCategory,addCategory,
+    loadCategory, loadaddCategory, addCategory,
     loadeditCategory, editCategory, blockCategory,
     unblockCategory
-}
-export default categoryController
+};
+
+export default categoryController;
