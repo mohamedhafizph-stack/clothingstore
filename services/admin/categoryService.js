@@ -22,6 +22,9 @@ export const createCategory = async (name) => {
     if (!trimmedName) {
         throw new Error("Please enter a valid category name.");
     }
+    if (trimmedName.length>10) {
+        throw new Error("name cannot be greater than 10 words");
+    }
 
     const exist = await Category.findOne({ name: { $regex: `^${trimmedName}$`, $options: "i" } });
     if (exist) {
@@ -41,6 +44,10 @@ export const updateCategory = async (id, newName) => {
 
     if (currentCategory.name === trimmedName) {
         throw new Error("Category name is the same as the current one.");
+    }
+
+    if (trimmedName.length>10) {
+        throw new Error("name cannot be greater than 10 words");
     }
 
     const exist = await Category.findOne({ _id: { $ne: id }, name: trimmedName });

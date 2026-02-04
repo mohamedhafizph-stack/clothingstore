@@ -26,9 +26,7 @@ export const loadUserList = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
         const search = req.query.search || '';
-
-        const { users, totalPages } = await adminService.fetchUserListData(search, page, limit);
-
+        const { users, totalPages,count } = await adminService.fetchUserListData(search, page, limit);
         res.render('admin/usermanagment', {
             users,
             currentPage: page,

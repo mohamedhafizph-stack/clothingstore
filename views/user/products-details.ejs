@@ -137,7 +137,7 @@
       <div class="related-grid">
         <% relatedProducts.forEach(item => { %>
           <div class="related-card">
-            <img src="<%= item.images?.[0] %>" alt="image">
+            <a href="/shop/details/<%= item._id %>"><img src="<%= item.images?.[0] %>" alt="image"></a>
             <h4><%= item.name %></h4>
             <p>₹<%= item.price %></p>
           </div>

@@ -310,7 +310,6 @@ export const cancelOrder = async (req, res) => {
                 $inc: { quantity: item.quantity } 
             });
         }
-       // Restore stock for all items that aren't already cancelled
 for (const item of order.items) {
     if (item.status !== 'Cancelled') {
         await Product.findOneAndUpdate(
@@ -325,12 +324,10 @@ for (const item of order.items) {
                 } 
             }
         );
-        // Mark the individual item as cancelled
         item.status = 'Cancelled';
     }
 }
 
-// Mark the whole order as cancelled
 order.status = 'Cancelled';
         await order.save();
 
@@ -440,7 +437,6 @@ export const cancelSingleItem = async (req, res) => {
         }
 
        if (item.product) {
-    // We need the size from the order item to know WHICH variant to increment
     await Product.findOneAndUpdate(
         { 
             _id: item.product, 
@@ -448,8 +444,8 @@ export const cancelSingleItem = async (req, res) => {
         },
         { 
             $inc: { 
-                "variants.$.stock": item.quantity, // Increment the specific size
-                "totalStock": item.quantity        // Increment the total global stock
+                "variants.$.stock": item.quantity,
+                "totalStock": item.quantity       
             } 
         }
     );
@@ -504,7 +500,6 @@ export const requestFullOrderReturn = async (req, res) => {
 
         if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
-        // Flag every 'Delivered' item for return
         let itemsFlagged = 0;
         order.items.forEach(item => {
             if (item.status === 'Delivered') {

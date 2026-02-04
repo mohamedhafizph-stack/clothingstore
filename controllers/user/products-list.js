@@ -1,113 +1,59 @@
-import User from '../../model/User.js'
-import optgenerator from 'otp-generator'
-import {sendOtp} from '../../utils/sendOtp.js'
-import bcrypt from 'bcryptjs'
-import {error} from 'console'
-import Address from '../../model/address.js'
-import Category from '../../model/category.js'
-import Product from '../../model/Product.js'
-
-
+import { productService } from '../../services/user/productService.js';
 
 const loadShirts = async (req, res) => {
   try {
-    const { category } = req.params; 
-    let { sizes, sort, maxPrice, search, page = 1 } = req.query;
-    console.log(category)
-    page = parseInt(page) || 1;
-    const limit = 8;
-    const skip = (page - 1) * limit;
+    const { category } = req.params;
+    const result = await productService.getProductsByCategory(category, req.query);
 
-    const categoryData = await Category.findOne({
-   name:category,
-   status:"active"
-});
-console.log(categoryData)
-
-    if (!categoryData) {
+    if (!result) {
       return res.status(404).render('error/404');
     }
-
-    
-    let query = {
-      "category":categoryData.name,
-      totalStock:{$gt:0},
-      status:"Active"
-    };
-
-    if (search) {
-      query.name = { $regex: search, $options: 'i' };
-    }
-
-    if (maxPrice) {
-      query.price = { $lte: Number(maxPrice) };
-    }
-
-if (req.query.sizes) {
-    const sizesArray = req.query.sizes.split(','); 
-    query.variants = {
-        $elemMatch: { 
-            stock: { $gt: 0 },
-            size: { $in: sizesArray } 
-        }
-    };
-}
-    
-    let sortQuery = {};
-    switch (sort) {
-      case 'priceLow':
-        sortQuery.price = 1;
-        break;
-      case 'priceHigh':
-        sortQuery.price = -1;
-        break;
-      case 'new':
-        sortQuery.createdAt = -1;
-        break;
-      default:
-        sortQuery.popularity = -1;
-    }
-
-    const categories = await Category.find()
-    const products = await Product.find(query).populate('category').sort(sortQuery).skip(skip).limit(limit);
-
-      console.log(products)
-
-    const totalProducts = await Product.countDocuments(query);
-    const totalPages = Math.ceil(totalProducts / limit);
-
+    console.log(result.categories)
     res.render('user/products', {
-      categories,
-      products,
-      currentPage: page,
-      totalPages,
-      category: categoryData,
-      selectedFilters: { sizes, sort, maxPrice, search }
+      categories: result.categories,
+      products: result.products,
+      currentPage: parseInt(req.query.page) || 1,
+      totalPages: result.totalPages,
+      category: result.categoryData,
+      selectedFilters: { 
+        sizes: req.query.sizes, 
+        sort: req.query.sort, 
+        maxPrice: req.query.maxPrice, 
+        search: req.query.search 
+      }
     });
-
   } catch (error) {
-    console.error(error);
+    console.error("Load Shirts Error:", error);
     res.status(500).send('Server Error');
   }
 };
 
-const loadProductDetails = async (req,res) => {
-    try{
-       const userId = req.session.user?.id || req.user
-        const {id}= req.params
-        const product = await Product.findById(id)
-         const categories = await Category.find()
-        const name = product.name
-        const cat = product.category
-        const relatedProducts = await Product.find({status:"Active",category:cat,name:{$ne:name}}).limit(3)
-        const user = await User.findById(userId)
-     res.render('user/products-details',{product,relatedProducts,categories,user})
-    }catch(err){
-        console.log(err)
+const loadProductDetails = async (req, res) => {
+  try {
+    const userId = req.session.user?.id || req.user;
+    const { id } = req.params;
+
+    const data = await productService.getProductDetails(id, userId);
+
+    if (!data) {
+      return res.status(404).render('error/404');
     }
-}  
+
+    res.render('user/products-details', {
+      product: data.product,
+      relatedProducts: data.relatedProducts,
+      categories: data.categories,
+      user: data.user
+    });
+  } catch (err) {
+    console.error("Load Product Details Error:", err);
+    res.status(500).send('Server Error');
+  }
+};
 
 const productController = {
-    loadShirts,loadProductDetails
-}
-export default productController
+  loadShirts,
+  loadProductDetails
+};
+
+export default productController;

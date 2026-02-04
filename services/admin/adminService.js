@@ -24,16 +24,23 @@ export const fetchUserListData = async (search, page, limit) => {
         };
     }
 
-   
     const [totalUsers, users] = await Promise.all([
         User.countDocuments(query),
-        User.find(query).skip(skip).limit(limit).lean()
+        User.find(query).skip(skip).limit(limit).lean(),
     ]);
-
+    
+    const usersWithCounts = await Promise.all(users.map(async (user) => {
+        const orderCount = await Orders.countDocuments({ user: user._id });
+        return { 
+            ...user,
+            orderCount
+        };
+    }));
+console.log(usersWithCounts)
     return {
-        users,
-        totalPages: Math.ceil(totalUsers / limit),
-        totalUsers
+        users: usersWithCounts,
+        totalUsers,
+        totalPages: Math.ceil(totalUsers / limit)
     };
 };
 

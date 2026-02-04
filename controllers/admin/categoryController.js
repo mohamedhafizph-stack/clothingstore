@@ -53,20 +53,38 @@ const editCategory = async (req, res) => {
 
 const blockCategory = async (req, res) => {
     try {
-        await categoryService.updateCategoryStatus(req.params.id, "blocked");
+        const updatedCategory = await categoryService.updateCategoryStatus(req.params.id, "blocked");
+
+        // Check if the request is an AJAX/Fetch request
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.json({ success: true, status: "blocked" });
+        }
+
         res.redirect('/admin/categories');
     } catch (err) {
         console.error(err);
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.status(500).json({ success: false, message: "Error blocking category" });
+        }
         res.redirect('/admin/categories');
     }
 };
 
 const unblockCategory = async (req, res) => {
     try {
-        await categoryService.updateCategoryStatus(req.params.id, "active");
+        const updatedCategory = await categoryService.updateCategoryStatus(req.params.id, "active");
+
+        // Check if the request is an AJAX/Fetch request
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.json({ success: true, status: "active" });
+        }
+
         res.redirect('/admin/categories');
     } catch (err) {
         console.error(err);
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.status(500).json({ success: false, message: "Error unblocking category" });
+        }
         res.redirect('/admin/categories');
     }
 };

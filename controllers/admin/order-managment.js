@@ -14,7 +14,8 @@ export const getAdminOrders = async (req, res) => {
             totalPages: Math.ceil(totalOrders / limit),
             currentStatus: status || 'All',
             searchTerm: search || '',
-            activePage: 'orders'
+            activePage: 'orders',
+            totalOrders
         });
     } catch (error) {
         console.error(error);

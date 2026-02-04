@@ -95,3 +95,145 @@
     background-color: #282e33;
     transform: scale(0.98);
 }
+/* ================= SAFE RESPONSIVE ADDITIONS ================= */
+
+/* Tablets */
+@media (max-width: 1024px) {
+
+    .item-details-container {
+        padding: 30px 5%;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .tracking-steps {
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    /* Navbar */
+    .navbar {
+        padding: 0.8rem 1rem;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    /* Container */
+    .item-details-container {
+        padding: 20px 1rem;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    /* Header */
+    .header-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    h1 {
+        font-size: 1.3rem;
+    }
+
+    /* Tracking */
+    .tracking-wrapper {
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .tracking-steps {
+        min-width: 520px;
+        gap: 25px;
+    }
+
+    /* Item cards */
+    .item-card-neat {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .item-thumb {
+        width: 70px;
+        height: 70px;
+    }
+
+    .item-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    /* Buttons */
+    .item-footer-actions {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn-item-cancel,
+    .btn-item-return,
+    .btn-full-return {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Info column */
+    .info-column {
+        gap: 20px;
+    }
+
+    .glass-card {
+        padding: 16px;
+    }
+
+    address {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+
+    h1 {
+        font-size: 1.15rem;
+    }
+
+    .section-label {
+        font-size: 0.95rem;
+    }
+
+    .item-sub {
+        font-size: 0.85rem;
+    }
+
+    .status-pill {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    .step-label {
+        font-size: 11px;
+    }
+
+    footer {
+        font-size: 0.8rem;
+        padding: 15px;
+        text-align: center;
+    }
+}

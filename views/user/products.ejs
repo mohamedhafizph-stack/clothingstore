@@ -6,177 +6,176 @@
     <title>Wearify - Shop</title>
     <link rel="stylesheet" href="/css/shirt.css">
 </head>
+
 <body class="shop-page">
 
-    <header class="shop-header">
-        <a href="/home"><div class="logo">Wearify</div></a>
-         <% categories.forEach(category => { %>
-  <div class="category-card">
-   <a href="/shop/<%= category.name%>">
+<!-- ================= HEADER ================= -->
+<header class="shop-header">
+    <a href="/home" class="logo">Wearify</a>
 
-      <h3><%= category.name %></h3>
-    </a>
-  </div>
-<% }) %>
-        <div class="header-tools">
-            <div class="search-bar">
-                <input type="text" id="shopSearch" placeholder="Search products..." value="<%= selectedFilters.search || '' %>">
-            </div>
-            <div class="icons">
-                <span class="icon">❤️</span>
-               <a href="/home/cart"><span class="icon">🛒</span></a> 
-              
-            </div>
-        </div>
-    </header>
+    <!-- CATEGORIES (HIDDEN BY DEFAULT) -->
+    <div class="categories-wrapper" id="categoriesWrapper">
+        <% categories.forEach(category => { %>
+            <a href="/shop/<%= category.name %>" class="category-card">
+                <h3><%= category.name %></h3>
+            </a>
+        <% }) %>
+    </div>
 
-    <div class="shop-container">
-        
-      <aside class="sidebar">
-    <form id="filterForm">
-        
-        <div class="filter-section">
-            <h3>Max Price</h3>
-            <input type="range" name="maxPrice" min="0" max="2000" class="slider" 
-                   value="<%= selectedFilters.maxPrice || 2000 %>">
-            <div class="price-labels">
-                <span>$0</span> - <span>$<%= selectedFilters.maxPrice || 2000 %></span>
-            </div>
+<div class="header-tools right-tools">
+        <button class="cat-toggle-btn" onclick="toggleCategories()">Categories</button>
+        <button class="filter-toggle-btn" onclick="toggleFilter()">Filters</button>
+
+        <div class="search-bar">
+            <input
+                type="text"
+                id="shopSearch"
+                placeholder="Search products..."
+                value="<%= selectedFilters.search || '' %>"
+            >
         </div>
 
-        <div class="filter-section">
-            <h3>Size</h3>
-            <div class="checkbox-group">
-                <% ['S', 'M', 'L', 'XL', 'XXL'].forEach(size => { %>
+        <div class="icons">
+            <span class="icon">❤️</span>
+            <a href="/home/cart"><span class="icon">🛒</span></a>
+        </div>
+    </div>
+</header>
+
+<!-- ================= MAIN LAYOUT ================= -->
+<div class="shop-container">
+
+    <!-- ========== SIDEBAR FILTER ========== -->
+    <aside class="sidebar">
+        <form id="filterForm">
+
+            <div class="filter-section">
+                <h3>Max Price</h3>
+                <input type="range" name="maxPrice" min="0" max="2000"
+                       class="slider"
+                       value="<%= selectedFilters.maxPrice || 2000 %>">
+                <div class="price-labels">
+                    <span>$0</span> - <span>$<%= selectedFilters.maxPrice || 2000 %></span>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3>Size</h3>
+                <% ['S','M','L','XL','XXL'].forEach(size => { %>
                     <label class="checkbox-container">
-                        <input type="checkbox" name="size" value="<%= size %>" 
-                            <%= (selectedFilters.sizes && selectedFilters.sizes.split(',').includes(size)) ? 'checked' : '' %>>
+                        <input type="checkbox" name="size" value="<%= size %>"
+                            <%= selectedFilters.sizes?.split(',').includes(size) ? 'checked' : '' %>>
                         <span class="checkmark"></span> <%= size %>
                     </label>
                 <% }) %>
             </div>
-        </div>
 
-        <div class="filter-section">
-            <h3>Sort By</h3>
-            <div class="radio-group">
-                <% const sorts = [
-                    { val: 'popularity', label: 'Popularity' },
-                    { val: 'new', label: 'New Arrivals' },
-                    { val: 'priceLow', label: 'Price (Low to High)' },
-                    { val: 'priceHigh', label: 'Price (High to Low)' }
-                ] %>
-                <% sorts.forEach(item => { %>
+            <div class="filter-section">
+                <h3>Sort By</h3>
+                <% [
+                    { val:'popularity', label:'Popularity' },
+                    { val:'new', label:'New Arrivals' },
+                    { val:'priceLow', label:'Price (Low → High)' },
+                    { val:'priceHigh', label:'Price (High → Low)' }
+                ].forEach(s => { %>
                     <label class="radio-container">
-                        <input type="radio" name="sort" value="<%= item.val %>" 
-                            <%= (selectedFilters.sort === item.val || (!selectedFilters.sort && item.val === 'popularity')) ? 'checked' : '' %>>
-                        <span class="radio-mark"></span> <%= item.label %>
+                        <input type="radio" name="sort" value="<%= s.val %>"
+                            <%= selectedFilters.sort === s.val ? 'checked' : '' %>>
+                        <span class="radio-mark"></span> <%= s.label %>
                     </label>
                 <% }) %>
             </div>
+
+        </form>
+    </aside>
+
+    <!-- ========== PRODUCTS ========== -->
+    <main class="product-listing">
+
+        <div class="listing-header">
+            <h1>Shirts Built for Men</h1>
+            <p>Premium shirts for every occasion</p>
         </div>
-        
-        <!-- <button type="button" class="btn-clear" onclick="window.location.href='/shirts'">Clear All Filters</button> -->
-    </form>
-</aside>
-        <main class="product-listing">
-            <div class="listing-header">
-                <h1>Shirts Built for Men</h1>
-                <p>Premium shirts for every occasion</p>
-            </div>
 
-            <div class="product-grid">
-                <% if (products && products.length > 0) { %>
-                    <% products.forEach(product => { %>
-                        <div class="product-card">
+        <div class="product-grid">
+            <% if (products.length) { %>
+                <% products.forEach(p => { %>
+                    <div class="product-card">
+                        <a href="/shop/details/<%= p._id %>">
                             <div class="image-wrapper">
-                               <a href="/shop/details/<%=product._id%>"><img src="<%= product.images[0] %>" alt="<%= product.name %>"></a> 
+                                <img src="<%= p.images[0] %>" alt="<%= p.name %>">
                             </div>
-                            <div class="product-info">
-                                <h4><%= product.name %></h4>
-                                <p class="price">$<%= product.price %></p>
-                            </div>
+                        </a>
+                        <div class="product-info">
+                            <h4><%= p.name %></h4>
+                            <p class="price">$<%= p.price %></p>
                         </div>
-                    <% }) %>
-                <% } else { %>
-                    <div class="no-results">No products found matching your filters.</div>
-                <% } %>
-            </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p class="no-results">No products found.</p>
+            <% } %>
+        </div>
 
-            <div class="pagination">
-                <% if (currentPage > 1) { %>
-                    <button class="arrow" onclick="changePage(<%= currentPage - 1 %>)">&lt;</button>
-                <% } %>
-                
-                <div class="page-numbers">
-                    <% for(let i=1; i <= totalPages; i++) { %>
-                        <span class="page-num <%= currentPage === i ? 'active' : '' %>" onclick="changePage(<%= i %>)">
-                            <%= i %>
-                        </span>
-                    <% } %>
-                </div>
+        <!-- PAGINATION -->
+        <div class="pagination">
+            <% for(let i=1;i<=totalPages;i++){ %>
+                <span class="page-num <%= currentPage===i?'active':'' %>"
+                      onclick="changePage(<%= i %>)"><%= i %></span>
+            <% } %>
+        </div>
 
-                <% if (currentPage < totalPages) { %>
-                    <button class="arrow" onclick="changePage(<%= currentPage + 1 %>)">&gt;</button>
-                <% } %>
-            </div>
-        </main>
-    </div>
+    </main>
+</div>
 
-   <script>
-    const categorySlug = "<%= category.name %>"
-    // Debounce function: waits until user stops typing
-function debounce(func, delay) {
-    let timer;
-    return function(...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
-    }
+<!-- ================= SCRIPT ================= -->
+<script>
+const categorySlug = "<%= category.name %>";
+const filterForm = document.getElementById('filterForm');
+const searchInput = document.getElementById('shopSearch');
+
+function debounce(fn, delay){
+    let t;
+    return (...args)=>{
+        clearTimeout(t);
+        t=setTimeout(()=>fn(...args),delay);
+    };
 }
 
-    const filterForm = document.getElementById('filterForm');
-  const searchInput = document.getElementById('shopSearch');
+function applyFilters(page=1){
+    const params = new URLSearchParams();
+    const sizes=[...document.querySelectorAll('input[name=size]:checked')].map(i=>i.value);
+    if(sizes.length) params.set('sizes',sizes.join(','));
+    const sort=document.querySelector('input[name=sort]:checked');
+    if(sort) params.set('sort',sort.value);
+    params.set('maxPrice',document.querySelector('.slider').value);
+    if(searchInput.value) params.set('search',searchInput.value);
+    params.set('page',page);
+    location.href=`/shop/${categorySlug}?${params}`;
+}
 
-  // Apply all filters
-  function applyFilters(page = 1) {
-      const params = new URLSearchParams();
+searchInput.addEventListener('input', debounce(()=>applyFilters(1),500));
+filterForm.addEventListener('change',()=>applyFilters(1));
+function changePage(p){applyFilters(p);}
 
-      // Sizes
-      const sizes = Array.from(document.querySelectorAll('input[name="size"]:checked')).map(el => el.value);
-      if (sizes.length) params.set('sizes', sizes.join(','));
-
-      // Sort
-      const sortInput = document.querySelector('input[name="sort"]:checked');
-      if (sortInput) params.set('sort', sortInput.value);
-
-      // Max price
-      const priceInput = document.querySelector('.slider');
-      if (priceInput) params.set('maxPrice', priceInput.value);
-
-      // Search
-      const searchValue = searchInput.value.trim();
-      if (searchValue) params.set('search', searchValue);
-
-      // Page
-      params.set('page', page);
-
-      // Redirect to filtered URL
-      const newUrl = `/shop/${categorySlug}?${params.toString()}`;
-      window.location.href = newUrl;
-  }
-
-  // Debounced search
-  searchInput.addEventListener('input', debounce(() => applyFilters(1), 500));
-
-  // Filter form change (size, sort, price)
-  if (filterForm) {
-      filterForm.addEventListener('change', () => applyFilters(1));
-  }
-
-  // Pagination
-  function changePage(page) { applyFilters(page); }
+function toggleCategories(){
+    document.getElementById('categoriesWrapper').classList.toggle('show');
+}
+function toggleFilters(){
+    document.querySelector('.sidebar').classList.toggle('open');
+}
 </script>
+<script>
+function toggleCategories() {
+    document.getElementById('categoriesWrapper')
+        .classList.toggle('show');
+}
+
+function toggleFilter() {
+    document.querySelector('.sidebar')
+        .classList.toggle('open');
+}
+</script>
+
 </body>
 </html>

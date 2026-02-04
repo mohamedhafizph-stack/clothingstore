@@ -22,6 +22,12 @@ export const createNewProduct = async (productData, files) => {
         throw new Error("Product Name, Category, and Price are required.");
     }
 
+    if(price<=0){
+        throw new Error("Price must be positive")
+    }
+
+    
+
     const imageUrls = files ? files.map(file => file.path) : [];
 
     const product = new Product({
@@ -40,6 +46,7 @@ export const createNewProduct = async (productData, files) => {
 
 export const updateProductDetails = async (id, updateData, files) => {
     let finalImages = [];
+    const { name, category, price, discount, description } = updateData;
 
     if (updateData.existingImages) {
         finalImages = Array.isArray(updateData.existingImages)
@@ -51,7 +58,14 @@ export const updateProductDetails = async (id, updateData, files) => {
         const newImages = files.map(file => file.path);
         finalImages = [...finalImages, ...newImages];
     }
+     if (!name || !category || !price) {
+        throw new Error("Product Name, Category, and Price are required.");
+    }
 
+    if(price<=0){
+        throw new Error("Price must be positive")
+    }
+    
     const updateBody = {
         ...updateData,
         price: Number(updateData.price),

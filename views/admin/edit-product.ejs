@@ -243,5 +243,17 @@
             document.getElementById('cropperModal').style.display = 'none';
         }
     </script>
+
+    <script>
+    // Use EJS to check if the error variable has content
+    <% if (error) { %>
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Failed',
+            text: '<%= error %>', // Injects: "Product Name, Category, and Price are required."
+            confirmButtonColor: '#d33',
+        });
+    <% } %>
+</script>
 </body>
 </html>

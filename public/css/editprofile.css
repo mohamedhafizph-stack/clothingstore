@@ -179,3 +179,43 @@ footer p {
     letter-spacing: -1.5px;
     text-transform: uppercase;
 }
+/* ================= RESPONSIVE FIX ================= */
+
+@media (max-width: 768px) {
+
+    body {
+        padding: 20px 12px;
+    }
+
+    .container {
+        padding: 25px 20px;
+    }
+
+    .email-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-change-mail {
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    .form-group,
+    .input-container {
+        max-width: 100%;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-save,
+    .btn-cancel {
+        width: 100%;
+    }
+
+    footer {
+        margin-top: 40px;
+    }
+}

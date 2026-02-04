@@ -1,51 +1,86 @@
-/* Layout & Background */
+/* ================= RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     background-color: #0f1115;
     color: #ffffff;
     font-family: 'Inter', sans-serif;
-    margin: 0;
 }
 
-/* Navbar */
+/* ================= NAVBAR ================= */
 .navbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 15px 50px;
-    border-bottom: 1px solid #2d2f36;
+    justify-content: space-between;
+    height: 64px;
+    padding: 0 5%;
+    background-color: #000000;
+    border-bottom: 1px solid #1a1a1a;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.logo { font-weight: bold; font-size: 20px; }
+.logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+}
 
-nav a {
-    color: #b0b3b8;
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.icon-group {
+    display: flex;
+    align-items: center;
+}
+
+.icon-group a {
+    display: flex;
+    align-items: center;
     text-decoration: none;
-    margin-right: 25px;
-    font-size: 14px;
 }
 
-.header-right { display: flex; align-items: center; gap: 20px; }
-
-.search-bar input {
-    background: #1c1e24;
-    border: 1px solid #3e414d;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 6px;
+/* Avatar */
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #333;
+    background-color: #111;
+    transition: all 0.25s ease;
 }
 
-.profile-thumb { border-radius: 50%; }
+.avatar:hover {
+    border-color: #ffffff;
+    transform: scale(1.08);
+}
 
-/* Main Content */
+/* ================= MAIN CONTAINER ================= */
 .container {
     max-width: 800px;
-    margin: 60px 100px;
+    margin: 60px auto;
+    padding: 0 20px;
 }
 
-h1 { font-size: 32px; margin-bottom: 40px; }
+h1 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
 
-/* Address Card Styling */
-.address-list { margin-bottom: 30px; }
+/* ================= ADDRESS LIST ================= */
+.address-list {
+    margin-bottom: 30px;
+}
 
 .address-card {
     margin-bottom: 50px;
@@ -57,7 +92,10 @@ h1 { font-size: 32px; margin-bottom: 40px; }
     margin-bottom: 5px;
 }
 
-h3 { margin: 0 0 10px 0; font-size: 18px; }
+.address-info h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+}
 
 .address-info p {
     color: #b0b3b8;
@@ -65,12 +103,16 @@ h3 { margin: 0 0 10px 0; font-size: 18px; }
     line-height: 1.5;
 }
 
-/* Button Styling */
+/* ================= BUTTONS ================= */
 .action-buttons {
     display: flex;
     gap: 10px;
     margin-top: 20px;
     margin-bottom: 15px;
+}
+
+.action-buttons form {
+    display: inline-block;
 }
 
 .btn-secondary {
@@ -94,6 +136,7 @@ h3 { margin: 0 0 10px 0; font-size: 18px; }
 }
 
 .btn-primary {
+    display: inline-block;
     background-color: #1a56db;
     color: white;
     border: none;
@@ -104,14 +147,16 @@ h3 { margin: 0 0 10px 0; font-size: 18px; }
     margin-top: 10px;
 }
 
-/* Footer */
+/* ================= FOOTER ================= */
 .footer {
-    padding: 60px 100px;
+    padding: 60px 5%;
     margin-top: 80px;
+    border-top: 1px solid #1a1a1a;
 }
 
 .footer-links {
     display: flex;
+    flex-wrap: wrap;
     gap: 30px;
     margin-bottom: 20px;
 }
@@ -127,90 +172,41 @@ h3 { margin: 0 0 10px 0; font-size: 18px; }
     font-size: 13px;
 }
 
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
 
-/* Fix for buttons inside forms to keep horizontal alignment */
-.action-buttons form {
-    display: inline-block;
-}
-
-.address-info form {
-    margin-top: 10px;
-}
-
-/* Ensure images don't break layout if not provided */
-.profile-thumb {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    background-color: #3e414d;
-}
-/* Minimalist Navbar Container */
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.8rem 5%;
-    background-color: #000000; /* Deep black */
-    border-bottom: 1px solid #1a1a1a;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-/* Logo Styling */
-.logo {
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: #ffffff;
-    letter-spacing: -1.5px;
-    text-transform: uppercase;
-    cursor: default;
-}
-
-/* Header Right & Icon Group */
-.header-right {
-    display: flex;
-    align-items: center;
-}
-
-.icon-group {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-/* Avatar Styling */
-.avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1.5px solid #333; /* Dark border */
-    background-color: #111;
-    transition: all 0.3s ease-in-out;
-}
-
-/* Avatar Hover Effect */
-.avatar:hover {
-    border-color: #ffffff; /* Glows white on hover */
-    transform: scale(1.1); /* Subtle pop */
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-}
-
-/* Handle link decoration */
-.icon-group a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-/* Mobile Responsive */
-@media (max-width: 480px) {
-    .navbar {
-        padding: 0.8rem 1.2rem;
+    h1 {
+        font-size: 26px;
+        margin-bottom: 30px;
     }
+
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    .btn-secondary,
+    .btn-outline {
+        width: 100%;
+        text-align: center;
+    }
+
+    .footer-links {
+        justify-content: center;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .navbar {
+        padding: 0 1.2rem;
+    }
+
     .logo {
         font-size: 1.3rem;
+    }
+
+    .container {
+        margin: 40px auto;
     }
 }

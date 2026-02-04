@@ -6,98 +6,144 @@
     --text-muted: #94a3b8;
 }
 
-body {
-    background-color: var(--bg-deep);
-    color: var(--text-white);
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    
+* {
+    box-sizing: border-box;
 }
 
-/* Header */
+body {
+    margin: 0;
+    background: var(--bg-deep);
+    color: var(--text-white);
+    font-family: 'Inter', sans-serif;
+}
+
+/* ================= HEADER ================= */
+
 .main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 5%;
-    background: var(--bg-deep);
-    border-bottom: 1px solid #1e293b;
+    padding: 1rem 5%;
+    background: #000;
+    border-bottom: 1px solid #1a1a1a;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
 }
 
-.nav-links a {
-    color: var(--text-white);
-    text-decoration: none;
-    margin: 0 15px;
+.logo {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+}
+
+.desktop-categories {
+    display: flex;
+}
+
+.category-card h3 {
     font-size: 0.85rem;
+    color: #888;
+    margin: 0 10px;
+    text-transform: uppercase;
+}
+
+.category-card:hover h3 {
+    color: white;
 }
 
 .header-icons {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 1rem;
 }
 
 .icon-btn {
     background: none;
     border: none;
-    color: var(--text-white);
-    font-size: 1.2rem;
+    color: white;
+    font-size: 1.4rem;
     cursor: pointer;
 }
 
-.user-avatar img {
-    width: 32px;
-    height: 32px;
+.avatar {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
+    border: 1px solid #333;
     object-fit: cover;
 }
 
-/* Hero Banner */
+/* ================= MOBILE MENU ================= */
+
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: #000;
+    padding: 1rem 5%;
+}
+
+.mobile-menu a {
+    padding: 12px 0;
+    border-bottom: 1px solid #222;
+    color: white;
+    text-decoration: none;
+}
+
+.mobile-menu.show {
+    display: flex;
+}
+
+.hamburger {
+    display: none;
+}
+
+/* ================= HERO ================= */
+
 .hero-banner {
-    /* width: 100%; */
-    position: relative;
     height: 500px;
     margin: 20px 5%;
     border-radius: 20px;
-    overflow: hidden;
     background: url('/images/Gemini_Generated_Image_1wrlnb1wrlnb1wrl.png') center/cover;
+    position: relative;
 }
 
 .hero-overlay {
     position: absolute;
-    bottom: 10%;
-    left: 5%;
+    bottom: 12%;
+    left: 6%;
 }
 
 .hero-overlay h1 {
     font-size: 2.5rem;
+}
+
+/* ================= SECTIONS ================= */
+
+.section {
+    padding: 40px 5%;
+}
+
+.section-title {
+    font-size: 1.2rem;
     margin-bottom: 20px;
 }
 
-.btn-shop-now {
-    background: var(--accent-green);
-    color: black;
-    padding: 10px 25px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.9rem;
-}
-
-/* Grids & Cards */
-.section { padding: 40px 5%; }
-.section-title { font-size: 1.2rem; margin-bottom: 20px; }
-
-.category-grid, .product-grid {
+/* PRODUCT GRID */
+.product-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
 }
 
-.cat-img-box, .product-img-box {
+.product-card {
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+}
+
+.product-img-box {
     background: var(--card-bg);
     border-radius: 12px;
     aspect-ratio: 1/1;
@@ -105,150 +151,178 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    margin-bottom: 10px;
 }
 
-.cat-img-box img, .product-img-box img {
+.product-img-box img {
     width: 90%;
     height: 90%;
     object-fit: contain;
+    transition: transform 0.3s ease;
 }
 
-/* Footer */
+.product-card:hover img {
+    transform: scale(1.05);
+}
+
+/* ================= MOBILE CART ================= */
+
+.mobile-cart {
+    display: none;
+}
+
+/* ================= FOOTER ================= */
+
 .main-footer {
     text-align: center;
-    padding: 60px 0 20px;
+    padding: 50px 0 20px;
     border-top: 1px solid #1e293b;
-}
-
-.footer-links {
-    margin-bottom: 20px;
 }
 
 .footer-links a {
     color: var(--text-muted);
-    text-decoration: none;
     margin: 0 15px;
     font-size: 0.8rem;
+    text-decoration: none;
 }
 
 .social-icons {
-    font-size: 1.2rem;
-    color: var(--text-muted);
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin-bottom: 20px;
+    margin: 20px 0;
+    color: var(--text-muted);
 }
 
 .copyright {
-    color: #475569;
     font-size: 0.75rem;
-}
-.avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-}
-a {
-  color: white;
-  text-decoration: none;
+    color: #475569;
 }
 
-a:hover {
-  color: #f5f5f5; /* slightly lighter white */
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+    .desktop-categories {
+        display: none;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .hero-banner {
+        height: 300px;
+        margin: 10px 4%;
+    }
+
+    .hero-overlay h1 {
+        font-size: 1.6rem;
+    }
+
+    .mobile-cart {
+        display: flex;
+        position: fixed;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--accent-green);
+        color: black;
+        padding: 12px 22px;
+        border-radius: 30px;
+        font-weight: bold;
+        gap: 8px;
+        text-decoration: none;
+        z-index: 999;
+    }
 }
-/* Main Header Container */
-.main-header {
+
+@media (max-width: 480px) {
+    .hero-banner {
+        height: 240px;
+    }
+
+    .hero-overlay h1 {
+        font-size: 1.3rem;
+    }
+
+    .product-img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+/* ================= CATEGORY – DESKTOP ================= */
+
+.desktop-categories {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 1rem 5%;
-    background-color: #000000; /* Pure black for a bold look */
-    border-bottom: 1px solid #1a1a1a;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    gap: 1.4rem;
 }
 
-/* Logo Styling */
-.logo {
-    font-size: 1.5rem;
-    color: #ffffff;
-    letter-spacing: -1px;
-    text-transform: uppercase;
+.category-card {
+    position: relative;
 }
 
-/* Category Navigation */
 .category-card a {
     text-decoration: none;
 }
 
 .category-card h3 {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
-    color: #888; /* Muted gray */
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: #9ca3af;
+    cursor: pointer;
     transition: color 0.3s ease;
-    margin: 0 10px;
+}
+
+/* underline hover animation */
+.category-card h3::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 0;
+    height: 2px;
+    background: var(--accent-green);
+    transition: width 0.3s ease;
 }
 
 .category-card:hover h3 {
     color: #ffffff;
 }
 
-/* Header Icons Group */
-.header-icons {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
+.category-card:hover h3::after {
+    width: 100%;
 }
 
-/* Icon Buttons */
-.icon-btn {
-    background: none;
-    border: none;
-    color: #ffffff;
-    font-size: 1.4rem; /* Size for Phosphor Icons */
-    cursor: pointer;
-    padding: 0;
-    transition: transform 0.2s ease, color 0.2s ease;
-    display: flex;
-    align-items: center;
+/* ================= CATEGORY – MOBILE MENU ================= */
+
+.mobile-menu {
+    background: #000;
 }
 
-.icon-btn:hover {
-    color: #888; /* Subtle dim on hover */
-    transform: translateY(-1px);
+.mobile-menu a {
+    padding: 14px 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #e5e7eb;
+    border-bottom: 1px solid #1f2933;
+    transition: color 0.2s ease, padding-left 0.2s ease;
 }
 
-/* User Profile & Avatar */
-.user-profile {
-    display: flex;
-    align-items: center;
+/* mobile hover / tap feedback */
+.mobile-menu a:hover {
+    color: var(--accent-green);
+    padding-left: 6px;
 }
 
-.avatar {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid #333;
-    transition: border-color 0.3s ease;
-}
+/* ================= RESPONSIVE ================= */
 
-.avatar:hover {
-    border-color: #ffffff;
-}
-
-/* Mobile Responsive */
 @media (max-width: 768px) {
-    .category-card {
-        display: none; /* Hide categories on small screens */
-    }
-    .main-header {
-        padding: 1rem 1.5rem;
+    .desktop-categories {
+        display: none;
     }
 }

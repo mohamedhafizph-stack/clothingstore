@@ -56,12 +56,28 @@ export const editProduct = async (req, res) => {
         res.redirect("/admin/products");
     }
 };
-
 export const productStatus = async (req, res) => {
     try {
-        await productService.toggleStatus(req.params.id);
+        // Capture the updated product from the service
+        const updatedProduct = await productService.toggleStatus(req.params.id);
+
+        // Check if the request is an AJAX/Fetch request
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.json({ 
+                success: true, 
+                status: updatedProduct.status // Returns "Active" or "Inactive"
+            });
+        }
+
+        // Fallback for regular form submissions
         res.redirect('/admin/products');
     } catch (error) {
+        console.error("Status Toggle Error:", error);
+        
+        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            return res.status(500).json({ success: false, message: "Server Error" });
+        }
+        
         res.redirect('/admin/products');
     }
 };
@@ -71,7 +87,7 @@ const productController = {
     loadProduct, addProduct, updateStock, editProduct, productStatus,
     loadaddProduct: async (req, res) => res.render('admin/add-products', { categories: await Category.find({status:"active"}), error: null }),
     getManageStock: async (req, res) => res.render("admin/manage-stock", { product: await Product.findById(req.params.id) }),
-    loadeditProduct: async (req, res) => res.render('admin/edit-product', { product: await Product.findById(req.params.id), categories: await Category.find({status:"active"}) }),
+    loadeditProduct: async (req, res) => res.render('admin/edit-product', { product: await Product.findById(req.params.id), categories: await Category.find({status:"active"}) ,error:null}),
     removeStock: async (req, res) => {
         await productService.deleteVariant(req.params.productId, req.params.variantId);
         res.redirect(`/admin/products/manage-stock/${req.params.productId}`);

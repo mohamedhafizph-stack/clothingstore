@@ -6,6 +6,7 @@
     <title>Wearify Admin - Products</title>
     <link rel="stylesheet" href="/css/product-managment.css">
     <%- include('../partials/sidebar', { activePage: 'products' }) %>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="admin-body">
 
@@ -96,17 +97,12 @@
     <a href="/admin/products/edit/<%= product._id %>" class="btn-edit-text">Edit</a>
     <span class="separator">|</span>
     
-    <form action="/admin/products/status/<%= product._id %>?_method=PATCH" method="POST" style="display:inline;">
-        <% if (product.status === 'Active') { %>
-            <button type="submit" class="btn-status-toggle deactivate" onclick="return confirm('Are you sure you want to deactivate this product?')">
-                Deactivate
-            </button>
-        <% } else { %>
-            <button type="submit" class="btn-status-toggle activate" onclick="return confirm('Are you sure you want to activate this product?')">
-                Activate
-            </button>
-        <% } %>
-    </form>
+    <button type="button" 
+            class="btn-status-toggle <%= product.status === 'Active' ? 'deactivate' : 'activate' %>" 
+            data-id="<%= product._id %>" 
+            data-status="<%= product.status %>">
+        <%= product.status === 'Active' ? 'Deactivate' : 'Activate' %>
+    </button>
 </td>
                                 </tr>
                             <% }); %>
@@ -183,6 +179,67 @@ document.getElementById('categoryFilter').addEventListener('change', () => {
         searchInput.value = val;
     }
 };
+document.querySelectorAll('.btn-status-toggle').forEach(button => {
+    button.addEventListener('click', async function() {
+        const productId = this.dataset.id;
+        const currentStatus = this.dataset.status;
+        const isDeactivating = currentStatus === 'Active';
+        
+        const actionText = isDeactivating ? 'Deactivate' : 'Activate';
+        const confirmColor = isDeactivating ? '#d33' : '#28a745';
+
+        // 1. Show SweetAlert Confirmation
+        const result = await Swal.fire({
+            title: 'Confirm Change',
+            text: `Are you sure you want to ${actionText.toLowerCase()} this product?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: confirmColor,
+            confirmButtonText: `Yes, ${actionText} it!`
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // 2. Send background request
+                const response = await fetch(`/admin/products/status/${productId}?_method=PATCH`, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 3. Update the UI manually (The No-Refresh Magic)
+                    const row = this.closest('tr');
+                    const statusPill = row.querySelector('.status-pill');
+                    
+                    const newStatus = data.status; // Expected "Active" or "Inactive"
+                    const isNowActive = newStatus === 'Active';
+
+                    // Update Button
+                    this.textContent = isNowActive ? 'Deactivate' : 'Activate';
+                    this.dataset.status = newStatus;
+                    this.className = `btn-status-toggle ${isNowActive ? 'deactivate' : 'activate'}`;
+
+                    // Update Status Pill/Badge
+                    statusPill.textContent = newStatus;
+                    statusPill.className = `status-pill ${newStatus.toLowerCase()}`;
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: `Product ${newStatus}`,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Failed to update product status', 'error');
+            }
+        }
+    });
+});
 </script>
 </body>
 </html>

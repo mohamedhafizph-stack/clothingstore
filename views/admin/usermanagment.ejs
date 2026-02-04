@@ -9,17 +9,6 @@
 </head>
 <body>
 
-    <!-- <div class="sidebar">
-        <h2>Wearify Admin</h2>
-        <nav>
-            <a href="/admin/dashboard" class="nav-item">Dashboard</a>
-            <a href="#" class="nav-item">Orders</a>
-            <a href="#" class="nav-item">Products</a>
-            <a href="#" class="nav-item">Categories</a>
-            <a href="/admin/users" class="nav-item active">Users</a>
-            <a href="#" class="nav-item">Settings</a>
-        </nav>
-    </div> -->
 
     <div class="main-content">
         <header class="header">
@@ -91,18 +80,15 @@
                             </span>
                         </td>
                         <td><%= user.createdAt.toLocaleString() %></td>
-                        <td>
-  <% if (user.status === 'active') { %>
-    <form action="/admin/users/block/<%= user._id %>" method="POST" style="display:inline;">
-      <button class="action-btn block-btn">Block</button>
-    </form>
-  <% } else { %>
-    <form action="/admin/users/unblock/<%= user._id %>" method="POST" style="display:inline;">
-      <button class="action-btn unblock-btn">Unblock</button>
-    </form>
-  <% } %>
+                       <td id="status-container-<%= user._id %>">
+  <button 
+    class="action-btn toggle-status-btn <%= user.status === 'active' ? 'block-btn' : 'unblock-btn' %>" 
+    data-id="<%= user._id %>"
+    data-current-status="<%= user.status %>">
+    <%= user.status === 'active' ? 'Block' : 'Unblock' %>
+  </button>
 </td>
-<td><%= count %></td>
+<td><%= user.orderCount %></td>
                     </tr>
                     <% }) %>
                 </tbody>
@@ -129,4 +115,54 @@
         </div>
     </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.querySelectorAll('.toggle-status-btn').forEach(button => {
+    button.addEventListener('click', async function() {
+        const userId = this.getAttribute('data-id');
+        const currentStatus = this.getAttribute('data-current-status');
+        const action = currentStatus === 'active' ? 'block' : 'unblock';
+
+        // Confirmation dialog
+        const result = await Swal.fire({
+            title: `Are you sure?`,
+            text: `You want to ${action} this user!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: action === 'block' ? '#d33' : '#28a745',
+            confirmButtonText: `Yes, ${action} them!`
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // Fetch call to your existing routes
+                const response = await fetch(`/admin/users/${action}/${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    // Update UI without refreshing
+                    const newStatus = action === 'block' ? 'inactive' : 'active';
+                    
+                    // 1. Update the Button
+                    this.setAttribute('data-current-status', newStatus);
+                    this.textContent = newStatus === 'active' ? 'Block' : 'Unblock';
+                    this.className = `action-btn toggle-status-btn ${newStatus === 'active' ? 'block-btn' : 'unblock-btn'}`;
+
+                    // 2. Update the Status Badge in the same row
+                    const row = this.closest('tr');
+                    const badge = row.querySelector('.status-badge');
+                    badge.textContent = newStatus;
+                    badge.className = `status-badge ${newStatus === 'active' ? 'status-active' : 'status-inactive'}`;
+
+                    Swal.fire('Updated!', `User has been ${action}ed.`, 'success');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Something went wrong', 'error');
+            }
+        }
+    });
+});
+</script>
 </html>

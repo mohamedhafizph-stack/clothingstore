@@ -89,17 +89,14 @@
                                         </span>
                                     </td>
                                     <td class="action-links">
-                                        <a href="/admin/categories/edit/<%= category._id %>">Edit</a> | 
-                                       <% if (category.status === 'active') { %>
-    <form action="/admin/categories/block/<%= category._id %>?_method=PATCH" method="POST" style="display:inline;">
-      <button class="action-btn block-btn">Block</button>
-    </form>
-  <% } else { %>
-    <form action="/admin/categories/unblock/<%= category._id %>?_method=PATCH" method="POST" style="display:inline;">
-      <button class="action-btn unblock-btn">Unblock</button>
-    </form>
-  <% } %>
-                                    </td>
+    <a href="/admin/categories/edit/<%= category._id %>">Edit</a> | 
+    <button 
+        class="action-btn toggle-category-btn <%= category.status.toLowerCase() === 'active' ? 'block-btn' : 'unblock-btn' %>" 
+        data-id="<%= category._id %>"
+        data-status="<%= category.status.toLowerCase() %>">
+        <%= category.status.toLowerCase() === 'active' ? 'Block' : 'Unblock' %>
+    </button>
+</td>
                                 </tr>
                             <% }); %>
                         <% } else { %>
@@ -118,6 +115,58 @@
             </section>
         </main>
     </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.querySelectorAll('.toggle-category-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const categoryId = this.dataset.id;
+        const currentStatus = this.dataset.status;
+        const action = currentStatus === 'active' ? 'block' : 'unblock';
 
+        const result = await Swal.fire({
+            title: 'Change Status?',
+            text: `Are you sure you want to ${action} this category?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: action === 'block' ? '#d33' : '#28a745',
+            confirmButtonText: `Yes, ${action} it!`
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // Ensure this URL matches your backend route
+                const response = await fetch(`/admin/categories/${action}/${categoryId}`, {
+                    method: 'PATCH', // Matching your ?_method=PATCH from the form
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const row = this.closest('tr');
+                    const badge = row.querySelector('.status-badge');
+                    
+                    // Toggle new status logic
+                    const isNowActive = data.status.toLowerCase() === 'active';
+                    this.dataset.status = isNowActive ? 'active' : 'inactive';
+                    
+                    // Update Button text and classes
+                    this.textContent = isNowActive ? 'Block' : 'Unblock';
+                    this.className = `action-btn toggle-category-btn ${isNowActive ? 'block-btn' : 'unblock-btn'}`;
+                    
+                    // Update Badge text and classes
+                    badge.textContent = data.status;
+                    badge.className = `status-badge ${data.status.toLowerCase()}`;
+
+                    Swal.fire('Success', `Category is now ${data.status}`, 'success');
+                }
+            } catch (err) {
+                Swal.fire('Error', 'Failed to update status', 'error');
+            }
+        }
+    });
+});
+</script>
+</script>
 </body>
 </html>

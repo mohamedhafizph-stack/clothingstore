@@ -406,3 +406,126 @@ textarea { background: var(--card-dark); border: 1px solid var(--border-grey); b
         gap: 1rem;
     }
 }
+/* ================= RESPONSIVE ADDITIONS (SAFE) ================= */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .checkout-container {
+        padding: 40px 5%;
+    }
+
+    .checkout-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .summary-card {
+        position: relative;
+        top: unset;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    /* Navbar */
+    .navbar {
+        padding: 0.8rem 1rem;
+    }
+
+    .logo {
+        font-size: 1.3rem;
+    }
+
+    .nav-right {
+        gap: 1rem;
+    }
+
+    /* Layout */
+    .checkout-container {
+        padding: 30px 1rem;
+    }
+
+    .checkout-grid {
+        grid-template-columns: 1fr;
+        gap: 35px;
+    }
+
+    /* Address cards */
+    .address-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .address-card {
+        align-items: flex-start;
+    }
+
+    /* Inputs */
+    input,
+    textarea {
+        font-size: 0.9rem;
+        padding: 11px;
+    }
+
+    /* Payment methods */
+    .payment-grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 12px;
+    }
+
+    .payment-content {
+        padding: 16px;
+    }
+
+    .payment-content span {
+        font-size: 11px;
+    }
+
+    /* Order summary */
+    .summary-card {
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .product-item {
+        gap: 12px;
+    }
+
+    .product-item img {
+        width: 52px;
+        height: 52px;
+    }
+
+    .btn-place-order {
+        padding: 14px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    h3 {
+        font-size: 1rem;
+    }
+
+    .product-info .name {
+        font-size: 0.85rem;
+    }
+
+    .price-row {
+        font-size: 0.85rem;
+    }
+
+    .total {
+        font-size: 1rem;
+    }
+
+    .btn-place-order {
+        font-size: 0.9rem;
+    }
+}
