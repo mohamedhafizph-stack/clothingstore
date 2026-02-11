@@ -3,15 +3,12 @@ import Category from '../../model/category.js';
 import User from '../../model/User.js';
 
 export const productService = {
-  /**
-   * Fetches products based on category, filters, and pagination
-   */
+ 
   async getProductsByCategory(categoryName, filters) {
     let { sizes, sort, maxPrice, search, page = 1 } = filters;
     const limit = 2;
     const skip = (parseInt(page) - 1) * limit;
 
-    // 1. Verify Category exists and is active
     const categoryData = await Category.findOne({
         status: "active",
       name: categoryName
@@ -19,7 +16,6 @@ export const productService = {
 
     if (!categoryData) return null;
 
-    // 2. Build Query
     let query = {
       category: categoryData.name,
       totalStock: { $gt: 0 },
@@ -44,7 +40,6 @@ export const productService = {
       };
     }
 
-    // 3. Build Sort
     let sortQuery = {};
     switch (sort) {
       case 'priceLow': sortQuery.price = 1; break;
@@ -53,7 +48,6 @@ export const productService = {
       default: sortQuery.popularity = -1;
     }
 
-    // 4. Execute Queries
     const [products, totalProducts, allCategories] = await Promise.all([
       Product.find(query).populate('category').sort(sortQuery).skip(skip).limit(limit),
       Product.countDocuments(query),

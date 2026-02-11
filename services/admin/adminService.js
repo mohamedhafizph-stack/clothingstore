@@ -55,15 +55,12 @@ export const toggleBlockStatus = async (userId) => {
 
 export const getDashboardData = async () => {
     const [salesStats, orderCount, recentOrders, weeklySales] = await Promise.all([
-        // Total Revenue (Delivered only)
         Orders.aggregate([
             { $match: { status: "Delivered" } },
             { $group: { _id: null, total: { $sum: "$totalPrice" } } }
         ]),
         Orders.countDocuments(),
-        // Latest 5 orders populated with User names
         Orders.find().sort({ createdAt: -1 }).limit(5).populate('user', 'name'),
-        // Weekly Data for Charts (Last 7 days)
         Orders.aggregate([
             { $match: { createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } },
             { $group: { 

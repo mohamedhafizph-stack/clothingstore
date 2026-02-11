@@ -54,8 +54,6 @@ const editCategory = async (req, res) => {
 const blockCategory = async (req, res) => {
     try {
         const updatedCategory = await categoryService.updateCategoryStatus(req.params.id, "blocked");
-
-        // Check if the request is an AJAX/Fetch request
         if (req.xhr || req.headers.accept.indexOf('json') > -1) {
             return res.json({ success: true, status: "blocked" });
         }
@@ -74,7 +72,6 @@ const unblockCategory = async (req, res) => {
     try {
         const updatedCategory = await categoryService.updateCategoryStatus(req.params.id, "active");
 
-        // Check if the request is an AJAX/Fetch request
         if (req.xhr || req.headers.accept.indexOf('json') > -1) {
             return res.json({ success: true, status: "active" });
         }

@@ -5,14 +5,11 @@ import Product from '../../model/Product.js';
 import bcrypt from 'bcryptjs';
 import { sendOtp } from '../../utils/sendOtp.js';
 
-/**
- * HOME & PRODUCT LOGIC
- */
+
 export const getHomeData = async (isAuthenticated = false, userId = null) => {
     const categories = await Category.find({ status: "active" });
     const activeCategoryNames = categories.map(cat => cat.name);
 
-    // Filter products: Must be Active, in an active category, and in stock
     const productQuery = { 
         status: "Active", 
         category: { $in: activeCategoryNames },
@@ -32,9 +29,7 @@ export const getHomeData = async (isAuthenticated = false, userId = null) => {
     return { categories, newArrivals, bestSellers, user: userData };
 };
 
-/**
- * AUTHENTICATION LOGIC
- */
+
 export const processRegistration = async (userData) => {
     const { email } = userData;
     const existingUser = await User.findOne({ email });
@@ -67,9 +62,7 @@ export const verifyUserCredentials = async (email, password) => {
     return user;
 };
 
-/**
- * PROFILE & PASSWORD LOGIC
- */
+
 export const updateProfile = async (userId, { name, currentpassword, password }) => {
     const user = await User.findById(userId);
     if (!user) throw new Error("User not found");
@@ -85,9 +78,6 @@ export const updateProfile = async (userId, { name, currentpassword, password })
     return await user.save();
 };
 
-/**
- * ADDRESS LOGIC
- */
 export const addressService = {
     getAll: (userId) => Address.find({ userId }),
     getById: (id) => Address.findById(id),

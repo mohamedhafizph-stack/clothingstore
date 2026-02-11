@@ -11,7 +11,6 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
 
     let cart = await Cart.findOne({ user: userId }) || new Cart({ user: userId, items: [] });
 
-    // Check total quantity limit for this product across all sizes
     const currentProductTotal = cart.items
         .filter(item => item.product.toString() === productId)
         .reduce((total, item) => total + item.quantity, 0);

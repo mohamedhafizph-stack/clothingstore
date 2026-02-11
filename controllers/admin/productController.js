@@ -58,18 +58,15 @@ export const editProduct = async (req, res) => {
 };
 export const productStatus = async (req, res) => {
     try {
-        // Capture the updated product from the service
         const updatedProduct = await productService.toggleStatus(req.params.id);
 
-        // Check if the request is an AJAX/Fetch request
         if (req.xhr || req.headers.accept.indexOf('json') > -1) {
             return res.json({ 
                 success: true, 
-                status: updatedProduct.status // Returns "Active" or "Inactive"
+                status: updatedProduct.status 
             });
         }
 
-        // Fallback for regular form submissions
         res.redirect('/admin/products');
     } catch (error) {
         console.error("Status Toggle Error:", error);

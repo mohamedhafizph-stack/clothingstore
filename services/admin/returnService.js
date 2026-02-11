@@ -26,7 +26,6 @@ export const fetchReturnRequests = async (search, status) => {
         .populate('items.product', 'name')
         .sort({ updatedAt: -1 });
 
-    // Handle RTN ID specific filtering
     if (search && search.toUpperCase().startsWith('RTN')) {
         const shortId = search.toUpperCase().replace('RTN', '');
         return orders.filter(order => 
@@ -50,13 +49,11 @@ export const processSingleReturn = async (orderId, itemId, action) => {
         item.status = 'Returned';
         const refundAmount = item.price * item.quantity;
 
-        // Restore Stock
         await Product.updateOne(
             { _id: item.product, "variants.size": item.size },
             { $inc: { "variants.$.stock": item.quantity, "totalStock": item.quantity } }
         );
 
-        // Refund Wallet
         await User.findByIdAndUpdate(order.user, {
             $inc: { wallet: refundAmount },
             $push: { walletHistory: { 
@@ -70,7 +67,6 @@ export const processSingleReturn = async (orderId, itemId, action) => {
         item.status = 'Delivered';
     }
 
-    // Sync Order Status
     const activeItems = order.items.filter(i => i.status !== 'Returned' && i.status !== 'Cancelled');
     order.status = activeItems.length === 0 ? 'Returned' : 'Delivered';
 
