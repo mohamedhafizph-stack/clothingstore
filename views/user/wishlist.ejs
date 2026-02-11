@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify - Your Wishlist</title>
+    <link rel="stylesheet" href="/css/cart.css"> <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .btn-add-cart {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 15px;
+        }
+        .btn-add-cart:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+    </style>
+</head>
+<body class="cart-page">
+
+<header class="shop-header">
+    <div class="header-left">
+        <div class="logo">Wearify</div>
+    </div>
+</header>
+
+<main class="container">
+    <h1 class="page-title">Your Wishlist</h1>
+
+    <div class="cart-layout">
+        <section class="cart-items">
+            <% if (wishlist && wishlist.items.length > 0) { %>
+                <% wishlist.items.forEach(item => { %>
+                    <div class="item-card">
+                        <div class="item-image">
+                            <% if (item.product.images && item.product.images.length > 0) { %>
+                                <img src="<%= item.product.images[0] %>" 
+                                     alt="<%= item.product.name %>" 
+                                     style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                            <% } else { %>
+                                <div style="width: 80px; height: 80px; background: #1e293b; border-radius: 8px;"></div>
+                            <% } %>
+                        </div>
+
+                        <div class="item-info">
+                            <h3><%= item.product.name %></h3>
+                            <p class="item-meta">
+                                Price: <strong>₹<%= item.product.price %></strong>
+                            </p>
+                        </div>
+
+                        <div class="item-actions">
+                            <button class="btn-add-cart" onclick="moveToCart('<%= item.product._id %>')">
+                                Add to Cart
+                            </button>
+                            
+                            <button class="delete-btn" onclick="removeFromWishlist('<%= item.product._id %>')">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="empty-cart-container">
+                    <p class="empty-msg">Your wishlist is empty.</p>
+                    <a href="/shop" class="continue-link">Discover Products</a>
+                </div>
+            <% } %>
+        </section>
+
+        <aside class="order-summary">
+            <h2>Account</h2>
+            <p class="summary-row">Items saved: <%= wishlist ? wishlist.items.length : 0 %></p>
+            <hr>
+            <a href="/home/cart"><button class="btn-checkout">View Your Cart</button></a>    
+            <a href="/home" class="continue-link">Back to Home</a>
+        </aside>
+    </div>
+</main>
+
+<script>
+    lucide.createIcons(); 
+
+    async function removeFromWishlist(productId) {
+        try {
+            const response = await fetch('/wishlist/remove', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId })
+            });
+            const data = await response.json();
+            if (data.success) window.location.reload();
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    async function moveToCart(productId) {
+        try {
+            // Usually involves adding to cart then removing from wishlist
+            const response = await fetch('/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, size: 'M', quantity: 1 }) // Default size or handle via modal
+            });
+            const data = await response.json();
+            if (data.success) {
+                removeFromWishlist(productId);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+</script>
+</body>
+</html>
