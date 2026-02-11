@@ -1,9 +1,25 @@
 import * as adminService from '../../services/admin/adminService.js';
-
+import User from '../../model/User.js';
+import Orders from '../../model/Orders.js';
 export const loadLoginPage = (req, res) => {
     res.render('admin/login', { error: null });
 };
 
+
+export const loadDashboard = async (req, res) => {
+    try {
+        const data = await adminService.getDashboardData();
+
+        res.render('admin/dashboard', {
+            stats: data.stats,
+            activity: data.recentActivity,
+            chartData: data.chartData
+        });
+    } catch (error) {
+        console.error("Dashboard Error:", error);
+        res.status(500).send("Error loading dashboard data");
+    }
+};
 export const logingIn = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -60,5 +76,5 @@ export const toggleUserStatus = async (req, res) => {
 };
 
 
-const authController = { loadLoginPage, logingIn, loadUserList, toggleUserStatus };
+const authController = { loadLoginPage, logingIn, loadUserList, toggleUserStatus,loadDashboard };
 export default authController;

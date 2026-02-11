@@ -1,32 +1,54 @@
-/* Base Reset */
+/* 1. Layout Structure */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #0f1115;
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* FIX: If your sidebar is hiding the content, 
+       this margin-left must match the sidebar's width.
+       Usually 250px to 280px.
+    */
+    margin-left: 260px; 
+}
+
+/* 2. Base Reset */
 body.admin-body {
+    margin: 0;
     background-color: #0f1115;
     color: #ffffff;
     font-family: 'Inter', sans-serif;
-    margin: 0;
 }
 
-/* Header Styling */
+/* 3. Header Styling */
 .top-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 40px;
     border-bottom: 1px solid #30363d;
+    background-color: #0f1115;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .brand { font-weight: bold; display: flex; align-items: center; gap: 8px; }
 .user-controls { display: flex; align-items: center; gap: 20px; }
 .nav-label { color: #8b949e; font-size: 14px; }
-.admin-avatar { width: 32px; height: 32px; border-radius: 50%; }
 
-/* Form Container */
+/* 4. Form & Content Area */
 .form-container {
     max-width: 600px;
-    margin: 50px 0 0 80px; /* Aligned left as per image */
+    padding: 50px 40px;
 }
 
-h1 { font-size: 32px; margin-bottom: 40px; }
+h1 { font-size: 32px; margin-bottom: 40px; margin-top: 0; }
 
 .form-group {
     margin-bottom: 25px;
@@ -39,7 +61,7 @@ label {
     color: #e4e6eb;
 }
 
-/* Input Fields */
+/* 5. Inputs & Textarea */
 input[type="text"], textarea {
     width: 100%;
     background-color: #1c1e24;
@@ -49,36 +71,19 @@ input[type="text"], textarea {
     color: white;
     font-size: 14px;
     box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
 }
 
-/* Status Radio Buttons */
-.status-options {
-    margin-bottom: 35px;
+input[type="text"]:focus, textarea:focus {
+    border-color: #1a56db;
 }
 
-.radio-container {
-    display: block;
-    background-color: #1c1e24;
-    border: 1px solid #3e414d;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.radio-container input[type="radio"] {
-    accent-color: #1a56db;
-    width: 18px;
-    height: 18px;
-}
-
-/* Action Buttons */
+/* 6. Buttons & Actions */
 .form-actions {
     display: flex;
     gap: 15px;
+    margin-top: 30px;
 }
 
 .btn-save {
@@ -89,6 +94,11 @@ input[type="text"], textarea {
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-save:hover {
+    background-color: #1e429f;
 }
 
 .btn-cancel {
@@ -98,4 +108,19 @@ input[type="text"], textarea {
     padding: 12px 30px;
     border-radius: 8px;
     cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background-color: #3f414d;
+}
+
+/* 7. Responsive Fix */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0; /* Stack on mobile */
+    }
+    .top-nav {
+        padding: 15px 20px;
+    }
 }

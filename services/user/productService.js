@@ -8,7 +8,7 @@ export const productService = {
    */
   async getProductsByCategory(categoryName, filters) {
     let { sizes, sort, maxPrice, search, page = 1 } = filters;
-    const limit = 8;
+    const limit = 2;
     const skip = (parseInt(page) - 1) * limit;
 
     // 1. Verify Category exists and is active

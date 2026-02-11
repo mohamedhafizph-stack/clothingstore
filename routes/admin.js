@@ -15,17 +15,19 @@ router.get('/login',isLoggedIn,authController.loadLoginPage);
 router.post('/login',isLoggedIn,authController.logingIn);
 
 
-router.get('/dashboard', (req, res) => {
-    const data = {
-        stats: { sales: '12,500', orders: 350, revenue: '25,000', avgValue: '71.43' },
-        activity: [
-            { id: '#12345', customer: 'Ethan Harper', amount: 150, status: 'Shipped' },
-            { id: '#12346', customer: 'Olivia Bennett', amount: 200, status: 'Processing' },
+// router.get('/dashboard', (req, res) => {
+//     const data = {
+//         stats: { sales: '12,500', orders: 350, revenue: '25,000', avgValue: '71.43' },
+//         activity: [
+//             { id: '#12345', customer: 'Ethan Harper', amount: 150, status: 'Shipped' },
+//             { id: '#12346', customer: 'Olivia Bennett', amount: 200, status: 'Processing' },
            
-        ]
-    };
-    res.render('admin/dashboard', data);
-});
+//         ]
+//     };
+//     res.render('admin/dashboard', data);
+// });
+
+router.get('/dashboard',adminAuth,authController.loadDashboard)
 
   
 router.get('/users',adminAuth,authController.loadUserList)

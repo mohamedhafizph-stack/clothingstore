@@ -52,3 +52,48 @@ export const toggleBlockStatus = async (userId) => {
     await user.save();
     return user;
 };
+
+export const getDashboardData = async () => {
+    const [salesStats, orderCount, recentOrders, weeklySales] = await Promise.all([
+        // Total Revenue (Delivered only)
+        Orders.aggregate([
+            { $match: { status: "Delivered" } },
+            { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+        ]),
+        Orders.countDocuments(),
+        // Latest 5 orders populated with User names
+        Orders.find().sort({ createdAt: -1 }).limit(5).populate('user', 'name'),
+        // Weekly Data for Charts (Last 7 days)
+        Orders.aggregate([
+            { $match: { createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } },
+            { $group: { 
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
+                dailySales: { $sum: "$totalPrice" },
+                dailyOrders: { $sum: 1 }
+            }},
+            { $sort: { "_id": 1 } }
+        ])
+    ]);
+
+    const totalRevenue = salesStats.length > 0 ? salesStats[0].total : 0;
+
+    return {
+        stats: {
+            sales: totalRevenue,
+            orders: orderCount,
+            revenue: totalRevenue,
+            avgValue: orderCount > 0 ? (totalRevenue / orderCount).toFixed(2) : 0
+        },
+        recentActivity: recentOrders.map(order => ({
+            id: order._id.toString().slice(-6).toUpperCase(),
+            customer: order.user?.name || 'Guest',
+            amount: order.totalPrice,
+            status: order.status
+        })),
+        chartData: {
+            labels: weeklySales.map(d => d._id),
+            sales: weeklySales.map(d => d.dailySales),
+            orders: weeklySales.map(d => d.dailyOrders)
+        }
+    };
+};
