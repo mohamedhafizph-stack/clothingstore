@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wearify - Your Wishlist</title>
-    <link rel="stylesheet" href="/css/cart.css"> <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="/css/cart.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
         .btn-add-cart {
             background: transparent;
@@ -23,13 +25,20 @@
             background: #ffffff;
             color: #000000;
         }
+        .item-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid #2d333b;
+        }
     </style>
 </head>
 <body class="cart-page">
 
 <header class="shop-header">
     <div class="header-left">
-        <div class="logo">Wearify</div>
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='/home'">Wearify</div>
     </div>
 </header>
 
@@ -40,7 +49,7 @@
         <section class="cart-items">
             <% if (wishlist && wishlist.items.length > 0) { %>
                 <% wishlist.items.forEach(item => { %>
-                    <div class="item-card">
+                    <div class="item-card" id="product-row-<%= item.product._id %>">
                         <div class="item-image">
                             <% if (item.product.images && item.product.images.length > 0) { %>
                                 <img src="<%= item.product.images[0] %>" 
@@ -59,20 +68,21 @@
                         </div>
 
                         <div class="item-actions">
-                            <button class="btn-add-cart" onclick="moveToCart('<%= item.product._id %>')">
+                            <button class="btn-add-cart" 
+                                    onclick="moveToCart('<%= item.product._id %>', '<%= JSON.stringify(item.product.variants) %>')">
                                 Add to Cart
                             </button>
                             
-                            <button class="delete-btn" onclick="removeFromWishlist('<%= item.product._id %>')">
+                            <button class="delete-btn" onclick="handleDelete('<%= item.product._id %>')" style="background: none; border: none; color: #ff4d4d; cursor: pointer;">
                                 <i data-lucide="trash-2"></i>
                             </button>
                         </div>
                     </div>
                 <% }) %>
             <% } else { %>
-                <div class="empty-cart-container">
+                <div class="empty-cart-container" style="text-align: center; padding: 50px;">
                     <p class="empty-msg">Your wishlist is empty.</p>
-                    <a href="/shop" class="continue-link">Discover Products</a>
+                    <a href="/shop" class="continue-link" style="color: #6366f1;">Discover Products</a>
                 </div>
             <% } %>
         </section>
@@ -90,34 +100,118 @@
 <script>
     lucide.createIcons(); 
 
+    // --- CORE LOGIC FUNCTIONS ---
+
+    // 1. SILENT REMOVE (Used by other functions)
     async function removeFromWishlist(productId) {
         try {
-            const response = await fetch('/wishlist/remove', {
+            const response = await fetch(`/shop/details/${productId}/wishlist/remove`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId })
+                headers: { 'Content-Type': 'application/json' }
             });
             const data = await response.json();
-            if (data.success) window.location.reload();
+            return data.success;
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Network error removing item:", error);
+            return false;
         }
     }
 
-    async function moveToCart(productId) {
-        try {
-            // Usually involves adding to cart then removing from wishlist
-            const response = await fetch('/cart/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, size: 'M', quantity: 1 }) // Default size or handle via modal
-            });
-            const data = await response.json();
-            if (data.success) {
-                removeFromWishlist(productId);
+    // 2. MANUAL DELETE (Called by Trash Icon)
+    async function handleDelete(productId) {
+        const result = await Swal.fire({
+            title: 'Remove from Wishlist?',
+            text: "Are you sure you want to remove this item?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#30363d',
+            confirmButtonText: 'Yes, remove it!',
+            background: '#161b22',
+            color: '#fff'
+        });
+
+        if (result.isConfirmed) {
+            const success = await removeFromWishlist(productId);
+            if (success) {
+                // Refresh to update the count and clear the list
+                window.location.reload();
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Could not remove item', background: '#161b22', color: '#fff' });
             }
-        } catch (error) {
-            console.error("Error:", error);
+        }
+    }
+
+    // 3. MOVE TO CART LOGIC
+    async function moveToCart(productId, variantsData) {
+        const variants = JSON.parse(variantsData); 
+        const sizeOptions = {};
+        let hasStock = false;
+
+        variants.forEach(v => {
+            if (v.stock > 0) {
+                sizeOptions[v.size] = `${v.size} (${v.stock} left)`;
+                hasStock = true;
+            }
+        });
+
+        if (!hasStock) {
+            return Swal.fire({
+                icon: 'error',
+                title: 'Out of Stock',
+                text: 'Sorry, this product is currently sold out.',
+                background: '#161b22',
+                color: '#fff'
+            });
+        }
+
+        const { value: selectedSize } = await Swal.fire({
+            title: 'Select Size',
+            input: 'select',
+            inputOptions: sizeOptions,
+            inputPlaceholder: 'Choose size',
+            showCancelButton: true,
+            background: '#161b22',
+            color: '#fff',
+            confirmButtonColor: '#6366f1',
+            inputValidator: (value) => {
+                if (!value) return 'Please pick a size!';
+            }
+        });
+
+        if (selectedSize) {
+            try {
+                const response = await fetch(`/shop/details/${productId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId, size: selectedSize, quantity: 1 })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Item added to cart, now remove from wishlist
+                    await removeFromWishlist(productId);
+                    
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Moved to Cart',
+                        text: 'Item successfully transferred to your cart!',
+                        background: '#161b22',
+                        color: '#fff',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+
+                    // Reload to update the Wishlist UI
+                    window.location.reload();
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: data.message, background: '#161b22', color: '#fff' });
+                }
+            } catch (error) {
+                console.error("Cart error:", error);
+                Swal.fire({ icon: 'error', title: 'Network Error', text: 'Failed to add to cart', background: '#161b22', color: '#fff' });
+            }
         }
     }
 </script>

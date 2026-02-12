@@ -10,7 +10,7 @@ import checkoutController from '../../controllers/user/checkout-controller.js';
 import orderController from '../../controllers/user/order-controller.js';
 import user from '../../controllers/admin/customer.js';
 import adminAuth from '../../middlewares/adminAuth.js';
-
+import wishlistController from '../../controllers/user/wishlist-Controller.js'
 
 
 router.get('/landing',isLoggedIn,userController.loadHome)
@@ -73,6 +73,9 @@ router.post('/user/orders/return-request', userAuth, orderController.requestRetu
 router.post('/orders/return-item', userAuth, orderController.requestItemReturn);
 router.post('/orders/cancel-item', userAuth, orderController.cancelSingleItem)
 router.post('/orders/return-full-order', userAuth, orderController.requestFullOrderReturn);
+router.get('/wishlist',userAuth,wishlistController.loadWishlistPage)
+router.post('/shop/details/:product__id/wishlist',userAuth,wishlistController.addTowishlist)
+router.delete('/shop/details/:product__id/wishlist/remove', userAuth, wishlistController.removeItem);
 
   
 

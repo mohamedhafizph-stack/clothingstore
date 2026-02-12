@@ -338,6 +338,50 @@ container.addEventListener('mousemove', (e) => {
 container.addEventListener('mouseleave', () => {
     img.style.transformOrigin = 'center';
 });
+
+document.querySelector('.btn-wishlist').addEventListener('click', async () => {
+    const productId = "<%= product._id %>";
+
+    try {
+        const response = await fetch(`/shop/details/${productId}/wishlist`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId }) 
+        });
+
+        // This is where the error happens if the response isn't JSON
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Saved!',
+                text: 'Item added to wishlist',
+                background: '#161b22',
+                color: '#fff',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message || 'Something went wrong',
+                background: '#161b22',
+                color: '#fff'
+            });
+        }
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Check console for details. Server likely sent HTML instead of JSON.',
+            background: '#161b22',
+            color: '#fff'
+        });
+    }
+});
 </script>
 
 
