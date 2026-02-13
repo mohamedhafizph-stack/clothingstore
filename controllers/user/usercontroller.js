@@ -168,7 +168,51 @@ export const verifyOtp = async (req, res) => {
     });
   }
 };
+export const redeemReferral = async (req, res) => {
+    try {
+        const { referralCode } = req.body;
+        const userId = req.session.user; // Ensure this matches how you store user session
 
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // 1. Check if user already has a referrer
+        if (user.referredBy) {
+            return res.status(400).json({ success: false, message: "Referral bonus already claimed." });
+        }
+
+        // 2. Prevent self-referral
+        if (user.referralCode === referralCode.trim()) {
+            return res.status(400).json({ success: false, message: "You cannot use your own code." });
+        }
+
+        // 3. Find the Referrer
+        const referrer = await User.findOne({ referralCode: referralCode.trim() });
+        if (!referrer) {
+            return res.status(400).json({ success: false, message: "Invalid referral code." });
+        }
+
+        // 4. Update Referrer (Give ₹100)
+        await User.findByIdAndUpdate(referrer._id, { $inc: { wallet: 100 } });
+
+        // 5. Update Current User (Give ₹50 and link them)
+        user.wallet += 50;
+        user.referredBy = referrer._id;
+        await user.save();
+
+        res.json({ 
+            success: true, 
+            message: "₹50 added to your wallet!", 
+            newBalance: user.wallet 
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
 export const loadLoginPage = async (req,res)=>{
  return res.render('user/login',{message:null})
 }
@@ -793,6 +837,7 @@ const userController = {
     updateAdress,
     deleteAdress,
     setDefaultAdress,
-    resendForgotOtp
+    resendForgotOtp,
+    redeemReferral
 };
 export default userController;

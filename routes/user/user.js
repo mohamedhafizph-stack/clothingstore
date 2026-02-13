@@ -76,7 +76,7 @@ router.post('/orders/return-full-order', userAuth, orderController.requestFullOr
 router.get('/wishlist',userAuth,wishlistController.loadWishlistPage)
 router.post('/shop/details/:product__id/wishlist',userAuth,wishlistController.addTowishlist)
 router.delete('/shop/details/:product__id/wishlist/remove', userAuth, wishlistController.removeItem);
-
+router.post('/referral/redeem', userAuth, userController.redeemReferral);
   
 
 export default router

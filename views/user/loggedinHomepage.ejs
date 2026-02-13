@@ -144,6 +144,67 @@ function toggleMenu() {
     document.getElementById("mobileMenu").classList.toggle("show");
 }
 </script>
+<% if (user && !user.referredBy && user.wallet === 0) { %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Show popup 2 seconds after page load
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            Swal.fire({
+                title: 'Claim Your Bonus!',
+                text: "Enter a referral code to get ₹50 in your wallet instantly.",
+                input: 'text',
+                inputPlaceholder: 'Enter code here...',
+                showCancelButton: true,
+                confirmButtonText: 'Claim Now',
+                confirmButtonColor: '#6366f1',
+                background: '#161b22',
+                color: '#fff',
+                preConfirm: (code) => {
+                    if (!code) {
+                        Swal.showValidationMessage('Code is required');
+                    }
+                    return code;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processReferral(result.value);
+                }
+            });
+        }, 2000);
+    });
 
+    async function processReferral(code) {
+        try {
+            const response = await fetch('/referral/redeem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ referralCode: code })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Bonus Applied!',
+                    text: data.message,
+                    background: '#161b22',
+                    color: '#fff'
+                }).then(() => window.location.reload());
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    background: '#161b22',
+                    color: '#fff'
+                });
+            }
+        } catch (err) {
+            console.error("Referral Error:", err);
+        }
+    }
+</script>
+<% } %>
 </body>
 </html>
