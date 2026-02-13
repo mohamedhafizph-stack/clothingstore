@@ -32,75 +32,48 @@ export const loadSignup = async(req,res)=>{
     res.render('user/Signup',{message:null})
 }
 
-export const registerUser = async(req,res)=>{
+export const registerUser = async (req, res) => {
+    try {
+        const { name, email, password, confirmPassword, referralCode } = req.body;
 
-    try{
-    const {name,email,password,confirmPassword}=req.body
+        if (!name || !email || !password || !confirmPassword) {
+            return res.render('user/Signup', { message: "All Fields are required" });
+        }
 
-    console.log(!name, !email, !password, !confirmPassword);
-    console.log(req.body)
-    if(!name||!email||!password||!confirmPassword){
-        return res.render('user/Signup',{message:"All Fields are required"})
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.render('user/Signup', { message: 'Email already registered' });
+        }
+
+        if (referralCode) {
+            const referrerExists = await User.findOne({ referralCode });
+            if (!referrerExists) {
+                return res.render('user/Signup', { message: 'Invalid Referral Code' });
+            }
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const otp = generateOTP();
+        await sendOtp(email, otp);
+
+        req.session.otp = otp;
+        req.session.tempUser = {
+            name,
+            email,
+            password: hashedPassword,
+            appliedReferralCode: referralCode || null 
+        };
+
+        req.session.save(() => {
+            res.redirect('/verify-otp');
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.render('user/Signup', { message: 'Registration failed' });
     }
-
-
-     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.render('user/Signup', {
-        message: 'Please enter a valid email address'
-      });
-    }
-
-     if (password.length < 6) {
-      return res.render('user/Signup', {
-        message: 'Password must be at least 6 characters'
-      });
-    }
-
-    if (password !== confirmPassword) {
-      return res.render('user/Signup', {
-        message: 'Passwords do not match'
-      });
-    }
-
-     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.render('user/Signup', {
-        message: 'Email already registered'
-      });
-    }
-   
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-     const otp = generateOTP();
-
-      const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-
-
-
-
-    await sendOtp(email,otp)
-
-    req.session.otpUserId = User._id;
-
-    req.session.otp = otp;
-    req.session.tempUser = {
-  name,
-  email,
-  password
-};
-
-req.session.save(() => {
-  res.redirect('/verify-otp');
-});
-
-     
-}catch (error) {
-    console.log(error);
-    res.render('user/Signup', { message: 'Registration failed' });
-  }
-
-}
+};  
 
 export const loadOtpPage = (req, res) => {
   try {
@@ -118,24 +91,21 @@ export const loadOtpPage = (req, res) => {
     res.redirect('/signup');
   }
 };
-
 export const verifyOtp = async (req, res) => {
   try {
     const { otp } = req.body;
 
     let enteredOtp = req.body.otp;
     if (Array.isArray(enteredOtp)) {
-       enteredOtp = enteredOtp.join('');
+      enteredOtp = enteredOtp.join('');
     }
 
-enteredOtp = String(enteredOtp).trim();
-const sessionOtp = String(req.session.otp).trim();
+    enteredOtp = String(enteredOtp).trim();
+    const sessionOtp = String(req.session.otp).trim();
 
-
- console.log('Entered OTP:', enteredOtp);
+    console.log('Entered OTP:', enteredOtp);
     console.log('Session OTP:', sessionOtp);
 
-   
     if (!req.session.otp || !req.session.tempUser) {
       return res.redirect('/signup');
     }
@@ -146,50 +116,55 @@ const sessionOtp = String(req.session.otp).trim();
         email: '',
         error: 'OTP expired. Please signup again.'
       });
-      console.log('hai');
     }
 
-    
     if (enteredOtp !== sessionOtp) {
       return res.render('user/verifyotp', {
         email: req.session.tempUser.email,
         error: 'Invalid OTP'
       });
-      console.log(otp);
-      console.log(req.session.otp);
     }
 
-   
-    const hashedPassword = await bcrypt.hash(
-      req.session.tempUser.password,
-      10
-    );
+    const { name, email, password, appliedReferralCode } = req.session.tempUser;
 
+    let referrerId = null;
+    let newUserWalletBonus = 0;
+
+    if (appliedReferralCode) {
+      const referrer = await User.findOne({ referralCode: appliedReferralCode });
+      if (referrer) {
+        referrerId = referrer._id;
+        newUserWalletBonus = 50; 
+
+        await User.findByIdAndUpdate(referrerId, {
+          $inc: { wallet: 100 }
+        });
+      }
+    }
 
     const user = new User({
-      name: req.session.tempUser.name,
-      email: req.session.tempUser.email,
-      password: hashedPassword,
+      name,
+      email,
+      password, 
       isVerified: true,
+      referredBy: referrerId,
+      wallet: newUserWalletBonus
     });
 
     await user.save();
 
-   
-   delete req.session.otp;
-delete req.session.otpExpiry;
-delete req.session.tempUser;
+    delete req.session.otp;
+    delete req.session.otpExpiry;
+    delete req.session.tempUser;
 
-    
     req.session.user = user._id;
-
     res.redirect('/login');
 
   } catch (error) {
-    console.log(error);
+    console.error("OTP Verification Error:", error);
     res.render('user/verifyotp', {
-      error: 'Something went wrong',
-      email: ''
+      error: 'Something went wrong during verification',
+      email: req.session.tempUser ? req.session.tempUser.email : ''
     });
   }
 };
