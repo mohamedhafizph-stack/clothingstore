@@ -10,7 +10,7 @@ export const userAuth = async (req,res,next)=>{
           }
        
 
-         const userId = req.user?.id || req.session?.user?.id
+        const userId = req.user?._id || req.session?.user?.id
          const user = await User.findById(userId)
          console.log(user)
          if(!user || user.status!=="active"){

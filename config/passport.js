@@ -30,6 +30,7 @@ passport.use(new GoogleStrategy({
           password: '', 
           authProvider:"google" ,      
           status:"active" , 
+          wallet: 0,
           isVerified: true
         });
         await user.save();

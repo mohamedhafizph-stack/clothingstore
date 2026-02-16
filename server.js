@@ -58,7 +58,7 @@ app.get("/", (req, res) => {
   res.send("Wearify server is running 🚀");
 });
 
-app.use(errorHandler)
+//app.use(errorHandler)
 
 
 const PORT = process.env.PORT || 3000;

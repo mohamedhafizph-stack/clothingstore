@@ -11,10 +11,15 @@ router.get('/google',
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    
+
+    req.session.user = {
+      id: req.user._id
+    };
+
     res.redirect('/home');  
   } 
-); 
+);
+
 
 
 router.get('/logout', (req, res) => {
