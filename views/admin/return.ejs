@@ -70,7 +70,21 @@
                                             <td><%= order.user.name %></td>
                                             <td><%= new Date(order.updatedAt).toISOString().split('T')[0] %></td>
                                             <td><%= item.returnReason %></td>
-                                            <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+                                           <td>
+    <% 
+        // 1. Calculate the original total for this item
+        let originalItemTotal = item.price * item.quantity;
+        let finalRefundAmount = originalItemTotal;
+
+        // 2. Apply proportional discount if a coupon was used
+        if (order.couponDiscount > 0 && order.subtotal > 0) {
+            let discountRatio = order.couponDiscount / order.subtotal;
+            let itemDiscount = originalItemTotal * discountRatio;
+            finalRefundAmount = originalItemTotal - itemDiscount;
+        }
+    %>
+    $<%= finalRefundAmount.toFixed(2) %>
+</td>
                                             <td>
                                                 <span class="status-badge <%= item.status.toLowerCase().replace(' ', '-') %>">
                                                     <%= item.status === 'Return Requested' ? 'Pending' : item.status %>

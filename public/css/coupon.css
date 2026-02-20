@@ -1,0 +1,209 @@
+:root {
+    --sidebar-w: 260px;
+    --bg-black: #09090b;
+    --card-bg: #111114;
+    --border-color: #1f1f23;
+    --text-gray: #a1a1aa;
+    --accent-blue: #2563eb;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--bg-black);
+    color: white;
+    font-family: 'Inter', sans-serif;
+}
+
+.main-content-wrapper {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+/* Header */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+
+.add-btn {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* Body */
+.content-body { padding: 2rem; }
+h1 { font-size: 2rem; margin-bottom: 1.5rem; }
+
+/* Filters */
+.filter-controls {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.search-box {
+    background: #1c1c1f;
+    border-radius: 8px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100%;
+    outline: none;
+}
+
+.drop-btn {
+    background: #1c1c1f;
+    color: white;
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Table */
+.table-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow-x: auto; /* For responsiveness */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+th {
+    text-align: left;
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+td {
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid #161618;
+    font-size: 0.9rem;
+}
+
+/* Status Pills */
+.status-pill {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: #27272a;
+    color: white;
+    width: 80px;
+}
+
+.status-pill.active { color: #fff; background: #27272a; border: 1px solid #3f3f46; }
+.status-pill.expired { color: #a1a1aa; opacity: 0.6; }
+.status-pill.disabled { color: #a1a1aa; background: #18181b; }
+
+.action-links { display: flex; gap: 8px; color: var(--text-gray); }
+.action-links a { color: white; text-decoration: none; font-size: 0.85rem; }
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    color: var(--text-gray);
+}
+
+.page-num {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.page-num.active { background: #27272a; color: white; }
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .main-content-wrapper { margin-left: 0; }
+    .top-header { padding: 1rem; }
+}
+/* Status Pill Colors */
+.status-pill.blocked {
+    background: #442323; /* Dark red background */
+    color: #ff8181;      /* Light red text */
+    border: 1px solid #663333;
+}
+
+/* Action Button Styles */
+.btn-block {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-unblock {
+    background: none;
+    border: none;
+    color: #4ade80;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-block:hover, .btn-unblock:hover {
+    text-decoration: underline;
+}
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.page-link {
+    padding: 8px 12px;
+    background: #1c1c1f;
+    border: 1px solid #27272a;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.page-link.active {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.page-link:hover:not(.active) {
+    background: #27272a;
+}

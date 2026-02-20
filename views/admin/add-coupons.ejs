@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify Admin | Add Coupon</title>
+    <link rel="stylesheet" href="/css/coupon-form.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-wrapper">
+        <%- include('../partials/sidebar', { activePage: 'coupons' }) %>
+
+        <div class="main-content-wrapper">
+            <div class="form-container">
+                <header class="form-header">
+                    <h1>Add Coupon</h1>
+                </header>
+
+                <form id="addCouponForm" action="/admin/coupons/add" method="POST">
+                    <div class="form-group">
+                        <label for="code">Coupon Code</label>
+                        <input type="text" id="code" name="code" placeholder="Enter coupon code" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="discountType">Discount Type</label>
+                            <select id="discountType" name="discountType" required>
+                                <option value="Percentage">Percentage</option>
+                                <option value="Flat">Flat Amount</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="discountValue">Discount Value</label>
+                            <input type="number" id="discountValue" name="discountValue" placeholder="Enter value" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="minOrderValue">Minimum Order Value</label>
+                            <input type="number" id="minOrderValue" name="minOrderValue" placeholder="Enter min order value" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maxDiscount">Maximum Discount (Optional)</label>
+                            <input type="number" id="maxDiscount" name="maxDiscount" placeholder="For percentage coupons">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiryDate">Expiry Date</label>
+                            <input type="date" id="expiryDate" name="expiryDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usageLimit">Usage Limit</label>
+                            <input type="number" id="usageLimit" name="usageLimit" placeholder="Total uses allowed" min="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="Active">Active</option>
+                            <option value="Disabled">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save">Save Coupon</button>
+                        <a href="/admin/coupons" class="btn-cancel">Cancel</a>
+                    </div>
+                </form>
+                <footer class="form-footer">
+                    <p>Wearify Admin ©</p>
+                </footer>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

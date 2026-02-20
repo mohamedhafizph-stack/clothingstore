@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify Admin | Coupons</title>
+    <link rel="stylesheet" href="/css/coupon.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="main-wrapper">
+        <%- include('../partials/sidebar', { activePage: activePage }) %>
+
+        <div class="main-content-wrapper">
+            <header class="top-header">
+                <div class="brand">
+                    <span>Wearify Admin</span>
+                </div>
+                <a href="/admin/coupons/add"><button class="add-btn">Add Coupon</button></a>
+            </header>
+
+            <section class="content-body">
+                <h1>Coupons</h1>
+
+                <div class="filter-controls">
+                    <div class="search-box">
+                        <input type="text" id="couponSearch" placeholder="Search by code..." value="<%= search %>">
+                    </div>
+                    
+                    <div class="dropdown-container">
+                        <select id="statusFilter">
+                            <option value="all" <%= currentStatus === 'all' ? 'selected' : '' %>>All Status</option>
+                            <% statusOptions.forEach(opt => { %>
+                                <option value="<%= opt %>" <%= currentStatus === opt ? 'selected' : '' %>><%= opt %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="couponTable">
+                        <thead>
+                            <tr>
+                                <th>Coupon code</th>
+                                <th>Discount type</th>
+                                <th>Discount value</th>
+                                <th>Min. order</th>
+                                <th>Expiry date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (coupons.length > 0) { %>
+                                <% coupons.forEach(coupon => { %>
+                                <tr class="coupon-row" data-status="<%= coupon.status %>" data-id="<%= coupon._id %>">
+                                    <td class="code-cell"><%= coupon.code %></td>
+                                    <td><%= coupon.discountType %></td>
+                                    <td>
+                                        <%= coupon.discountType === 'Percentage' ? coupon.discountValue + '%' : '₹' + coupon.discountValue %>
+                                    </td>
+                                    <td>₹<%= coupon.minOrderValue %></td>
+                                    <td><%= new Date(coupon.expiryDate).toLocaleDateString('en-CA') %></td>
+                                    <td>
+                                        <span class="status-pill <%= coupon.status.toLowerCase() %>">
+                                            <%= coupon.status %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-links">
+                                            <a href="/admin/coupons/edit/<%= coupon._id %>" class="btn-edit">Edit</a>
+                                            <span>|</span>
+                                            
+                                           <% if (coupon.status === 'Blocked') { %>
+            <button onclick="toggleBlockStatus('<%= coupon._id %>', 'Active')" class="btn-unblock">Unblock</button>
+        <% } else if (coupon.status === 'Active') { %>
+            <button onclick="toggleBlockStatus('<%= coupon._id %>', 'Blocked')" class="btn-block">Block</button>
+        <% } else { %>
+            <span class="text-muted" title="Extend date to reactivate">Expired</span>
+        <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 2rem;">No coupons found matching your criteria.</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+
+                    <% if (totalPages > 1) { %>
+                        <div class="pagination">
+                            <% if (currentPage > 1) { %>
+                                <a href="?page=<%= currentPage - 1 %>&search=<%= search %>&status=<%= currentStatus %>" class="page-num">«</a>
+                            <% } %>
+
+                            <% for(let i = 1; i <= totalPages; i++) { %>
+                                <a href="?page=<%= i %>&search=<%= search %>&status=<%= currentStatus %>" 
+                                   class="page-num <%= i === currentPage ? 'active' : '' %>">
+                                    <%= i %>
+                                </a>
+                            <% } %>
+
+                            <% if (currentPage < totalPages) { %>
+                                <a href="?page=<%= currentPage + 1 %>&search=<%= search %>&status=<%= currentStatus %>" class="page-num">»</a>
+                            <% } %>
+                        </div>
+                    <% } %>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        let debounceTimer;
+
+        /**
+         * Collects filter values and updates the URL
+         */
+        function applyFilters() {
+            const search = document.getElementById('couponSearch').value.trim();
+            const status = document.getElementById('statusFilter').value;
+
+            const url = new URL(window.location.origin + window.location.pathname);
+            
+            if (search) url.searchParams.set('search', search);
+            if (status !== 'all') url.searchParams.set('status', status);
+            
+            // Always reset to page 1 when filtering/searching
+            url.searchParams.set('page', 1);
+
+            window.location.href = url.toString();
+        }
+
+        // Debounce search: Wait 600ms after user stops typing
+        document.getElementById('couponSearch').addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(applyFilters, 600);
+        });
+
+        // Immediate filter for status dropdown
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+        /**
+         * Toggles the coupon status between 'Active' and 'Blocked'
+         */
+        async function toggleBlockStatus(couponId, newStatus) {
+            const actionText = newStatus === 'Blocked' ? 'block' : 'unblock';
+            
+            const confirm = await Swal.fire({
+                title: `Are you sure?`,
+                text: `You want to ${actionText} this coupon.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: newStatus === 'Blocked' ? '#ef4444' : '#22c55e',
+                cancelButtonColor: '#3f3f46',
+                confirmButtonText: `Yes, ${actionText} it!`,
+                background: '#161b22',
+                color: '#fff'
+            });
+
+            if (confirm.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/coupons/toggle-status/${couponId}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Updated!',
+                            text: `Coupon has been ${newStatus.toLowerCase()}.`,
+                            background: '#161b22',
+                            color: '#fff',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', result.message, 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'Server communication failed', 'error');
+                }
+            }
+        }
+
+        // Focus search input and put cursor at end on page load
+        const searchBox = document.getElementById('couponSearch');
+        if (searchBox.value) {
+            searchBox.focus();
+            const val = searchBox.value;
+            searchBox.value = '';
+            searchBox.value = val;
+        }
+    </script>
+</body>
+</html>

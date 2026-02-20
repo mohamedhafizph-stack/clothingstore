@@ -1,0 +1,132 @@
+:root {
+    --sidebar-w: 260px;
+    --bg-black: #09090b;
+    --input-bg: #1c1c1f;
+    --border: #27272a;
+    --accent-blue: #2563eb;
+    --text-dim: #a1a1aa;
+}
+
+body {
+    background-color: var(--bg-black);
+    color: white;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.main-content-wrapper {
+    margin-left: var(--sidebar-w);
+    display: flex;
+    justify-content: center;
+    padding: 3rem 1rem;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 700px;
+}
+
+.form-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #efefef;
+}
+
+input, select {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: white;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+    border-color: var(--accent-blue);
+}
+
+input::placeholder {
+    color: #52525b;
+}
+
+/* Buttons */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-save {
+    background-color: var(--accent-blue);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    flex: 1;
+}
+
+.btn-cancel {
+    background-color: #27272a;
+    color: white;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    flex: 1;
+}
+
+.form-footer {
+    margin-top: 3rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-content-wrapper { margin-left: 0; }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+}
+:root {
+    --bg-black: #09090b;
+    --input-bg: #1c1c1f;
+    --border: #27272a;
+    --accent-blue: #2563eb;
+}
+
+/* Add specialized styling for pre-filled values if needed */
+input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form-container {
+    background: #111114;
+    padding: 2.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}

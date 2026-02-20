@@ -3,11 +3,11 @@ import Cart from '../../model/cart.js';
 import Address from '../../model/address.js';
 import Product from '../../model/Product.js';
 import PDFDocument from 'pdfkit';
-
+import Coupon from '../../model/Coupons.js';
 export const placeOrder = async (req, res) => {
     try {
-        const userId = req.session.user?.id || req.user;
-        const { addressId } = req.body;
+        const userId = req.session.user?.id || req.user?._id;
+        const { addressId, couponCode, paymentMethod } = req.body;
 
         const [cart, selectedAddress] = await Promise.all([
             Cart.findOne({ user: userId }).populate('items.product'),
@@ -20,32 +20,55 @@ export const placeOrder = async (req, res) => {
 
         for (const item of cart.items) {
             const variant = item.product.variants.find(v => v.size === item.size);
-            
             if (!variant || variant.stock < item.quantity) {
                 return res.status(400).json({ 
                     success: false, 
-                    message: `Stock unavailable for ${item.product.name} (Size: ${item.size}). Only ${variant ? variant.stock : 0} left.` 
+                    message: `Stock unavailable for ${item.product.name} (Size: ${item.size}).` 
                 });
             }
         }
 
-        const orderItems = cart.items.map(item => {
-            const itemPrice = Number(item.price);
-            return {
-                product: item.product._id,
-                quantity: item.quantity,
-                price: itemPrice, 
-                size: item.size    
-            };
-        });
+        const orderItems = cart.items.map(item => ({
+            product: item.product._id,
+            quantity: Number(item.quantity),
+            price: Number(item.price), 
+            size: item.size    
+        }));
 
-        const totalAmount = orderItems.reduce((acc, item) => {
-            return acc + (item.price * item.quantity);
-        }, 0);
+        const subtotal = orderItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+        
+        let discount = 0;
 
-        if (isNaN(totalAmount)) {
-            return res.status(400).json({ success: false, message: "Error calculating total price." });
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ 
+                code: couponCode.trim().toUpperCase(), 
+                status: 'Active' 
+            });
+            
+            if (coupon) {
+                const now = new Date();
+                const isNotExpired = new Date(coupon.expiryDate) >= now;
+                const hasLimitLeft = coupon.usageLimit === null || coupon.usedCount < coupon.usageLimit;
+                const notUsedByUser = userId ? !coupon.usersUsed.includes(userId) : true;
+                const minOrderMet = subtotal >= coupon.minOrderValue;
+
+                if (isNotExpired && hasLimitLeft && notUsedByUser && minOrderMet) {
+                    if (coupon.discountType === 'Percentage') {
+                        let calculatedDiscount = (subtotal * Number(coupon.discountValue)) / 100;
+
+                        if (coupon.maxDiscount > 0 && calculatedDiscount > coupon.maxDiscount) {
+                            discount = coupon.maxDiscount;
+                        } else {
+                            discount = calculatedDiscount;
+                        }
+                    } else if (coupon.discountType === 'Flat') {
+                        discount = Number(coupon.discountValue);
+                    }
+                }
+            }
         }
+
+        const finalTotal = Math.max(0, subtotal - discount);
 
         const newOrder = new Order({
             user: userId,
@@ -58,40 +81,49 @@ export const placeOrder = async (req, res) => {
                 pincode: selectedAddress.pincode,
                 phone: selectedAddress.phone
             },
-            totalPrice: totalAmount,
-            paymentMethod: 'COD',
+            subtotal: subtotal,        
+            couponDiscount: discount,  
+            totalPrice: finalTotal,    
+            paymentMethod: paymentMethod || 'COD',
             status: 'Pending'
         });
 
-        
         await newOrder.save();
 
+      
         const stockUpdates = cart.items.map(item => {
             return Product.findOneAndUpdate(
-                { 
-                    _id: item.product._id, 
-                    "variants.size": item.size 
-                },
-                { 
-                    $inc: { 
-                        "variants.$.stock": -item.quantity, 
-                        "totalStock": -item.quantity 
-                    } 
-                }
+                { _id: item.product._id, "variants.size": item.size },
+                { $inc: { "variants.$.stock": -item.quantity, "totalStock": -item.quantity } }
             );
         });
 
-        
-        await Promise.all(stockUpdates);
+        const asyncTasks = [...stockUpdates];
+        if (couponCode && discount > 0) {
+            asyncTasks.push(
+                Coupon.findOneAndUpdate(
+                    { code: couponCode.toUpperCase() },
+                    { 
+                        $inc: { usedCount: 1 }, 
+                        $push: { usersUsed: userId } 
+                    }
+                )
+            );
+        }
 
-        
+        await Promise.all(asyncTasks);
+
         await Cart.findOneAndDelete({ user: userId });
 
-        res.json({ success: true, orderId: newOrder.orderId });
+        res.json({ 
+            success: true, 
+            orderId: newOrder.orderId,
+            finalAmount: finalTotal.toFixed(2) 
+        });
 
     } catch (error) {
-        console.error("Order Placement Error:", error);
-        res.status(500).json({ success: false, message: "Server error during order placement" });
+        console.error("ORDER_PLACEMENT_CRITICAL_ERROR:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error during checkout." });
     }
 };
 export const loadOrderSuccess = async (req, res) => {
@@ -413,22 +445,20 @@ export const requestItemReturn = async (req, res) => {
     }
 };
 export const cancelSingleItem = async (req, res) => {
-    console.log("!!! THE REQUEST REACHED THE CONTROLLER !!!");
     try {
         const { orderId, itemId } = req.body;
-        console.log("Cancel Request Received:", { orderId, itemId });
 
         const order = await Order.findById(orderId);
-        if(order.status=="Shipped"){
-             return res.status(400).json({ success: false, message: "Item cannot be cancelled as it is shipped" });
-        }
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });
         }
-        const item = order.items.id(itemId);
 
+        if (order.status === "Shipped") {
+            return res.status(400).json({ success: false, message: "Item cannot be cancelled as it is already shipped" });
+        }
+
+        const item = order.items.id(itemId);
         if (!item) {
-            console.log("Item ID not found in Order items array");
             return res.status(404).json({ success: false, message: "Product not found in this order" });
         }
 
@@ -436,61 +466,65 @@ export const cancelSingleItem = async (req, res) => {
             return res.status(400).json({ success: false, message: "Item is already cancelled" });
         }
 
-       if (item.product) {
-    await Product.findOneAndUpdate(
-        { 
-            _id: item.product, 
-            "variants.size": item.size 
-        },
-        { 
-            $inc: { 
-                "variants.$.stock": item.quantity,
-                "totalStock": item.quantity       
-            } 
-        }
-    );
-}
+        const itemOriginalTotal = Number(item.price) * Number(item.quantity);
+        let refundAmount = itemOriginalTotal;
 
-        const isPrepaid = ['Paid', 'Online Payment', 'Wallet'].includes(order.paymentStatus) || order.paymentMethod === 'Wallet';
+        if (order.couponDiscount > 0 && order.subtotal > 0) {
+            const discountRatio = order.couponDiscount / order.subtotal;
+            const itemShareOfDiscount = itemOriginalTotal * discountRatio;
+            refundAmount = itemOriginalTotal - itemShareOfDiscount;
+        }
+        
+        refundAmount = Math.max(0, Number(refundAmount.toFixed(2)));
+
+        if (item.product) {
+            await Product.findOneAndUpdate(
+                { _id: item.product, "variants.size": item.size },
+                { 
+                    $inc: { 
+                        "variants.$.stock": item.quantity,
+                        "totalStock": item.quantity       
+                    } 
+                }
+            );
+        }
+
+        const isPrepaid = ['Paid', 'Completed'].includes(order.paymentStatus) || order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay';
         
         if (isPrepaid) {
-            const refundAmount = item.price * item.quantity;
             await User.findByIdAndUpdate(order.user, {
                 $inc: { wallet: refundAmount },
                 $push: {
                     walletHistory: {
                         amount: refundAmount,
                         type: 'Credit',
-                        reason: `Cancelled: ${item.productName || 'Product'}`,
+                        reason: `Cancelled Item Refund: ORD${order.orderId}`,
                         date: new Date()
                     }
                 }
             });
         }
-        const itemTotal = item.price * item.quantity;
-         order.totalPrice -= itemTotal;
+
+        order.totalPrice = Math.max(0, order.totalPrice - refundAmount);
         
         item.status = 'Cancelled';
 
+        const areAllItemsCancelled = order.items.every(i => i.status === 'Cancelled');
+        if (areAllItemsCancelled) {
+            order.status = 'Cancelled';
+        }
+
         await order.save();
-      
-item.status = 'Cancelled';
 
-const areAllItemsCancelled = order.items.every(item => item.status === 'Cancelled');
-
-if (areAllItemsCancelled) {
-    order.status = 'Cancelled';
-    console.log(`Order ${order._id} fully cancelled because all items are cancelled.`);
-}
-
-
-await order.save();
-
-        res.json({ success: true, message: "Item cancelled and refund processed" });
+        res.json({ 
+            success: true, 
+            message: "Item cancelled successfully", 
+            refunded: isPrepaid ? refundAmount : 0 
+        });
 
     } catch (error) {
-        console.error("DETAILED ERROR:", error); 
-        res.status(500).json({ success: false, message: "Internal Server Error: " + error.message });
+        console.error("CANCEL_ITEM_ERROR:", error); 
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
 export const requestFullOrderReturn = async (req, res) => {

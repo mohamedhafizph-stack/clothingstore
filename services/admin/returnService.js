@@ -46,28 +46,54 @@ export const processSingleReturn = async (orderId, itemId, action) => {
     if (!item) throw new Error("Item not found");
 
     if (action === 'Approve') {
+        const itemOriginalTotal = Number(item.price) * Number(item.quantity);
+
+        let refundAmount = itemOriginalTotal;
+
+        if (order.couponDiscount > 0 && order.subtotal > 0) {
+            const discountRatio = order.couponDiscount / order.subtotal;
+            const itemShareOfDiscount = itemOriginalTotal * discountRatio;
+            
+            refundAmount = itemOriginalTotal - itemShareOfDiscount;
+        }
+
+        refundAmount = Math.max(0, Number(refundAmount.toFixed(2)));
+
         item.status = 'Returned';
-        const refundAmount = item.price * item.quantity;
 
         await Product.updateOne(
             { _id: item.product, "variants.size": item.size },
-            { $inc: { "variants.$.stock": item.quantity, "totalStock": item.quantity } }
+            { 
+                $inc: { 
+                    "variants.$.stock": item.quantity, 
+                    "totalStock": item.quantity 
+                } 
+            }
         );
 
         await User.findByIdAndUpdate(order.user, {
             $inc: { wallet: refundAmount },
-            $push: { walletHistory: { 
-                amount: refundAmount, type: 'Credit', 
-                reason: `Refund for Return: ORD${order.orderId}`, date: new Date()
-            }}
+            $push: { 
+                walletHistory: { 
+                    amount: refundAmount, 
+                    type: 'Credit', 
+                    reason: `Refund for Item Return: ${item.product.name} (ORD${order.orderId})`, 
+                    date: new Date()
+                }
+            }
         });
 
-        order.totalPrice -= refundAmount;
-    } else {
-        item.status = 'Delivered';
+        order.totalPrice = Math.max(0, order.totalPrice - refundAmount);
+
+    } else if (action === 'Reject') {
+        item.status = 'Delivered'; 
     }
 
-    const activeItems = order.items.filter(i => i.status !== 'Returned' && i.status !== 'Cancelled');
+    const activeItems = order.items.filter(i => 
+        i.status !== 'Returned' && 
+        i.status !== 'Cancelled'
+    );
+    
     order.status = activeItems.length === 0 ? 'Returned' : 'Delivered';
 
     return await order.save();
@@ -77,13 +103,11 @@ export const processFullOrderReturn = async (orderId) => {
     const order = await Order.findById(orderId);
     if (!order) throw new Error("Order not found");
 
-    let totalRefund = 0;
+    const totalRefund = order.totalPrice; 
 
     for (let item of order.items) {
-        if (['Return Requested', 'Delivered'].includes(item.status)) {
+        if (['Return Requested', 'Delivered', 'Shipped'].includes(item.status)) {
             item.status = 'Returned';
-            const itemTotal = item.price * item.quantity;
-            totalRefund += itemTotal;
 
             await Product.updateOne(
                 { _id: item.product, "variants.size": item.size },
@@ -94,13 +118,16 @@ export const processFullOrderReturn = async (orderId) => {
 
     if (totalRefund > 0) {
         await User.findByIdAndUpdate(order.user, {
-            $inc: { wallet: totalRefund },
+            $inc: { wallet: Number(totalRefund.toFixed(2)) },
             $push: { walletHistory: { 
-                amount: totalRefund, type: 'Credit', 
-                reason: `Full Return Approved: ORD${order.orderId}`, date: new Date()
+                amount: Number(totalRefund.toFixed(2)), 
+                type: 'Credit', 
+                reason: `Full Refund for Order: ORD${order.orderId}`, 
+                date: new Date()
             }}
         });
-        order.totalPrice -= totalRefund;
+        
+        order.totalPrice = 0;
     }
 
     order.status = 'Returned';

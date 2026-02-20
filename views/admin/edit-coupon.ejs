@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wearify Admin | Edit Coupon</title>
+    <link rel="stylesheet" href="/css/coupon-form.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="main-wrapper">
+        <%- include('../partials/sidebar', { activePage: 'coupons' }) %>
+
+        <div class="main-content-wrapper">
+            <div class="form-container">
+                <header class="form-header">
+                    <h1>Edit Coupon</h1>
+                </header>
+
+                <form id="editCouponForm">
+                    <input type="hidden" id="couponId" value="<%= coupon._id %>">
+                    
+                    <div class="form-group">
+                        <label for="code">Coupon Code</label>
+                        <input type="text" id="code" name="code" value="<%= coupon.code %>" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="discountType">Discount Type</label>
+                            <select id="discountType" name="discountType" required>
+                                <option value="Percentage" <%= coupon.discountType === 'Percentage' ? 'selected' : '' %>>Percentage</option>
+                                <option value="Flat" <%= coupon.discountType === 'Flat' ? 'selected' : '' %>>Flat Amount</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="discountValue">Discount Value</label>
+                            <input type="number" id="discountValue" name="discountValue" value="<%= coupon.discountValue %>" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="minOrderValue">Minimum Order Value</label>
+                            <input type="number" id="minOrderValue" name="minOrderValue" value="<%= coupon.minOrderValue %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maxDiscount">Maximum Discount</label>
+                            <input type="number" id="maxDiscount" name="maxDiscount" value="<%= coupon.maxDiscount %>">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiryDate">Expiry Date</label>
+                            <input type="date" id="expiryDate" name="expiryDate" value="<%= new Date(coupon.expiryDate).toISOString().split('T')[0] %>" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usageLimit">Usage Limit</label>
+                            <input type="number" id="usageLimit" name="usageLimit" value="<%= coupon.usageLimit %>">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save">Update Coupon</button>
+                        <a href="/admin/coupons" class="btn-cancel">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('editCouponForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('couponId').value;
+            
+            const formData = {
+                code: document.getElementById('code').value.trim().toUpperCase(),
+                discountType: document.getElementById('discountType').value,
+                discountValue: document.getElementById('discountValue').value,
+                minOrderValue: document.getElementById('minOrderValue').value,
+                maxDiscount: document.getElementById('maxDiscount').value,
+                expiryDate: document.getElementById('expiryDate').value,
+                usageLimit: document.getElementById('usageLimit').value
+            };
+
+            try {
+                const response = await fetch(`/admin/coupons/edit/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({ icon: 'success', title: 'Updated!', background: '#161b22', color: '#fff' })
+                    .then(() => window.location.href = '/admin/coupons');
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: result.message, background: '#161b22', color: '#fff' });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
