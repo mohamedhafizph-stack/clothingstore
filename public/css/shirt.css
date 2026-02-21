@@ -350,3 +350,141 @@ input:checked~.radio-mark{background:var(--blue)}
     align-items: center;
     gap: 12px;
 }
+/* FORCE EVERYTHING ON ONE LINE */
+.shop-header {
+    display: grid;
+    grid-template-columns: 180px 1fr auto; /* [Logo] [Space/Categories] [Tools] */
+    align-items: center;
+    padding: 0 40px;
+    height: 80px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-black);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* CATEGORIES: Clean and Centered */
+.categories-wrapper {
+    display: flex;
+    justify-content: center; /* This centers them in the middle column */
+    gap: 25px;
+    position: static;        /* 🔴 IMPORTANT: This stops it from floating "under" */
+    background: transparent;
+    padding: 0;
+    width: auto;
+}
+
+/* RIGHT TOOLS: Search & Icons */
+.header-tools {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-bar input {
+    width: 200px;
+    height: 40px;
+    background: #1a1a1a;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0 12px;
+    color: #fff;
+}
+
+/* MOBILE OVERRIDE */
+@media (max-width: 900px) {
+    .shop-header {
+        grid-template-columns: auto auto; /* Logo and Tools only */
+        justify-content: space-between;
+    }
+
+    .categories-wrapper {
+        display: none; /* Hide on mobile until toggle */
+        position: absolute; /* Floating only on mobile */
+        top: 80px; left: 0; width: 100%;
+        background: #0a0a0a;
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .categories-wrapper.show { display: flex; }
+    
+    .cat-toggle-btn { display: block; }
+}
+.product-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Fixed space between Image, Title, and Price */
+}
+
+.product-info h4 {
+    font-size: 0.95rem;
+    margin: 0; /* Remove default margins */
+    color: var(--text-white);
+}
+
+.price-stack {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+/* --- HEADER: The ONLY place with a border --- */
+.shop-header {
+    display: grid;
+    grid-template-columns: 180px 1fr auto;
+    align-items: center;
+    padding: 0 40px;
+    height: 80px;
+    background: var(--bg-black);
+    border-bottom: 1px solid var(--border); /* This is the ONLY bottom line */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* --- CATEGORIES: Removed absolute positioning and borders --- */
+.categories-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    position: static;     /* 🟢 Fixes the "floating/under" issue */
+    border-bottom: none;  /* 🟢 Removes the extra line you see */
+    background: transparent;
+    padding: 0;
+}
+
+/* --- PRODUCT SPACING --- */
+.product-card {
+    margin-bottom: 20px;
+}
+
+.image-wrapper {
+    margin-bottom: 12px; /* Clean gap between image and title */
+}
+
+.product-info h4 {
+    margin-bottom: 5px; /* Clean gap between title and price */
+    font-size: 0.95rem;
+}
+/* --- LISTING HEADER SPACING --- */
+.listing-header {
+    margin-bottom: 50px; /* This creates the gap you want */
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border); /* Optional: adds a subtle separator line */
+}
+
+.listing-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px; /* Space between the Title and the Subtitle */
+}
+
+.listing-header p {
+    color: var(--text-gray);
+    font-size: 1rem;
+}
+
+/* --- PRODUCT GRID SPACING --- */
+.product-grid {
+    margin-top: 20px; /* Additional safety gap */
+}
