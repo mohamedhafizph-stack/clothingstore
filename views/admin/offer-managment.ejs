@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Offer Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #000000; --card-bg: #111111; --border-color: #1a1a1a;
+            --text-main: #ffffff; --text-muted: #71717a; --accent-blue: #3b82f6;
+            --danger: #ef4444; --success: #22c55e;
+        }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; }
+        .main-content-wrapper { padding: 2rem; margin-left: 250px; }
+        .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+        .table-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th { background: #080808; padding: 1rem; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .admin-table td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        .btn-primary { background: var(--accent-blue); border: none; color: #fff; padding: 0.7rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn-icon-edit { background: none; border: none; color: var(--accent-blue); cursor: pointer; font-size: 1.1rem; margin-right: 10px; }
+        .btn-icon-delete { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.1rem; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; }
+        .modal-card { background: var(--bg-dark); border: 1px solid var(--border-color); max-width: 500px; margin: 50px auto; border-radius: 12px; padding: 2rem; position: relative; }
+        .form-group { margin-bottom: 1.2rem; }
+        .hidden { display: none !important; }
+        input, select { width: 100%; background: var(--card-bg); border: 1px solid #222; padding: 0.8rem; color: #fff; border-radius: 6px; }
+        .btn-submit { width: 100%; background: var(--accent-blue); color: #fff; border: none; padding: 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+        .status-indicator { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .status-online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-offline { background: var(--danger); }
+    </style>
+</head>
+<body>
+    <%- include('../partials/sidebar', {activePage: 'offers'}) %>
+
+    <main class="main-content-wrapper">
+        <div class="page-header">
+            <div>
+                <h1>Offer Management</h1>
+                <p>Manage product and category-wide discounts.</p>
+            </div>
+            <button class="btn-primary" onclick="openModal()">
+                <i class="fas fa-plus"></i> Create New Offer
+            </button>
+        </div>
+<div class="filter-wrapper" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+    <form action="/admin/offers" method="GET" style="display: flex; gap: 10px; flex: 1;">
+        <input type="text" name="search" placeholder="Search by offer name..." value="<%= search %>" style="max-width: 300px;">
+        
+        <select name="type" style="max-width: 200px;" onchange="this.form.submit()">
+            <option value="all" <%= type === 'all' ? 'selected' : '' %>>All Types</option>
+            <option value="Product" <%= type === 'Product' ? 'selected' : '' %>>Product Only</option>
+            <option value="Category" <%= type === 'Category' ? 'selected' : '' %>>Category Only</option>
+        </select>
+        <div style="flex: 1; min-width: 150px;">
+            <select name="status" onchange="this.form.submit()">
+                <option value="all" <%= status === 'all' ? 'selected' : '' %>>All Status</option>
+                <option value="active" <%= status === 'active' ? 'selected' : '' %>>Active Now</option>
+                <option value="expired" <%= status === 'expired' ? 'selected' : '' %>>Expired/Inactive</option>
+            </select>
+        </div>
+        <button type="submit" class="btn-primary"><i class="fas fa-search"></i></button>
+        <a href="/admin/offers" class="btn-primary" style="background: #333; text-decoration: none;">Reset</a>
+    </form>
+</div>
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Offer Name</th>
+                        <th>Type</th>
+                        <th>Target Item</th>
+                        <th>Discount</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (offers && offers.length > 0) { %>
+                        <% offers.forEach(offer => { %>
+                            <tr>
+                                <td><strong><%= offer.offerName %></strong></td>
+                                <td><%= offer.offerType %></td>
+                                <td>
+                                    <% if (offer.offerType === 'Product') { %>
+                                        <%= offer.productId ? offer.productId.name : 'Unknown Product' %>
+                                    <% } else { %>
+                                        <%= offer.categoryId ? offer.categoryId.name : 'Unknown Category' %>
+                                    <% } %>
+                                </td>
+                                <td style="color:var(--accent-blue)"><%= offer.discountPercentage %>% OFF</td>
+                                <td><%= new Date(offer.expireAt).toLocaleDateString() %></td>
+                                <td>
+                                    <% if (new Date(offer.expireAt) > new Date() && offer.isActive) { %>
+                                        <span class="status-indicator status-online"></span> Active
+                                    <% } else { %>
+                                        <span class="status-indicator status-offline"></span> Expired
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <button class="btn-icon-edit" onclick='openEditModal(<%- JSON.stringify(offer).replace(/'/g, "\\'") %>)'>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-icon-delete" onclick="confirmDelete('<%= offer._id %>')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="7" style="text-align:center; padding: 3rem;">No offers available.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination-container" style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 5px;">
+    <% if (currentPage > 1) { %>
+        <a href="?page=<%= currentPage - 1 %>&search=<%= search %>&type=<%= type %>" class="btn-primary" style="padding: 5px 12px;">Prev</a>
+    <% } %>
+
+    <% for(let i = 1; i <= totalPages; i++) { %>
+        <a href="?page=<%= i %>&search=<%= search %>&type=<%= type %>" 
+           class="btn-primary" 
+           style="padding: 5px 12px; <%= i === currentPage ? 'background: var(--accent-blue)' : 'background: #222' %>">
+           <%= i %>
+        </a>
+    <% } %>
+
+    <% if (currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %>&search=<%= search %>&type=<%= type %>" class="btn-primary" style="padding: 5px 12px;">Next</a>
+    <% } %>
+</div>
+    </main>
+
+    <div id="offerModal" class="modal-overlay">
+        <div class="modal-card">
+            <h3 id="modalTitle" style="margin-top:0">Create New Offer</h3>
+            <form id="offerForm">
+                <input type="hidden" name="offerId" id="offerId">
+                
+                <div class="form-group">
+                    <label>Offer Name</label>
+                    <input type="text" name="name" id="nameInput" required>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <div class="form-group" style="flex:1">
+                        <label>Offer Type</label>
+                        <select name="offerType" id="offerType" onchange="toggleSelects()">
+                            <option value="Product">Product Offer</option>
+                            <option value="Category">Category Offer</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label>Discount (%)</label>
+                        <input type="number" name="discount" id="discountInput" min="1" max="99" required>
+                    </div>
+                </div>
+
+                <div class="form-group" id="productSelectGroup">
+                    <label>Select Product</label>
+                    <select name="productId" id="productIdSelect">
+                        <option value="">-- Choose Product --</option>
+                        <% products.forEach(p => { %> 
+                            <option value="<%= p._id %>"><%= p.name %></option> 
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="form-group hidden" id="categorySelectGroup">
+                    <label>Select Category</label>
+                    <select name="categoryId" id="categoryIdSelect">
+                        <option value="">-- Choose Category --</option>
+                        <% categories.forEach(c => { %> 
+                            <option value="<%= c._id %>"><%= c.name %></option> 
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Expiry Date</label>
+                    <input type="date" name="expiryDate" id="expiryDateInput" required>
+                </div>
+
+                <div style="display:flex; gap: 1rem">
+                    <button type="submit" class="btn-submit" id="submitBtn">Activate Offer</button>
+                    <button type="button" class="btn-submit" onclick="closeModal()" style="background:#333">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let isEditMode = false;
+
+        function openModal() {
+            isEditMode = false;
+            document.getElementById('offerForm').reset();
+            document.getElementById('offerId').value = '';
+            document.getElementById('modalTitle').innerText = "Create New Offer";
+            document.getElementById('submitBtn').innerText = "Activate Offer";
+            document.getElementById('offerModal').style.display = 'block';
+            toggleSelects();
+        }
+
+        function closeModal() { document.getElementById('offerModal').style.display = 'none'; }
+
+        function toggleSelects() {
+            const type = document.getElementById('offerType').value;
+            const pGroup = document.getElementById('productSelectGroup');
+            const cGroup = document.getElementById('categorySelectGroup');
+            
+            if (type === 'Product') {
+                pGroup.classList.remove('hidden');
+                cGroup.classList.add('hidden');
+                document.getElementById('categoryIdSelect').value = ""; // Clear category selection
+            } else {
+                pGroup.classList.add('hidden');
+                cGroup.classList.remove('hidden');
+                document.getElementById('productIdSelect').value = ""; // Clear product selection
+            }
+        }
+
+        function openEditModal(offer) {
+            isEditMode = true;
+            document.getElementById('modalTitle').innerText = "Edit Offer";
+            document.getElementById('submitBtn').innerText = "Update Offer";
+            document.getElementById('offerId').value = offer._id;
+            document.getElementById('nameInput').value = offer.offerName;
+            document.getElementById('discountInput').value = offer.discountPercentage;
+            document.getElementById('offerType').value = offer.offerType;
+            
+            // Format date for input
+            if(offer.expireAt) {
+                document.getElementById('expiryDateInput').value = new Date(offer.expireAt).toISOString().split('T')[0];
+            }
+
+            toggleSelects();
+
+            // Set select values based on ID
+            if (offer.offerType === 'Product') {
+                document.getElementById('productIdSelect').value = offer.productId?._id || offer.productId || "";
+            } else {
+                document.getElementById('categoryIdSelect').value = offer.categoryId?._id || offer.categoryId || "";
+            }
+            
+            document.getElementById('offerModal').style.display = 'block';
+        }
+
+        // Handle Form Submission
+        document.getElementById('offerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    // Clean data to prevent CastErrors
+    if (data.offerType === 'Product') {
+        delete data.categoryId;
+        if (!data.productId) return Swal.fire("Error", "Please select a product", "error");
+    } else {
+        delete data.productId;
+        if (!data.categoryId) return Swal.fire("Error", "Please select a category", "error");
+    }
+
+    const url = isEditMode ? `/admin/offers/edit/${data.offerId}` : '/admin/offers/add';
+    const method = isEditMode ? 'PUT' : 'POST';
+
+    try {
+        Swal.fire({ 
+            title: 'Processing...', 
+            allowOutsideClick: false, 
+            didOpen: () => Swal.showLoading(),
+            background: '#111',
+            color: '#fff'
+        });
+
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // 1. CLOSE MODAL IMMEDIATELY
+            closeModal(); 
+            
+            // 2. SHOW SUCCESS MESSAGE
+            await Swal.fire({ 
+                icon: 'success', 
+                title: 'Success', 
+                text: result.message, 
+                background: '#111', 
+                color: '#fff',
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+            // 3. RELOAD PAGE
+            window.location.reload();
+        } else {
+            Swal.fire({ 
+                icon: 'error', 
+                title: 'Error', 
+                text: result.message, 
+                background: '#111', 
+                color: '#fff' 
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        Swal.fire({ 
+            icon: 'error', 
+            title: 'Network Error', 
+            text: 'Connection failed', 
+            background: '#111', 
+            color: '#fff' 
+        });
+    }
+});
+
+        async function confirmDelete(id) {
+            const res = await Swal.fire({ 
+                title: 'Are you sure?', 
+                text: "Product prices will be recalculated.", 
+                icon: 'warning', 
+                showCancelButton: true, 
+                confirmButtonColor: '#ef4444', 
+                background: '#111', 
+                color: '#fff' 
+            });
+            
+            if (res.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/offers/delete/${id}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    if (result.success) window.location.reload();
+                    else Swal.fire("Error", result.message, "error");
+                } catch (err) {
+                    Swal.fire("Error", "Delete failed", "error");
+                }
+            }
+        }
+    </script>
+</body>
+</html>

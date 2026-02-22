@@ -1,6 +1,6 @@
 import Product from "../../model/Product.js";
 import Category from "../../model/category.js";
-
+import mongoose from 'mongoose'; 
 export const getProductsList = async (query, page, limit) => {
     const skip = (page - 1) * limit;
     const [products, totalProducts] = await Promise.all([
@@ -22,17 +22,19 @@ export const createNewProduct = async (productData, files) => {
         throw new Error("Product Name, Category, and Price are required.");
     }
 
-    if(price<=0){
-        throw new Error("Price must be positive")
+    if (Number(price) <= 0) {
+        throw new Error("Price must be a positive number.");
     }
 
-    
+    if (!mongoose.Types.ObjectId.isValid(category)) {
+        throw new Error("Invalid Category ID. Please select a valid category.");
+    }
 
     const imageUrls = files ? files.map(file => file.path) : [];
 
     const product = new Product({
         name,
-        category,
+        category, 
         price: Number(price),
         discount: Number(discount) || 0,
         description,

@@ -7,7 +7,8 @@ import session from "express-session";
 import passport from "passport";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-
+import Product from "./model/Product.js";
+import Category from "./model/category.js";
 import connectDB from "./db/connectDB.js";
 import "./config/passport.js"; 
 import errorHandler from "./middlewares/errorhandler.js";
@@ -60,7 +61,17 @@ app.get("/", (req, res) => {
 
 //app.use(errorHandler)
 
-
+// const migrateData = async () => {
+//     const products = await Product.find({ category: { $not: { $type: "objectId" } } });
+//     for (let p of products) {
+//         const cat = await Category.findOne({ name: p.category });
+//         if (cat) {
+//             await Product.updateOne({ _id: p._id }, { $set: { category: cat._id } });
+//         }
+//     }
+//     console.log("Migration done!");
+// };
+// migrateData()
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

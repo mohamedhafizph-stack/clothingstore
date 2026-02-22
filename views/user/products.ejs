@@ -5,15 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wearify - Shop</title>
     <link rel="stylesheet" href="/css/shirt.css">
+    <style>
+        
+        /* CSS for the Offer UI */
+        .price-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .sale-price {
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .offer-badge {
+            background-color: #22c55e;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .image-wrapper {
+            position: relative;
+        }
+        .floating-discount {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ef4444;
+            color: white;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 3px;
+            z-index: 2;
+        }
+    </style>
+    <style>
+    /* Force visibility for prices */
+    .product-info {
+        background: #111 !important;
+        padding: 15px !important;
+        display: block !important;
+    }
+
+    .price-wrapper {
+        display: flex !important;
+        align-items: baseline !important;
+        gap: 10px !important;
+        margin-top: 10px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .sale-price {
+        color: #ffffff !important; /* Force White */
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+        display: inline-block !important;
+    }
+
+    .original-price {
+        color: #888 !important; /* Grey */
+        text-decoration: line-through !important;
+        font-size: 0.9rem !important;
+        display: inline-block !important;
+    }
+
+    .discount-text {
+        color: #22c55e !important; /* Green */
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+    }
+</style>
 </head>
 
 <body class="shop-page">
 
-<!-- ================= HEADER ================= -->
 <header class="shop-header">
     <a href="/home" class="logo">Wearify</a>
 
-    <!-- CATEGORIES (HIDDEN BY DEFAULT) -->
     <div class="categories-wrapper" id="categoriesWrapper">
         <% categories.forEach(category => { %>
             <a href="/shop/<%= category.name %>" class="category-card">
@@ -22,7 +101,7 @@
         <% }) %>
     </div>
 
-<div class="header-tools right-tools">
+    <div class="header-tools right-tools">
         <button class="cat-toggle-btn" onclick="toggleCategories()">Categories</button>
         <button class="filter-toggle-btn" onclick="toggleFilter()">Filters</button>
 
@@ -42,13 +121,10 @@
     </div>
 </header>
 
-<!-- ================= MAIN LAYOUT ================= -->
 <div class="shop-container">
 
-    <!-- ========== SIDEBAR FILTER ========== -->
     <aside class="sidebar">
         <form id="filterForm">
-
             <div class="filter-section">
                 <h3>Max Price</h3>
                 <input type="range" name="maxPrice" min="0" max="2000"
@@ -85,16 +161,13 @@
                     </label>
                 <% }) %>
             </div>
-
         </form>
     </aside>
 
-    <!-- ========== PRODUCTS ========== -->
     <main class="product-listing">
-
         <div class="listing-header">
-        <h1><%= category.name.toUpperCase() %> BUILT FOR MEN</h1>
-    <p>Premium selection for every occasion</p>
+            <h1><%= category.name.toUpperCase() %> BUILT FOR MEN</h1>
+            <p>Premium selection for every occasion</p>
         </div>
 
         <div class="product-grid">
@@ -103,13 +176,25 @@
                     <div class="product-card">
                         <a href="/shop/details/<%= p._id %>">
                             <div class="image-wrapper">
+                                <% if (p.offerPercentage > 0) { %>
+                                    <div class="floating-discount"><%= p.offerPercentage %>% OFF</div>
+                                <% } %>
                                 <img src="<%= p.images[0] %>" alt="<%= p.name %>">
                             </div>
                         </a>
-                        <div class="product-info">
-                            <h4><%= p.name %></h4>
-                            <p class="price">$<%= p.price %></p>
-                        </div>
+                       <div class="product-info">
+    <h4 style="color: white !important;"><%= p.name %></h4>
+    
+    <div class="price-wrapper">
+        <% if (p.offerPercentage && p.offerPercentage > 0) { %>
+            <span class="sale-price">$<%= p.salePrice || p.price %></span>
+            <span class="original-price">$<%= p.regularPrice %></span>
+            <span class="discount-text"><%= p.offerPercentage %>% OFF</span>
+        <% } else { %>
+            <span class="sale-price">$<%= p.price %></span>
+        <% } %>
+    </div>
+</div>
                     </div>
                 <% }) %>
             <% } else { %>
@@ -117,18 +202,15 @@
             <% } %>
         </div>
 
-        <!-- PAGINATION -->
         <div class="pagination">
             <% for(let i=1;i<=totalPages;i++){ %>
                 <span class="page-num <%= currentPage===i?'active':'' %>"
                       onclick="changePage(<%= i %>)"><%= i %></span>
             <% } %>
         </div>
-
     </main>
 </div>
 
-<!-- ================= SCRIPT ================= -->
 <script>
 const categorySlug = "<%= category.name %>";
 const filterForm = document.getElementById('filterForm');
@@ -156,24 +238,15 @@ function applyFilters(page=1){
 
 searchInput.addEventListener('input', debounce(()=>applyFilters(1),500));
 filterForm.addEventListener('change',()=>applyFilters(1));
-function changePage(p){applyFilters(p);}
 
-function toggleCategories(){
-    document.getElementById('categoriesWrapper').classList.toggle('show');
-}
-function toggleFilters(){
-    document.querySelector('.sidebar').classList.toggle('open');
-}
-</script>
-<script>
+function changePage(p){ applyFilters(p); }
+
 function toggleCategories() {
-    document.getElementById('categoriesWrapper')
-        .classList.toggle('show');
+    document.getElementById('categoriesWrapper').classList.toggle('show');
 }
 
 function toggleFilter() {
-    document.querySelector('.sidebar')
-        .classList.toggle('open');
+    document.querySelector('.sidebar').classList.toggle('open');
 }
 </script>
 

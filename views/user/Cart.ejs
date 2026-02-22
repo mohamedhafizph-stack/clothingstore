@@ -7,86 +7,119 @@
     <link rel="stylesheet" href="/css/cart.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Offer Styles */
+        .price-wrapper { display: flex; flex-direction: column; }
+        .sale-price { color: #2ea043; font-weight: bold; font-size: 1.1rem; }
+        .regular-price { text-decoration: line-through; color: #8b949e; font-size: 0.85rem; }
+        .savings-tag { color: #da3633; font-size: 0.75rem; font-weight: bold; margin-top: 2px; }
+        .summary-row.savings { color: #da3633; font-weight: bold; }
+        .free { color: #2ea043; font-weight: bold; }
+    </style>
 </head>
 <body class="cart-page">
 
 <header class="shop-header">
     <div class="header-left">
         <div class="logo">Wearify</div>
-        
     </div>
-   
 </header>
 
 <main class="container">
     <h1 class="page-title">Your Cart</h1>
 
     <div class="cart-layout">
-        
         <section class="cart-items">
-    <% if (cart && cart.items.length > 0) { %>
-        <% cart.items.forEach(item => { %>
-            <div class="item-card">
-                
-                <div class="item-image">
-                    <% if (item.product.images && item.product.images.length > 0) { %>
-                        <img src="<%= item.product.images[0] %>" 
-                             alt="<%= item.product.name %>" 
-                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
-                    <% } else { %>
-                        <div style="width: 80px; height: 80px; background: #1e293b; border-radius: 8px;"></div>
-                    <% } %>
+            <% if (cart && cart.items.length > 0) { %>
+                <% cart.items.forEach(item => { %>
+                    <div class="item-card">
+                        <div class="item-image">
+                            <% if (item.product.images && item.product.images.length > 0) { %>
+                                <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>" 
+                                     style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                            <% } else { %>
+                                <div style="width: 80px; height: 80px; background: #1e293b; border-radius: 8px;"></div>
+                            <% } %>
+                        </div>
+
+                        <div class="item-info">
+                            <h3><%= item.product.name %></h3>
+                            <div class="price-wrapper">
+                                <p class="item-meta">Size: <strong><%= item.size %></strong></p>
+                                
+                                <% if (item.product.salePrice < item.product.regularPrice) { %>
+                                    <span class="sale-price">₹<%= item.product.salePrice %></span>
+                                    <span class="regular-price">₹<%= item.product.regularPrice %></span>
+                                    <span class="savings-tag">Save ₹<%= (item.product.regularPrice - item.product.salePrice) * item.quantity %></span>
+                                <% } else { %>
+                                    <span class="sale-price">₹<%= item.product.price %></span>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="item-actions">
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty('<%= item.product._id %>', '<%= item.size %>', -1)">-</button>
+                                <span class="qty-number"><%= item.quantity %></span>
+                                <button class="qty-btn" onclick="changeQty('<%= item.product._id %>', '<%= item.size %>', 1)">+</button>
+                            </div>
+                            <button class="delete-btn" onclick="changeQty('<%= item.product._id %>', '<%= item.size %>', -<%= item.quantity %>)">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="empty-cart-container">
+                    <p class="empty-msg">Your cart is empty.</p>
+                    <a href="/shop" class="continue-link">Go to Shop</a>
                 </div>
+            <% } %>
+        </section>
 
-                <div class="item-info">
-                    <h3><%= item.product.name %></h3>
-                    <p class="item-meta">
-                        Size: <strong><%= item.size %></strong> | 
-                        Price: <strong>₹<%= item.product.price %></strong>
-                    </p>
-                </div>
-
-               <div class="item-actions">
-    <div class="qty-control">
-        <button class="qty-btn" onclick="changeQty('<%= item.product._id %>', '<%= item.size %>', -1)">-</button>
-        <span class="qty-number"><%= item.quantity %></span>
-        <button class="qty-btn" onclick="changeQty('<%= item.product._id %>', '<%= item.size %>', 1)">+</button>
-    </div>
-    <button class="delete-btn" onclick="changeQty('<%= item.product._id %>', '<%= item.size %>', -<%= item.quantity %>)">
-        <i data-lucide="trash-2"></i>
-    </button>
-</div>
-
-            </div>
-            <% }) %>
-    <% } else { %>
-        <div class="empty-cart-container">
-            <p class="empty-msg">Your cart is empty.</p>
-            <a href="/shop" class="continue-link">Go to Shop</a>
-        </div>
-    <% } %>
-</section>
         <aside class="order-summary">
             <h2>Order Summary</h2>
+            
+            <% 
+                // Calculate total savings for the summary box
+                let totalSavings = 0;
+                if (cart && cart.items) {
+                    cart.items.forEach(item => {
+                        if (item.product.salePrice < item.product.regularPrice) {
+                            totalSavings += (item.product.regularPrice - item.product.salePrice) * item.quantity;
+                        }
+                    });
+                }
+            %>
+
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span>₹<%= cart ? cart.totalPrice : 0 %></span>
+                <span>₹<%= cart ? (cart.totalPrice ) : 0 %></span>
             </div>
+
+            <% if (totalSavings > 0) { %>
+                <div class="summary-row savings">
+                    <span>Discount Savings</span>
+                    <span>- ₹<%= totalSavings %></span>
+                </div>
+            <% } %>
+
             <div class="summary-row">
                 <span>Shipping</span>
                 <span class="free">Free</span>
             </div>
-            <div class="summary-row">
-                
-                
-            </div>
+
             <hr>
             <div class="summary-row total">
                 <span>Total</span>
-                 <span>₹<%= cart ? cart.totalPrice : 0 %></span>
+                <span>₹<%= cart ? (cart.totalPrice-totalSavings ): 0 %></span>
             </div>
 
-        <a href="/cart/checkout"><button class="btn-checkout">Proceed to Checkout</button></a>    
+            <a href="/cart/checkout">
+                <button class="btn-checkout" <%= (!cart || cart.items.length === 0) ? 'disabled' : '' %>>
+                    Proceed to Checkout
+                </button>
+            </a>    
             <a href="/home" class="continue-link">Continue Shopping</a>
         </aside>
     </div>
@@ -96,35 +129,38 @@
     lucide.createIcons(); 
     
     async function changeQty(productId, size, change) {
-        
-    }
-    async function changeQty(productId, size, change) {
-    try {
-        const response = await fetch('/home/cart/update', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, size, change })
-        });
+        try {
+            const response = await fetch('/home/cart/update', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, size, change })
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (data.success) {
-           
-            window.location.reload(); 
-        } else {
-           
+            if (data.success) {
+                window.location.reload(); 
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Note',
+                    text: data.message,
+                    background: '#161b22',
+                    color: '#fff',
+                    confirmButtonColor: '#2f81f7'
+                });
+            }
+        } catch (error) {
+            console.error("Error updating quantity:", error);
             Swal.fire({
-                icon: 'warning',
-                title: 'Note',
-                text: data.message,
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong. Please try again.',
                 background: '#161b22',
                 color: '#fff'
             });
         }
-    } catch (error) {
-        console.error("Error updating quantity:", error);
     }
-}
 </script>
 </body>
 </html>

@@ -5,11 +5,19 @@ const MAX_LIMIT = 4;
 
 export const addToCartLogic = async (userId, { productId, size, quantity }) => {
     const requestedQty = parseInt(quantity);
+    const MAX_LIMIT = 4; 
     
     const product = await Product.findById(productId);
     if (!product) throw new Error("Product not found");
 
-    let cart = await Cart.findOne({ user: userId }) || new Cart({ user: userId, items: [] });
+    const effectivePrice = (product.salePrice && product.salePrice < product.regularPrice) 
+        ? product.salePrice 
+        : (product.price || product.regularPrice);
+
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+        cart = new Cart({ user: userId, items: [] });
+    }
 
     const currentProductTotal = cart.items
         .filter(item => item.product.toString() === productId)
@@ -18,7 +26,7 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
     if (currentProductTotal + requestedQty > MAX_LIMIT) {
         const allowedMore = MAX_LIMIT - currentProductTotal;
         throw new Error(allowedMore > 0 
-            ? `Limit: 4. You can only add ${allowedMore} more.` 
+            ? `Limit: 4 per product. You can only add ${allowedMore} more.` 
             : `Maximum limit of 4 reached for this product.`);
     }
 
@@ -28,25 +36,50 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
 
     if (existingItem) {
         existingItem.quantity += requestedQty;
+        existingItem.price = effectivePrice; 
     } else {
         cart.items.push({
             product: productId,
             size,
             quantity: requestedQty,
-            price: product.price
+            price: effectivePrice 
         });
     }
+
+    cart.totalPrice = cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
     return await cart.save();
 };
 
 export const getCartData = async (userId) => {
     const cart = await Cart.findOne({ user: userId }).populate('items.product');
-    if (!cart) return { items: [], totalPrice: 0 };
+    
+    if (!cart || !cart.items.length) {
+        return { items: [], totalPrice: 0, totalSavings: 0, originalSubtotal: 0 };
+    }
 
-    const subtotal = cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    cart.totalPrice = subtotal;
-    return cart;
+    let actualTotal = 0; 
+    let originalSubtotal = 0; 
+
+    cart.items.forEach(item => {
+        const qty = Number(item.quantity) || 0;
+        
+        const currentSalePrice = Number(item.price) || 0;
+        
+        const originalPrice = Number(item.product.regularPrice) || currentSalePrice;
+
+        actualTotal += currentSalePrice * qty;
+        originalSubtotal += originalPrice * qty;
+    });
+
+    const totalSavings = originalSubtotal - actualTotal;
+
+    const cartObj = cart.toObject();
+    cartObj.totalPrice = actualTotal;        
+    cartObj.originalSubtotal = originalSubtotal; 
+    cartObj.totalSavings = totalSavings;     
+
+    return cartObj;
 };
 
 export const updateQuantityLogic = async (userId, { productId, size, change }) => {

@@ -269,41 +269,44 @@ export const VerifyLogin = async(req,res)=>{
 
 }
 
-export const loadLoggedinHomepage = async(req,res)=>{
- const categories = await Category.find({status:"active"})
-     let userData;
-const userId = req.user?._id || req.session.user.id;
-   
-    if (req.user) {
-      userData = req.user;
-      userData = await User.findById(userId);
-    }
-    
-    else if (req.session.user){
-   
-      userData = await User.findById(userId);
-    }
-    
-    
-    else {
-      return res.redirect('/login');
-    }
+export const loadLoggedinHomepage = async(req, res) => {
+    try {
+        const categories = await Category.find({ status: "active" });
+        let userData;
+        const userId = req.user?._id || req.session.user?.id;
 
-   const categoryData = await Category.find({status:"active"})
-   
-   const activeCategoryNames = categoryData.map(cat => cat.name);
+        if (req.user || req.session.user) {
+            userData = await User.findById(userId);
+        } else {
+            return res.redirect('/login');
+        }
 
-    const newArrivals = await Product.find({status:"Active",totalStock:{$gt:0},category:{$in:activeCategoryNames}}).limit(4)
+        const activeCategoryIds = categories.map(cat => cat._id);
 
-    const bestSellers = await Product.find({status:"Active",totalStock:{$gt:0},category:{$in:activeCategoryNames}}).limit(4)
-    console.log(req.session.user)
-    
-   return res.render('user/loggedinHomepage',{
-        user:userData,
-        categories: categories, 
-        newArrivals: newArrivals,
-        bestSellers: bestSellers 
-    })
+        const newArrivals = await Product.find({
+            status: "Active",
+            totalStock: { $gt: 0 },
+            category: { $in: activeCategoryIds } 
+        }).sort({ createdAt: -1 }).limit(4);
+
+        const bestSellers = await Product.find({
+            status: "Active",
+            totalStock: { $gt: 0 },
+            category: { $in: activeCategoryIds } 
+        }).limit(4);
+
+        console.log("Session User:", req.session.user);
+
+        return res.render('user/loggedinHomepage', {
+            user: userData,
+            categories: categories,
+            newArrivals: newArrivals,
+            bestSellers: bestSellers
+        });
+    } catch (error) {
+        console.error("Homepage Load Error:", error);
+        res.status(500).send("Internal Server Error");
+    }
 }
 
 export const resendOtp = async (req, res) => {

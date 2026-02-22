@@ -488,3 +488,58 @@ input:checked~.radio-mark{background:var(--blue)}
 .product-grid {
     margin-top: 20px; /* Additional safety gap */
 }
+/* --- PRICE VISIBILITY FIX --- */
+.product-info {
+    padding: 15px;
+    background: #111; /* Match your card background */
+}
+
+.product-info h4 {
+    color: #fff;
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.price-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    min-height: 24px; /* Prevents layout jump */
+}
+
+/* The active price (Sale Price or Regular Price if no offer) */
+.sale-price {
+    color: #ffffff; /* Bright white */
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* The old price (Strikethrough) */
+.original-price {
+    text-decoration: line-through;
+    color: #71717a; /* Muted grey */
+    font-size: 0.9rem;
+}
+
+/* The percentage badge next to price */
+.offer-badge-text {
+    color: #22c55e; /* Vibrant green */
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Floating badge on top of image */
+.floating-discount {
+    position: absolute;
+    top: 10px;
+    right: 10px; /* Moved to right for better visibility */
+    background: #ef4444;
+    color: #fff;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border-radius: 4px;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}

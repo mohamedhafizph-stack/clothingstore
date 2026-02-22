@@ -11,6 +11,7 @@ import upload from "../config/productMulter.js";
 import orderController from '../controllers/admin/order-managment.js';
 import returnController from '../controllers/admin/return-controller.js';
 import couponController from '../controllers/admin/couponController.js';
+import offerController, { editOffer } from '../controllers/admin/offer-Controller.js';
 router.get('/login',isLoggedIn,authController.loadLoginPage);
 router.post('/login',isLoggedIn,authController.logingIn);
 
@@ -68,10 +69,14 @@ router.post('/coupons/add',adminAuth,couponController.addCoupon)
 router.patch('/coupons/toggle-status/:id', adminAuth, couponController.toggleStatus);
 router.get('/coupons/edit/:id', adminAuth, couponController.loadEditCoupon);
 router.put('/coupons/edit/:id', adminAuth, couponController.updateCoupon);
+router.get('/offers',adminAuth,offerController.loadOfferPage)
+router.post('/offers/add',adminAuth,offerController.addOffer)
+router.put('/offers/edit/:id',adminAuth,offerController.editOffer)
+router.delete('/offers/delete/:id',adminAuth,offerController.deleteOffer)
 router.get('/logout',(req,res)=>{
     req.session.destroy(()=>{
         res.redirect('/admin/login')
-    })
+    }) 
 })
  
 export default router 

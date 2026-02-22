@@ -44,14 +44,14 @@
     </div>
 
     <form action="/admin/products" method="GET" id="filterForm">
-        <select name="category" id="categoryFilter" class="btn-filter">
-            <option value="">All Categories</option>
-            <% categories.forEach(cat => { %>
-                <option value="<%= cat.name %>" <%= selectedCategory === cat.name ? 'selected' : '' %>>
-                    <%= cat.name %>
-                </option>
-            <% }) %>
-        </select>
+       <select name="category" id="categoryFilter" class="btn-filter" onchange="this.form.submit()">
+    <option value="">All Categories</option>
+    <% categories.forEach(cat => { %>
+        <option value="<%= cat._id %>" <%= String(selectedCategory) === String(cat._id) ? 'selected' : '' %>>
+            <%= cat.name %>
+        </option>
+    <% }) %>
+</select>
     </form>
 </div>
                 <table class="product-table">

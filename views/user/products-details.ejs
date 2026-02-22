@@ -3,26 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wearify - <%= product.productName %></title>
+  <title>Wearify - <%= product.name %></title>
   <link rel="stylesheet" href="/css/product-details.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* Offer & Price Styling */
+    .price-container { margin: 15px 0; display: flex; align-items: baseline; gap: 12px; }
+    .sale-price { color: #2ea043; font-weight: bold; font-size: 2.2rem; margin: 0; }
+    .original-price { text-decoration: line-through; color: #8b949e; font-size: 1.2rem; }
+    .discount-badge { background: #da3633; color: white; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
+    
+    /* Related Products Styling */
+    .related-price-box { margin-top: 8px; font-size: 0.95rem; }
+    .related-sale { color: #2ea043; font-weight: bold; }
+    .related-old { text-decoration: line-through; color: #8b949e; margin-left: 6px; font-size: 0.85rem; }
+    
+    /* Image Zoom */
+    #zoom-container { overflow: hidden; cursor: crosshair; position: relative; border-radius: 8px; }
+    #mainProductImage { transition: transform 0.2s ease-out; width: 100%; display: block; }
+  </style>
 </head>
 
 <body class="details-page">
 
 <header class="shop-header">
   <div class="logo">Wearify</div>
-  <!-- <nav class="nav-links">
-    <a href="/products?category=Shirts">Shirts</a>
-    <a href="/products?category=T-Shirts">T-Shirts</a>
-    <a href="/products?category=Pants">Pants</a>
-    <a href="/products?category=Shorts">Shorts</a>
-  </nav> -->
 </header>
 
 <main class="container">
 
-  <!-- Breadcrumb -->
   <nav class="breadcrumb">
     <a href="/">Men</a> /
     <a href="/products?category=<%= product.category?.name || '' %>">
@@ -30,360 +39,178 @@
     </a>
   </nav>
 
-  <!-- PRODUCT MAIN -->
   <section class="product-main">
-
     <h1><%= product.name %></h1>
 
-    <!-- IMAGES -->
-<div class="image-gallery">
+    <div class="image-gallery">
+      <div class="main-image" id="zoom-container">
+        <img id="mainProductImage" src="<%= product.images?.[0] %>" alt="<%= product.name %>">
+      </div>
 
-  <!-- MAIN IMAGE -->
-  <div class="main-image" id="zoom-container">
-    <img 
-      id="mainProductImage"
-      src="<%= product.images?.[0] %>"
-      alt="<%= product.name %>"
-    >
-  </div>
+      <div class="thumbnail-list">
+        <% (product.images || []).forEach((img, index) => { %>
+          <img src="<%= img %>" class="thumbnail <%= index === 0 ? 'active' : '' %>" onclick="changeImage('<%= img %>', this)">
+        <% }) %>
+      </div>
+    </div>
 
-  <!-- THUMBNAILS -->
-  <div class="thumbnail-list">
-    <% (product.images || []).forEach((img, index) => { %>
-      <img
-        src="<%= img %>"
-        class="thumbnail <%= index === 0 ? 'active' : '' %>"
-        onclick="changeImage('<%= img %>', this)"
-      >
-    <% }) %>
-  </div>
-
-</div>
-
-
-    <!-- SUMMARY -->
     <div class="product-summary">
-
       <p class="description"><%= product.description || '' %></p>
-      <h2 class="price">₹<%= product.price %></h2>
+      
+      <div class="price-container">
+        <% if (product.salePrice < product.regularPrice) { %>
+          <h2 class="sale-price">₹<%= product.salePrice %></h2>
+          <span class="original-price">₹<%= product.regularPrice %></span>
+          <span class="discount-badge"><%= product.offerPercentage %>% OFF</span>
+        <% } else { %>
+          <h2 class="price">₹<%= product.price %></h2>
+        <% } %>
+      </div>
 
-      <!-- SIZE OPTIONS -->
-     <div class="size-options">
-  <% (product.variants || []).forEach(v => { %>
-    <button
-  type="button"
-  class="size-btn <%= v.stock === 0 ? 'disabled' : '' %>"
-  data-size="<%= v.size %>"
-  data-stock="<%= v.stock %>"
-  onclick="selectSize(this)"
-  <%= v.stock === 0 ? 'disabled' : '' %>
->
-  <%= v.size %>
-</button>
+      <div class="size-options">
+        <% (product.variants || []).forEach(v => { %>
+          <button type="button" class="size-btn <%= v.stock === 0 ? 'disabled' : '' %>" 
+                  data-size="<%= v.size %>" data-stock="<%= v.stock %>" 
+                  onclick="selectSize(this)" <%= v.stock === 0 ? 'disabled' : '' %>>
+            <%= v.size %>
+          </button>
+        <% }) %>
+      </div>
 
-  <% }) %>
-</div>
-
-
-      <!-- COLORS -->
-      <% if ((product.colors || []).length > 0) { %>
-        <div class="color-options">
-          <% product.colors.forEach(color => { %>
-            <span class="color-circle" style="background-color:<%= color %>"></span>
-          <% }) %>
-        </div>
-      <% } %>
-
-      <!-- ACTIONS -->
       <div class="purchase-actions">
         <div class="quantity-picker">
-  <button id="minusBtn" onclick="updateQty(-1)">−</button>
-  <input type="number" id="qty" value="1" readonly>
-  <button id="plusBtn" onclick="updateQty(1)">+</button>
-</div>
+          <button id="minusBtn" onclick="updateQty(-1)">−</button>
+          <input type="number" id="qty" value="1" readonly>
+          <button id="plusBtn" onclick="updateQty(1)">+</button>
+        </div>
 
-
-      <button id="buyNowBtn" class="btn-buy">Buy Now</button>
+        <button id="buyNowBtn" class="btn-buy">Buy Now</button>
         <button class="btn-cart">Add to Cart</button>
         <button class="btn-wishlist">❤️ Wishlist</button>
       </div>
-
     </div>
   </section>
 
-  <!-- REVIEWS -->
-  <section class="reviews">
-    <h3>Customer Reviews</h3>
-
-    <p><%= (product.reviews || []).length %> reviews</p>
-
-    <% if ((product.reviews || []).length === 0) { %>
-      <p class="no-reviews">No reviews yet</p>
-    <% } %>
-
-    <% (product.reviews || []).forEach(review => { %>
-      <div class="review">
-        <p><strong><%= review.user?.name || 'Anonymous' %></strong></p>
-        <p>Rating: <%= review.rating || 0 %> ⭐</p>
-        <p><%= review.comment || '' %></p>
-      </div>
-    <% }) %>
-  </section>
-
-  <!-- RELATED PRODUCTS -->
   <% if ((relatedProducts || []).length > 0) { %>
     <section class="related">
       <h3>Related Products</h3>
       <div class="related-grid">
         <% relatedProducts.forEach(item => { %>
           <div class="related-card">
-            <a href="/shop/details/<%= item._id %>"><img src="<%= item.images?.[0] %>" alt="image"></a>
+            <a href="/shop/details/<%= item._id %>">
+              <img src="<%= item.images?.[0] %>" alt="image">
+            </a>
             <h4><%= item.name %></h4>
-            <p>₹<%= item.price %></p>
+            <div class="related-price-box">
+              <% if (item.salePrice < item.regularPrice) { %>
+                <span class="related-sale">₹<%= item.salePrice %></span>
+                <span class="related-old">₹<%= item.regularPrice %></span>
+              <% } else { %>
+                <span>₹<%= item.price %></span>
+              <% } %>
+            </div>
           </div>
         <% }) %>
       </div>
     </section>
   <% } %>
-
 </main>
 
-<footer></footer>
-
-<script>
-  function updateQty(val) {
-    const input = document.getElementById('qty');
-    let current = parseInt(input.value);
-    if (current + val >= 1) input.value = current + val;
-  }
-
-  function changeImage(src, el) {
-    document.getElementById('mainProductImage').src = src;
-
-    document.querySelectorAll('.thumbnail').forEach(t =>
-      t.classList.remove('active')
-    );
-
-    el.classList.add('active');
-  }
-</script>
 <script>
   let selectedStock = 0;
 
+  function changeImage(src, el) {
+    document.getElementById('mainProductImage').src = src;
+    document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
   function selectSize(btn) {
-    // ONLY target buttons inside the size-options container
-    const sizeContainer = document.querySelector('.size-options');
-    sizeContainer.querySelectorAll('.size-btn').forEach(b => {
-        b.classList.remove('active');
-    });
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedStock = parseInt(btn.dataset.stock);
     document.getElementById('qty').value = 1;
     updateButtons();
-    // This logic ensures '.color-circle' elements are never touched
-}
+  }
 
   function updateQty(change) {
     const input = document.getElementById('qty');
     let value = parseInt(input.value);
-
     value += change;
-
     if (value < 1) value = 1;
     if (value > selectedStock) value = selectedStock;
-
     input.value = value;
     updateButtons();
   }
 
   function updateButtons() {
     const qty = parseInt(document.getElementById('qty').value);
-    const plusBtn = document.getElementById('plusBtn');
-    const minusBtn = document.getElementById('minusBtn');
-
-    plusBtn.disabled = qty >= selectedStock;
-    minusBtn.disabled = qty <= 1;
+    document.getElementById('plusBtn').disabled = qty >= selectedStock;
+    document.getElementById('minusBtn').disabled = qty <= 1;
   }
-document.querySelector('.btn-cart').addEventListener('click', async () => {
+
+  // Zoom Logic
+  const container = document.getElementById('zoom-container');
+  const img = document.getElementById('mainProductImage');
+  container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / container.offsetWidth) * 100;
+    const y = ((e.clientY - rect.top) / container.offsetHeight) * 100;
+    img.style.transformOrigin = `${x}% ${y}%`;
+    img.style.transform = "scale(2)";
+  });
+  container.addEventListener('mouseleave', () => {
+    img.style.transform = "scale(1)";
+  });
+
+  // Add to Cart Logic
+  document.querySelector('.btn-cart').addEventListener('click', async () => {
     const activeSizeBtn = document.querySelector('.size-btn.active');
-    
-    // 1. Alert if no size is selected
     if (!activeSizeBtn) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Select Size',
-            text: 'Please choose a size before adding to cart.',
-            background: '#161b22',
-            color: '#fff',
-            confirmButtonColor: '#2f81f7'
-        });
-        return;
+      return Swal.fire({ icon: 'warning', title: 'Select Size', text: 'Please choose a size.', background: '#161b22', color: '#fff' });
     }
-
-    const productId = "<%= product._id %>";
-    const size = activeSizeBtn.dataset.size;
-    const quantity = document.getElementById('qty').value;
 
     try {
-        const response = await fetch(`/shop/details/${productId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, size, quantity })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            // 2. Success Message
-            Swal.fire({
-                icon: 'success',
-                title: 'Added to Cart!',
-                text: data.message,
-                background: '#161b22',
-                color: '#fff',
-                showConfirmButton: false,
-                timer: 2000,
-                iconColor: '#2ea043'
-            });
-        } else {
-            // 3. Server Error Message (e.g., Out of Stock)
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: data.message,
-                background: '#161b22',
-                color: '#fff',
-                confirmButtonColor: '#2f81f7'
-            });
-        }
-    } catch (error) {
-        // 4. Connection Error
-        Swal.fire({
-            icon: 'error',
-            title: 'Connection Failed',
-            text: 'Could not connect to the server. Please try again later.',
-            background: '#161b22',
-            color: '#fff'
-        });
+      const response = await fetch(`/shop/details/<%= product._id %>`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          productId: "<%= product._id %>", 
+          size: activeSizeBtn.dataset.size, 
+          quantity: document.getElementById('qty').value 
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        Swal.fire({ icon: 'success', title: 'Added!', text: data.message, timer: 1500, showConfirmButton: false });
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: data.message });
+      }
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Server connection failed.' });
     }
-});
-document.getElementById('buyNowBtn').addEventListener('click', async () => {
+  });
+
+  // Buy Now Logic
+  document.getElementById('buyNowBtn').addEventListener('click', async () => {
     const activeSizeBtn = document.querySelector('.size-btn.active');
-    
-    // 1. Validation: Check if size is selected
     if (!activeSizeBtn) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Select Size',
-            text: 'Please choose a size before buying.',
-            background: '#161b22',
-            color: '#fff',
-            confirmButtonColor: '#2f81f7'
-        });
-        return;
+      return Swal.fire({ icon: 'warning', title: 'Select Size', text: 'Please choose a size first.' });
     }
-
-    const productId = "<%= product._id %>";
-    const size = activeSizeBtn.dataset.size;
-    const quantity = document.getElementById('qty').value;
-
-    try {
-        // 2. Add to cart first (Backend logic)
-        const response = await fetch(`/shop/details/${productId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, size, quantity })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            // 3. Redirect to checkout page on success
-            window.location.href = '/cart/checkout'; 
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: data.message,
-                background: '#161b22',
-                color: '#fff'
-            });
-        }
-    } catch (error) {
-        console.error("Buy Now Error:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Something went wrong. Please try again.',
-            background: '#161b22',
-            color: '#fff'
-        });
-    }
-});
-const container = document.getElementById('zoom-container');
-const img = document.getElementById('mainProductImage');
-
-container.addEventListener('mousemove', (e) => {
-    const x = e.clientX - e.target.offsetLeft;
-    const y = e.clientY - e.target.offsetTop;
-
-    // Calculate position in percentage
-    const xPercent = (x / container.offsetWidth) * 100;
-    const yPercent = (y / container.offsetHeight) * 100;
-
-    // Move the transform-origin so it zooms into the cursor point
-    img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
-});
-
-container.addEventListener('mouseleave', () => {
-    img.style.transformOrigin = 'center';
-});
-
-document.querySelector('.btn-wishlist').addEventListener('click', async () => {
-    const productId = "<%= product._id %>";
-
-    try {
-        const response = await fetch(`/shop/details/${productId}/wishlist`, { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId }) 
-        });
-
-        // This is where the error happens if the response isn't JSON
-        const data = await response.json();
-
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Saved!',
-                text: 'Item added to wishlist',
-                background: '#161b22',
-                color: '#fff',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: data.message || 'Something went wrong',
-                background: '#161b22',
-                color: '#fff'
-            });
-        }
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Check console for details. Server likely sent HTML instead of JSON.',
-            background: '#161b22',
-            color: '#fff'
-        });
-    }
-});
+    // Logic to add to cart and then redirect to checkout
+    const response = await fetch(`/shop/details/<%= product._id %>`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        productId: "<%= product._id %>", 
+        size: activeSizeBtn.dataset.size, 
+        quantity: document.getElementById('qty').value 
+      })
+    });
+    const data = await response.json();
+    if (data.success) window.location.href = '/cart/checkout';
+  });
 </script>
-
 
 </body>
 </html>
