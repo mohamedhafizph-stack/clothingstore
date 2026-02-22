@@ -104,7 +104,7 @@
                     <img src="<%= item.product.images[0] %>" alt="Product">
                     <div class="product-info">
                         <p class="name"><%= item.product.name %></p>
-                        <p class="qty">Quantity: <%= item.quantity %></p>
+                        <p class="qty">Quantity: <%= item.quantity %> Price :₹<%= item.price %></p>
                     </div>
                 </div>
             <% }) %>
@@ -178,6 +178,7 @@
 </aside>
 
 <script>
+    lucide.createIcons();
     let currentAppliedCoupon = null;
 
     async function applyCouponCode(code) {
