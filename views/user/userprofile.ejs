@@ -7,25 +7,133 @@
     <link rel="stylesheet" href="/css/userprofile.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
+    <style>
+        /* --- Referral Modal Styles --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f0f0f0;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .close-modal:hover { background: #e0e0e0; }
+
+        .modal-header i {
+            font-size: 3.5rem;
+            color: #007aff;
+            margin-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.8rem;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .modal-header p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        .referral-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border: 2px dashed #007aff;
+            padding: 18px 25px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        #referralCodeDisplay {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #1a1a1a;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: #007aff;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .copy-btn:active { transform: scale(0.9); }
+
+        .copy-status {
+            font-size: 0.85rem;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .btn-secondary { cursor: pointer; }
+    </style>
 </head>
 <body>
 
     <header class="profile-header">
         <div class="header-left">
             <div class="logo"><strong>Wearify</strong></div>
-           
         </div>
 
         <div class="header-right">
-           
             <button class="icon-btn"><i class="ph ph-heart"></i></button>
-           <a href="/home/cart"> <button class="icon-btn"><i class="ph ph-shopping-bag"></i></button></a>
-           <img 
-  src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
-  alt="Avatar"
-  style="width:80px;height:80px;border-radius:50%;object-fit:cover;"
->
-
+            <a href="/home/cart"> 
+                <button class="icon-btn"><i class="ph ph-shopping-bag"></i></button>
+            </a>
+            <img 
+                src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
+                alt="Avatar"
+                style="width:40px;height:40px;border-radius:50%;object-fit:cover; border: 1px solid #ddd;"
+            >
         </div>
     </header>
 
@@ -36,55 +144,75 @@
             <div class="user-info">
                 <h2><%= user.name %></h2>
                 <p class="user-detail"><%= user.email %></p>
-                <p class="user-detail"><%= user.phone %></p>
-                <p class="user-detail"><%= user.address %></p>
+               
 
                 <div class="action-grid">
                     <a href="/profile/edit-profile" class="btn-secondary">Edit Profile</a>
                     <a href="/profile/adresses" class="btn-secondary">Manage Addresses</a>
                     <a href="/user/orders" class="btn-secondary">My Orders</a>
                     <a href="/wallet" class="btn-secondary">Wallets</a>
+                    <a href="javascript:void(0)" class="btn-secondary" onclick="openReferralModal()">Referral</a>
                 </div>
 
                 <a href="/auth/logout" class="btn-logout">Logout</a>
             </div>
 
             <div class="profile-image-section">
-    <img 
-     src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
-      alt="Profile Image"
-      class="profile-image-large"
-    >
+                <img 
+                    src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
+                    alt="Profile Image"
+                    class="profile-image-large"
+                >
 
-    <form 
-      action="/profile/upload-image"
-      method="POST"
-      enctype="multipart/form-data"
-      class="profile-image-form"
-    >
-        <label for="profilePic" class="change-photo-btn">
-            Change Photo
-        </label>
+                <form 
+                    action="/profile/upload-image"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    class="profile-image-form"
+                >
+                    <label for="profilePic" class="change-photo-btn">
+                        Change Photo
+                    </label>
 
-        <input 
-          type="file"
-          id="profilePic"
-          name="profilePic"
-          accept="image/*"
-          hidden
-          onchange="this.form.submit()"
-        >
-    </form>
-</div>
-
-
+                    <input 
+                        type="file"
+                        id="profilePic"
+                        name="profilePic"
+                        accept="image/*"
+                        hidden
+                        onchange="this.form.submit()"
+                    >
+                </form>
+            </div>
         </div>
     </main>
 
+    <div id="referralModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeReferralModal()">
+                <i class="ph ph-x"></i>
+            </button>
+            
+            <div class="modal-header">
+                <i class="ph ph-gift"></i>
+                <h2>Refer & Earn</h2>
+                <p>Invite friends to Wearify! When they join using your code, you both get exclusive rewards.</p>
+            </div>
+            
+            <div class="referral-box">
+                <span id="referralCodeDisplay"><%= user.referralCode %></span>
+                <button onclick="copyCode()" class="copy-btn" title="Copy Code">
+                    <i class="ph ph-copy" id="copyIcon"></i>
+                </button>
+            </div>
+            <p class="copy-status" id="copyStatusText">Click the icon to copy your code</p>
+        </div>
+    </div>
+
     <footer class="profile-footer">
         <div class="footer-nav">
-            <a href="#">About</a>
-            <a href="#">Contact</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
             <a href="#">FAQ</a>
             <a href="#">Shipping & Returns</a>
             <a href="#">Privacy Policy</a>
@@ -93,6 +221,55 @@
         <p>© 2024 Wearify. All rights reserved.</p>
     </footer>
 
+    <script>
+        const modal = document.getElementById('referralModal');
+        const statusText = document.getElementById('copyStatusText');
+        const copyIcon = document.getElementById('copyIcon');
 
+        function openReferralModal() {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        function closeReferralModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            // Reset state
+            statusText.innerText = "Click the icon to copy your code";
+            statusText.style.color = "#999";
+            copyIcon.className = "ph ph-copy";
+        }
+
+        // Close on outside click
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeReferralModal();
+            }
+        }
+
+        async function copyCode() {
+            const code = document.getElementById('referralCodeDisplay').innerText;
+            
+            try {
+                await navigator.clipboard.writeText(code);
+                
+                // Success Feedback
+                statusText.innerText = "Code copied to clipboard!";
+                statusText.style.color = "#27ae60";
+                copyIcon.className = "ph ph-check-circle";
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    statusText.innerText = "Click the icon to copy your code";
+                    statusText.style.color = "#999";
+                    copyIcon.className = "ph ph-copy";
+                }, 3000);
+
+            } catch (err) {
+                statusText.innerText = "Failed to copy. Try again.";
+                statusText.style.color = "#e74c3c";
+            }
+        }
+    </script>
 </body>
 </html>
