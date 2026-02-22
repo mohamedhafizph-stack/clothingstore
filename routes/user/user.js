@@ -69,6 +69,7 @@ router.get('/cart/checkout',userAuth,checkoutController.loadCheckoutpage)
 router.get('/cart/checkout/add',userAuth,userController.loadAddAddressPage)
 router.post('/cart/checkout/add',userAuth,userController.Addaddress)
 router.post('/order/place', userAuth, orderController.placeOrder);
+router.post('/order/verify',userAuth, orderController.verifyPayment); 
 router.get('/cart/checkout/success/:orderId', userAuth, orderController.loadOrderSuccess);
 router.get('/order/download-invoice/:orderId', userAuth, orderController.downloadInvoice);
 router.get('/user/orders/:id', userAuth, orderController.getOrderDetails);

@@ -176,12 +176,13 @@
         </button>
     </div>
 </aside>
-
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     lucide.createIcons();
+    
     let currentAppliedCoupon = null;
 
-    async function applyCouponCode(code) {
+   async function applyCouponCode(code) {
         if (!code) return;
         const subtotal = <%= totalPrice %>;
 
@@ -196,85 +197,108 @@
             if (result.success) {
                 currentAppliedCoupon = code.trim().toUpperCase();
                 
-                // Show Discount Row
                 document.getElementById('discountRow').style.display = 'flex';
                 document.getElementById('activeCouponName').innerText = currentAppliedCoupon;
                 document.getElementById('discountValue').innerText = result.discount.toFixed(2);
                 document.getElementById('finalTotalDisplay').innerText = `₹${result.newTotal.toFixed(2)}`;
                 
-                // Update Message
                 document.getElementById('couponMsg').innerHTML = `
-                    <div style="display:flex; justify-content:space-between; color: green; font-weight: 500;">
+                    <div style="display:flex; justify-content:space-between; color: green; font-weight: 500; font-size: 12px; margin-top: 5px;">
                         Coupon Applied! 
                         <a href="javascript:void(0)" onclick="removeCoupon()" style="color: #ef4444; text-decoration: none;">Remove</a>
                     </div>`;
                 
                 Swal.fire({ icon: 'success', title: 'Coupon Applied!', timer: 1000, showConfirmButton: false });
             } else {
-                Swal.fire('Error', result.message, 'error');
+                Swal.fire('Invalid Coupon', result.message, 'error');
             }
         } catch (err) {
-            Swal.fire('Error', 'Failed to apply coupon', 'error');
+            Swal.fire('Error', 'Failed to connect to coupon service', 'error');
         }
     }
 
+    
     function removeCoupon() {
         currentAppliedCoupon = null;
         document.getElementById('discountRow').style.display = 'none';
-        document.getElementById('finalTotalDisplay').innerText = `₹<%= totalPrice.toFixed(2) %>`;
+        document.getElementById('finalTotalDisplay').innerText = `₹<%= (totalPrice || 0).toFixed(2) %>`;
         document.getElementById('manualCoupon').value = '';
         document.getElementById('couponMsg').innerHTML = '';
+        Swal.fire({ icon: 'info', title: 'Coupon Removed', timer: 800, showConfirmButton: false });
     }
 
-    // UPDATED PLACE ORDER FUNCTION
+    
     async function placeOrder() {
         const addressId = document.querySelector('input[name="addressId"]:checked')?.value;
         const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
 
-        if (!addressId) {
-            return Swal.fire({ icon: 'warning', title: 'Address Required', text: 'Please select a shipping address.' });
-        }
+        if (!addressId || !paymentMethod) return Swal.fire('Error', 'Please select address and payment method', 'warning');
 
-        Swal.fire({ title: 'Processing Order...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Preparing your order',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
 
         try {
             const response = await fetch('/order/place', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    addressId, 
-                    paymentMethod, 
-                    couponCode: currentAppliedCoupon // Sending the applied code to backend
-                })
+                body: JSON.stringify({ addressId, paymentMethod })
             });
 
             const result = await response.json();
 
-            if (result.success) {
-                if (paymentMethod === 'Razorpay') {
-                    const options = {
-                        "key": result.rzpKey,
-                        "amount": result.amount,
-                        "currency": "INR",
-                        "order_id": result.rzpOrderId,
-                        "handler": function (res) {
-                            window.location.href = `/order/verify?orderId=${result.orderId}&paymentId=${res.razorpay_payment_id}`;
-                        },
-                        "theme": { "color": "#000000" }
-                    };
-                    const rzp = new Razorpay(options);
-                    rzp.open();
-                } else {
-                    window.location.href = `/cart/checkout/success/${result.orderId}`;
-                }
-            } else {
-                Swal.fire('Error', result.message, 'error');
-            }
-        } catch (error) {
-            Swal.fire('Error', 'Server connection failed', 'error');
+            if (!result.success) return Swal.fire('Error', result.message, 'error');
+
+            if (paymentMethod === 'Razorpay') {
+                const options = {
+                    key: result.rzpKey,
+                    amount: result.amount,
+                    currency: "INR",
+                    name: "Wearify",
+                    order_id: result.rzpOrderId,
+                    handler: async function (res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Payment Received!',
+                            text: 'Generating your invoice...',
+                            allowOutsideClick: false,
+                            didOpen: () => { Swal.showLoading(); }
+                        });
+
+                        const vRes = await fetch('/order/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ...res, orderId: result.orderId })
+                        });
+                        const vData = await vRes.json();
+
+                        if (vData.success) {
+                            // Success Step 2: Redirect to Order Success Page
+                            window.location.href = `/cart/checkout/success/${vData.customOrderId}`;
+                        } else {
+                            Swal.fire('Error', 'Verification failed', 'error');
+                        }
+                    },
+                    prefill: { name: "<%= user.name %>", email: "<%= user.email %>" },
+                    theme: { color: "#000000" },
+                    modal: { ondismiss: () => { Swal.close(); } }
+                };
+                const rzp = new Razorpay(options);
+                rzp.open();
+           } else {
+    if (result.success && result.customOrderId) {
+        window.location.href = `/cart/checkout/success/${result.customOrderId}`;
+    } else {
+        Swal.fire('Error', 'Order created but redirect failed', 'error');
+    }
+}
+        } catch (err) {
+            Swal.fire('Error', 'Network error occurred', 'error');
         }
     }
 </script>
-
 </body>
 </html>
