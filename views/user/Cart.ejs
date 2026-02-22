@@ -94,7 +94,7 @@
 
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span>₹<%= cart ? (cart.totalPrice ) : 0 %></span>
+                <span>₹<%= cart ? (cart.totalPrice+totalSavings ) : 0 %></span>
             </div>
 
             <% if (totalSavings > 0) { %>
@@ -112,7 +112,7 @@
             <hr>
             <div class="summary-row total">
                 <span>Total</span>
-                <span>₹<%= cart ? (cart.totalPrice-totalSavings ): 0 %></span>
+                <span>₹<%= cart ? (cart.totalPrice ): 0 %></span>
             </div>
 
             <a href="/cart/checkout">
