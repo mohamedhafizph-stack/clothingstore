@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Wearify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --card-gray: #161616;
+            --border-gray: #2a2a2a;
+            --accent-blue: #007aff;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Navigation (Matches About Page) --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-gray);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .logo span { color: var(--accent-blue); }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--accent-blue); }
+
+        /* --- Hero Header --- */
+        .contact-header {
+            text-align: center;
+            padding: 80px 20px 40px;
+        }
+
+        .contact-header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to bottom, #fff 50%, #666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .contact-header p {
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* --- Contact Section --- */
+        .contact-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px 100px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 60px;
+        }
+
+        /* --- Left Side: Info --- */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .info-item .icon {
+            width: 50px;
+            height: 50px;
+            background: var(--glass);
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-blue);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .info-item h3 {
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .info-item p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* --- Right Side: Form --- */
+        .contact-form-wrapper {
+            background: var(--card-gray);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border-gray);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-group input, 
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            background: #0f0f0f;
+            border: 1px solid var(--border-gray);
+            border-radius: 10px;
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus, 
+        .form-group textarea:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #0066d6;
+            transform: translateY(-2px);
+        }
+
+        /* --- Map Placeholder --- */
+        .map-section {
+            width: 100%;
+            height: 400px;
+            background: var(--card-gray);
+            border-top: 1px solid var(--border-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            position: relative;
+        }
+
+        /* --- Footer (Matches About Page) --- */
+        footer {
+            border-top: 1px solid var(--border-gray);
+            padding: 60px 8% 40px;
+            background: var(--bg-black);
+            text-align: center;
+        }
+
+        .footer-bottom {
+            color: #444;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 850px) {
+            .contact-container { grid-template-columns: 1fr; gap: 40px; }
+            .contact-header h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo">WEARI<span>FY</span></a>
+        <ul class="nav-links">
+            <li><a href="/">Collection</a></li>
+            <li><a href="/shop">Shop</a></li>
+            <li><a href="/about">About</a></li>
+        </ul>
+    </nav>
+
+    <header class="contact-header">
+        <h1>Connect with Us.</h1>
+        <p>Whether you have a question about our collections or just want to say hello, we're here for you.</p>
+    </header>
+
+    <section class="contact-container">
+        <div class="contact-info">
+            <div class="info-item">
+                <div class="icon"><i class="fas fa-envelope"></i></div>
+                <div>
+                    <h3>Email Support</h3>
+                    <p>hello@wearify.com</p>
+                    <p>Response within 24 hours.</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="icon"><i class="fas fa-phone-alt"></i></div>
+                <div>
+                    <h3>Phone</h3>
+                    <p>+91 (800) 123-4567</p>
+                    <p>Mon - Fri, 9am - 6pm</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div>
+                    <h3>Headquarters</h3>
+                    <p>123 Fashion District, Cyber City</p>
+                    <p>Kerala, India - 682001</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--text-muted);">Follow the culture</h3>
+                <div style="display: flex; gap: 20px; font-size: 1.5rem;">
+                    <a href="#" style="color: #fff;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" style="color: #fff;"><i class="fab fa-twitter"></i></a>
+                    <a href="#" style="color: #fff;"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-form-wrapper">
+            <form action="/contact" method="POST">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="john@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <select style="width: 100%; padding: 14px; background: #0f0f0f; border: 1px solid var(--border-gray); border-radius: 10px; color: #fff;">
+                        <option>General Inquiry</option>
+                        <option>Order Support</option>
+                        <option>Collaboration</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea name="message" rows="5" placeholder="How can we help you?" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                    Send Message <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <div class="map-section">
+        <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-right: 15px;"></i>
+        <span>Interactive Map Integration Placeholder</span>
+    </div>
+
+    <footer>
+        <p class="footer-bottom">&copy; 2026 WEARIFY CO. DESIGNED IN DARK MODE.</p>
+    </footer>
+
+</body>
+</html>

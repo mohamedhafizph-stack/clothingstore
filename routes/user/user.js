@@ -13,6 +13,7 @@ import adminAuth from '../../middlewares/adminAuth.js';
 import wishlistController from '../../controllers/user/wishlist-Controller.js'
 import walletController from '../../controllers/user/walletController.js';
 import couponApplyController from '../../controllers/user/coupon-Controller.js';
+import homeController from '../../controllers/user/home-Controller.js';
 // Add this at the top of your routes file
 router.use((req, res, next) => {
     console.log(`Request Path: ${req.path} | Session User: ${req.session.user} | Passport User: ${req.user ? req.user._id : 'None'}`);
@@ -89,5 +90,7 @@ router.post('/wallet/add', userAuth, walletController.addMoney);
 router.post('/wallet/create-order', userAuth, walletController.createWalletOrder);
 router.post('/wallet/verify-payment', userAuth, walletController.verifyWalletPayment);
 router.post('/order/apply-coupon',userAuth,couponApplyController.applyCoupon)
+router.get('/about-us',userAuth,homeController.loadAboutUs)
+router.get('/contact',userAuth,homeController.loadcontact)
 
 export default router
