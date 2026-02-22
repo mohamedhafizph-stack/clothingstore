@@ -210,6 +210,44 @@
     const data = await response.json();
     if (data.success) window.location.href = '/cart/checkout';
   });
+
+  // Add to Wishlist Logic
+document.querySelector('.btn-wishlist').addEventListener('click', async () => {
+    const productId = "<%= product._id %>";
+
+    try {
+        // Updated URL to match your route: /shop/details/:product__id/wishlist
+        const response = await fetch(`/shop/details/${productId}/wishlist`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId }) 
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Wishlist Updated',
+                text: data.message,
+                background: '#161b22',
+                color: '#fff',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'Note',
+                text: data.message,
+                background: '#161b22',
+                color: '#fff'
+            });
+        }
+    } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to update wishlist.' });
+    }
+});
 </script>
 
 </body>

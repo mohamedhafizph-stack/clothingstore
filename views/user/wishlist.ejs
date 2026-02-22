@@ -9,6 +9,15 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
+        :root {
+            --bg-dark: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --success-green: #3fb950;
+            --danger-red: #f85149;
+            --text-muted: #8b949e;
+        }
+
         .btn-add-cart {
             background: transparent;
             border: 1px solid var(--border-color);
@@ -21,50 +30,87 @@
             transition: all 0.2s;
             margin-right: 15px;
         }
+
         .btn-add-cart:hover {
             background: #ffffff;
             color: #000000;
         }
+
         .item-card {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 20px;
-            border-bottom: 1px solid #2d333b;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--card-bg);
+            transition: background 0.3s;
         }
+
+        .item-card:hover {
+            background: #1c2128;
+        }
+
+        /* Price Styling */
+        .price-container { display: flex; align-items: baseline; gap: 8px; margin-top: 5px; }
+        .sale-price { color: var(--success-green); font-weight: bold; font-size: 1.2rem; }
+        .original-price { text-decoration: line-through; color: var(--text-muted); font-size: 0.9rem; }
+        .discount-badge { 
+            background: rgba(248, 81, 73, 0.15); 
+            color: #ff7b72; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 0.75rem; 
+            font-weight: bold;
+            border: 1px solid rgba(248, 81, 73, 0.2);
+        }
+
+        .item-info h3 { margin: 0; font-size: 1.1rem; color: #adbac7; }
+        .item-meta { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
     </style>
 </head>
-<body class="cart-page">
+<body class="cart-page" style="background-color: var(--bg-dark); color: #adbac7;">
 
-<header class="shop-header">
+<header class="shop-header" style="border-bottom: 1px solid var(--border-color); padding: 1rem 2rem;">
     <div class="header-left">
-        <div class="logo" style="cursor: pointer;" onclick="window.location.href='/home'">Wearify</div>
+        <div class="logo" style="cursor: pointer; font-size: 1.5rem; font-weight: bold;" onclick="window.location.href='/home'">Wearify</div>
     </div>
 </header>
 
-<main class="container">
-    <h1 class="page-title">Your Wishlist</h1>
+<main class="container" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px;">
+    <h1 class="page-title" style="margin-bottom: 30px;">Your Wishlist</h1>
 
-    <div class="cart-layout">
+    <div class="cart-layout" style="display: grid; grid-template-columns: 1fr 300px; gap: 30px;">
         <section class="cart-items">
             <% if (wishlist && wishlist.items.length > 0) { %>
                 <% wishlist.items.forEach(item => { %>
                     <div class="item-card" id="product-row-<%= item.product._id %>">
-                        <div class="item-image">
-                            <% if (item.product.images && item.product.images.length > 0) { %>
-                                <img src="<%= item.product.images[0] %>" 
-                                     alt="<%= item.product.name %>" 
-                                     style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
-                            <% } else { %>
-                                <div style="width: 80px; height: 80px; background: #1e293b; border-radius: 8px;"></div>
-                            <% } %>
-                        </div>
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            <div class="item-image">
+                                <% if (item.product.images && item.product.images.length > 0) { %>
+                                    <img src="<%= item.product.images[0] %>" 
+                                         alt="<%= item.product.name %>" 
+                                         style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);">
+                                <% } else { %>
+                                    <div style="width: 100px; height: 100px; background: #1e293b; border-radius: 8px;"></div>
+                                <% } %>
+                            </div>
 
-                        <div class="item-info">
-                            <h3><%= item.product.name %></h3>
-                            <p class="item-meta">
-                                Price: <strong>₹<%= item.product.price %></strong>
-                            </p>
+                            <div class="item-info">
+                                <h3><%= item.product.name %></h3>
+                                
+                                <div class="price-container">
+                                    <% if (item.product.salePrice < item.product.regularPrice) { %>
+                                        <span class="sale-price">₹<%= item.product.salePrice %></span>
+                                        <span class="original-price">₹<%= item.product.regularPrice %></span>
+                                        <span class="discount-badge">
+                                            <%= Math.round(((item.product.regularPrice - item.product.salePrice) / item.product.regularPrice) * 100) %>% OFF
+                                        </span>
+                                    <% } else { %>
+                                        <span class="sale-price" style="color: #fff;">₹<%= item.product.regularPrice %></span>
+                                    <% } %>
+                                </div>
+                                <!-- <p class="item-meta">Category: <%= item.product.category?.name || 'General' %></p> -->
+                            </div>
                         </div>
 
                         <div class="item-actions">
@@ -73,36 +119,45 @@
                                 Add to Cart
                             </button>
                             
-                            <button class="delete-btn" onclick="handleDelete('<%= item.product._id %>')" style="background: none; border: none; color: #ff4d4d; cursor: pointer;">
+                            <button class="delete-btn" onclick="handleDelete('<%= item.product._id %>')" style="background: none; border: none; color: var(--danger-red); cursor: pointer; vertical-align: middle;">
                                 <i data-lucide="trash-2"></i>
                             </button>
                         </div>
                     </div>
                 <% }) %>
             <% } else { %>
-                <div class="empty-cart-container" style="text-align: center; padding: 50px;">
-                    <p class="empty-msg">Your wishlist is empty.</p>
-                    <a href="/shop" class="continue-link" style="color: #6366f1;">Discover Products</a>
+                <div class="empty-cart-container" style="text-align: center; padding: 100px 20px; background: var(--card-bg); border-radius: 12px; border: 1px dashed var(--border-color);">
+                    <i data-lucide="heart" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                    <p class="empty-msg" style="font-size: 1.2rem; color: var(--text-muted);">Your wishlist is empty.</p>
+                    <a href="/shop" class="continue-link" style="color: #58a6ff; text-decoration: none; display: inline-block; margin-top: 10px;">Discover Products →</a>
                 </div>
             <% } %>
         </section>
 
-        <aside class="order-summary">
-            <h2>Account</h2>
-            <p class="summary-row">Items saved: <%= wishlist ? wishlist.items.length : 0 %></p>
-            <hr>
-            <a href="/home/cart"><button class="btn-checkout">View Your Cart</button></a>    
-            <a href="/home" class="continue-link">Back to Home</a>
+        <aside class="order-summary" style="background: var(--card-bg); padding: 25px; border-radius: 12px; height: fit-content; border: 1px solid var(--border-color);">
+            <h2 style="font-size: 1.2rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Overview</h2>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <span>Saved Items</span>
+                <span style="color: #fff; font-weight: bold;"><%= wishlist ? wishlist.items.length : 0 %></span>
+            </div>
+            <a href="/home/cart" style="text-decoration: none;">
+                <button class="btn-checkout" style="width: 100%; padding: 12px; background: #238636; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+                    View Your Cart
+                </button>
+            </a>    
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="/home" class="continue-link" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Back to Store</a>
+            </div>
         </aside>
     </div>
 </main>
 
+
+
 <script>
     lucide.createIcons(); 
 
-    // --- CORE LOGIC FUNCTIONS ---
-
-    // 1. SILENT REMOVE (Used by other functions)
+    // 1. SILENT REMOVE (Utility function)
     async function removeFromWishlist(productId) {
         try {
             const response = await fetch(`/shop/details/${productId}/wishlist/remove`, {
@@ -117,16 +172,16 @@
         }
     }
 
-    // 2. MANUAL DELETE (Called by Trash Icon)
+    // 2. MANUAL DELETE (Trash Icon)
     async function handleDelete(productId) {
         const result = await Swal.fire({
-            title: 'Remove from Wishlist?',
-            text: "Are you sure you want to remove this item?",
+            title: 'Remove item?',
+            text: "Do you want to remove this product from your wishlist?",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
+            confirmButtonColor: '#f85149',
             cancelButtonColor: '#30363d',
-            confirmButtonText: 'Yes, remove it!',
+            confirmButtonText: 'Yes, remove',
             background: '#161b22',
             color: '#fff'
         });
@@ -134,10 +189,9 @@
         if (result.isConfirmed) {
             const success = await removeFromWishlist(productId);
             if (success) {
-                // Refresh to update the count and clear the list
-                window.location.reload();
+                location.reload();
             } else {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Could not remove item', background: '#161b22', color: '#fff' });
+                Swal.fire({ icon: 'error', title: 'Oops', text: 'Action failed', background: '#161b22', color: '#fff' });
             }
         }
     }
@@ -150,37 +204,29 @@
 
         variants.forEach(v => {
             if (v.stock > 0) {
-                sizeOptions[v.size] = `${v.size} (${v.stock} left)`;
+                sizeOptions[v.size] = `${v.size} (${v.stock} in stock)`;
                 hasStock = true;
             }
         });
 
         if (!hasStock) {
-            return Swal.fire({
-                icon: 'error',
-                title: 'Out of Stock',
-                text: 'Sorry, this product is currently sold out.',
-                background: '#161b22',
-                color: '#fff'
-            });
+            return Swal.fire({ icon: 'error', title: 'Sold Out', text: 'This item is no longer available.', background: '#161b22', color: '#fff' });
         }
 
         const { value: selectedSize } = await Swal.fire({
-            title: 'Select Size',
+            title: 'Choose Size',
             input: 'select',
             inputOptions: sizeOptions,
-            inputPlaceholder: 'Choose size',
+            inputPlaceholder: 'Select a size',
             showCancelButton: true,
             background: '#161b22',
             color: '#fff',
-            confirmButtonColor: '#6366f1',
-            inputValidator: (value) => {
-                if (!value) return 'Please pick a size!';
-            }
+            confirmButtonColor: '#238636'
         });
 
         if (selectedSize) {
             try {
+                // Post to Cart endpoint
                 const response = await fetch(`/shop/details/${productId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -190,27 +236,23 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Item added to cart, now remove from wishlist
+                    // Success! Now clear it from wishlist
                     await removeFromWishlist(productId);
                     
-                    await Swal.fire({
+                    Swal.fire({
                         icon: 'success',
-                        title: 'Moved to Cart',
-                        text: 'Item successfully transferred to your cart!',
+                        title: 'Moved!',
+                        text: 'Item is now in your cart.',
                         background: '#161b22',
                         color: '#fff',
-                        timer: 2000,
+                        timer: 1500,
                         showConfirmButton: false
-                    });
-
-                    // Reload to update the Wishlist UI
-                    window.location.reload();
+                    }).then(() => location.reload());
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: data.message, background: '#161b22', color: '#fff' });
+                    Swal.fire({ icon: 'error', title: 'Failed', text: data.message, background: '#161b22', color: '#fff' });
                 }
             } catch (error) {
-                console.error("Cart error:", error);
-                Swal.fire({ icon: 'error', title: 'Network Error', text: 'Failed to add to cart', background: '#161b22', color: '#fff' });
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Server error', background: '#161b22', color: '#fff' });
             }
         }
     }
