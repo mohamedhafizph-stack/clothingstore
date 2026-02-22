@@ -33,7 +33,7 @@ export const updateMainOrderStatus = async (orderId, newStatus) => {
     if (terminalStates.includes(order.status)) {
         throw new Error(`Order is already ${order.status} and cannot be changed.`);
     }
-
+    
     order.status = newStatus;
     return await order.save();
 };
@@ -50,6 +50,7 @@ export const updateSpecificItemStatus = async (orderId, itemId, newStatus) => {
         order.status = 'Cancelled';
     } else if (statuses.every(s => s === 'Delivered' || s === 'Cancelled')) {
         order.status = 'Delivered';
+        order.paymentStatus="Paid"
     } else if (statuses.some(s => s === 'Shipped')) {
         order.status = 'Shipped';
     } else {

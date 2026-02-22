@@ -10,9 +10,9 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
     const product = await Product.findById(productId);
     if (!product) throw new Error("Product not found");
 
-    const effectivePrice = (product.salePrice && product.salePrice < product.regularPrice) 
+    const effectivePrice = (product.salePrice && product.salePrice < product.price) 
         ? product.salePrice 
-        : (product.price || product.regularPrice);
+        : (product.price || product.Price);
 
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
@@ -29,7 +29,7 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
             ? `Limit: 4 per product. You can only add ${allowedMore} more.` 
             : `Maximum limit of 4 reached for this product.`);
     }
-
+    const realPrice = product.price
     const existingItem = cart.items.find(
         item => item.product.toString() === productId && item.size === size
     );
@@ -37,12 +37,14 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
     if (existingItem) {
         existingItem.quantity += requestedQty;
         existingItem.price = effectivePrice; 
+        existingItem.realPrice=product.Price
     } else {
         cart.items.push({
             product: productId,
             size,
             quantity: requestedQty,
-            price: effectivePrice 
+            price: effectivePrice,
+            realPrice : realPrice
         });
     }
 

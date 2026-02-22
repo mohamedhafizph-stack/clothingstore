@@ -12,6 +12,7 @@ import orderController from '../controllers/admin/order-managment.js';
 import returnController from '../controllers/admin/return-controller.js';
 import couponController from '../controllers/admin/couponController.js';
 import offerController, { editOffer } from '../controllers/admin/offer-Controller.js';
+import reportController from '../controllers/admin/report-Controller.js';
 router.get('/login',isLoggedIn,authController.loadLoginPage);
 router.post('/login',isLoggedIn,authController.logingIn);
 
@@ -73,6 +74,9 @@ router.get('/offers',adminAuth,offerController.loadOfferPage)
 router.post('/offers/add',adminAuth,offerController.addOffer)
 router.put('/offers/edit/:id',adminAuth,offerController.editOffer)
 router.delete('/offers/delete/:id',adminAuth,offerController.deleteOffer)
+router.get('/reports',adminAuth,reportController.loadReportPage)
+router.get('/sales-report/download/pdf',adminAuth, reportController.downloadPDF);
+router.get('/sales-report/download/excel', adminAuth,reportController.downloadExcel);
 router.get('/logout',(req,res)=>{
     req.session.destroy(()=>{
         res.redirect('/admin/login')

@@ -142,8 +142,7 @@
         <div class="stats-grid">
             <div class="card">
                 <h4>Sales Summary</h4>
-                <div class="value">₹<%= stats.sales.toLocaleString() %></div>
-            </div>
+<div class="value">₹<%= (stats.revenue || 0).toLocaleString() %></div>            </div>
             <div class="card">
                 <h4>Total Orders</h4>
                 <div class="value"><%= stats.orders %></div>

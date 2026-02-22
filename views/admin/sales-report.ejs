@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Sales Report | Wearify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #000000; --card-bg: #111111; --border-color: #1a1a1a;
+            --text-main: #ffffff; --text-muted: #71717a; --accent-blue: #3b82f6;
+            --danger: #ef4444; --success: #22c55e;
+        }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; }
+        .main-content-wrapper { padding: 2rem; margin-left: 250px; }
+        .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+        
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; }
+
+        /* Table & Filters */
+        .table-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th { background: #080808; padding: 1rem; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .admin-table td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        
+        /* Form Elements */
+        .filter-wrapper { background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; }
+        input, select { background: #000; border: 1px solid #222; padding: 0.7rem; color: #fff; border-radius: 6px; font-size: 0.9rem; }
+        .btn-primary { background: var(--accent-blue); border: none; color: #fff; padding: 0.7rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-secondary { background: #222; border: none; color: #fff; padding: 0.7rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; }
+        
+        .hidden { display: none !important; }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+    </style>
+</head>
+<body>
+    <%- include('../partials/sidebar', {activePage: 'reports'}) %>
+
+    <main class="main-content-wrapper">
+        <div class="page-header">
+            <div>
+                <h1>Sales Report</h1>
+                <p>Track business performance and revenue metrics.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="/admin/sales-report/download/pdf?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn-secondary">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </a>
+                <a href="/admin/sales-report/download/excel?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn-secondary">
+                    <i class="fas fa-file-excel"></i> Excel
+                </a>
+            </div>
+        </div>
+
+        <div class="filter-wrapper">
+            <form action="/admin/reports" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">REPORT RANGE</label>
+                    <select name="filter" id="filterSelect" style="min-width: 180px;">
+                        <option value="all" <%= filter === 'all' ? 'selected' : '' %>>All Time</option>
+                        <option value="daily" <%= filter === 'daily' ? 'selected' : '' %>>Daily</option>
+                        <option value="weekly" <%= filter === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                        <option value="monthly" <%= filter === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                        <option value="yearly" <%= filter === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                        <option value="custom" <%= filter === 'custom' ? 'selected' : '' %>>Custom Range</option>
+                    </select>
+                </div>
+
+                <div id="customDateSection" class="<%= filter !== 'custom' ? 'hidden' : '' %>" style="display: flex; gap: 15px;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">START DATE</label>
+                        <input type="date" name="startDate" value="<%= startDate %>">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">END DATE</label>
+                        <input type="date" name="endDate" value="<%= endDate %>">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="height: 42px;">Apply Filter</button>
+            </form>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Orders Count</div>
+                <div class="stat-value"><%= report.totalSalesCount %></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value">₹<%= report.totalOrderAmount.toLocaleString('en-IN') %></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Discount</div>
+                <div class="stat-value text-danger">₹<%= (report.totalDiscount).toLocaleString('en-IN') %></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Net Sales</div>
+                <div class="stat-value text-success">₹<%= (report.totalOrderAmount - report.totalDiscount).toLocaleString('en-IN') %></div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Gross Total</th>
+                        <th>Offers</th>
+                        <th>Discount</th>
+                        <th>Final Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   <% if (orders && orders.length > 0) { %>
+    <% orders.forEach(order => { 
+        // 1. Calculate the Gross Original Price (Sum of MRP * Quantity)
+        const grossOriginal = order.items.reduce((acc, item) => {
+            return acc + (item.originalPrice * item.quantity);
+        }, 0);
+
+        // 2. Calculate Offer Discount (Original Sum - Price before Coupon)
+        // We use order.subtotal here because you saved the discounted subtotal earlier
+        const offerDiscount = grossOriginal - (order.totalPrice + (order.couponDiscount || 0));
+    %>
+        <tr>
+            <td style="color: var(--text-muted)"><%= new Date(order.createdAt).toLocaleDateString('en-GB') %></td>
+
+            <td style="font-weight: 600;">#<%= order.orderId %></td>
+
+            <td>
+                <div style="font-weight: 600;"><%= order.shippingAddress.fullName %></div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+                    <% order.items.forEach(item => { %>
+                        • <%= item.product ? item.product.name : 'Product' %> (<%= item.size %>) x<%= item.quantity %><br>
+                    <% }) %>
+                </div>
+            </td>
+
+            <td>₹<%= grossOriginal.toFixed(2) %></td>
+
+            <td class="text-danger">-₹<%= offerDiscount > 0 ? offerDiscount.toFixed(2) : "0.00" %></td>
+
+            <td class="text-danger">-₹<%= (order.couponDiscount || 0).toFixed(2) %></td>
+
+            <td style="font-weight: 700; color: var(--accent-blue)">₹<%= order.totalPrice.toFixed(2) %></td>
+        </tr>
+    <% }) %>
+<% } else { %>
+    <tr>
+        <td colspan="7" style="text-align:center; padding: 4rem; color: var(--text-muted);">
+            <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 1rem;"></i>
+            No orders found for the selected period.
+        </td>
+    </tr>
+<% } %>
+                </tbody>
+            </table>
+            <div class="pagination-container" style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 5px;">
+    <% if (currentPage > 1) { %>
+        <a href="?page=<%= currentPage - 1 %>&filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn-secondary" style="padding: 8px 15px; text-decoration: none; font-size: 0.8rem;">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+    <% } %>
+
+    <% for(let i = 1; i <= totalPages; i++) { %>
+        <a href="?page=<%= i %>&filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" 
+           class="btn-primary" 
+           style="padding: 8px 15px; text-decoration: none; font-size: 0.8rem; <%= i === currentPage ? 'background: var(--accent-blue)' : 'background: #222' %>">
+            <%= i %>
+        </a>
+    <% } %>
+
+    <% if (currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %>&filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn-secondary" style="padding: 8px 15px; text-decoration: none; font-size: 0.8rem;">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+    <% } %>
+</div>
+        </div>
+    </main>
+
+    <script>
+        const filterSelect = document.getElementById('filterSelect');
+        const customDateSection = document.getElementById('customDateSection');
+
+        filterSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customDateSection.classList.remove('hidden');
+            } else {
+                customDateSection.classList.add('hidden');
+                this.form.submit();
+            }
+        });
+    </script>
+</body>
+</html>

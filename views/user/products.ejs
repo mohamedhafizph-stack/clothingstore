@@ -125,7 +125,7 @@
                 <h3>Max Price</h3>
                 <input type="range" name="maxPrice" min="0" max="2000" class="slider" value="<%= selectedFilters.maxPrice || 2000 %>">
                 <div class="price-labels">
-                    <span>$0</span> - <span>$<%= selectedFilters.maxPrice || 2000 %></span>
+                    <span>₹0</span> - <span>₹<%= selectedFilters.maxPrice || 2000 %></span>
                 </div>
             </div>
 
@@ -186,8 +186,8 @@
                             <h4 style="color: white !important;"><%= p.name %></h4>
                             <div class="price-wrapper">
                                 <% if (p.offerPercentage && p.offerPercentage > 0) { %>
-                                    <span class="sale-price">$<%= p.salePrice || p.price %></span>
-                                    <span class="original-price">$<%= p.regularPrice %></span>
+                                    <span class="sale-price">₹<%= p.salePrice || p.price %></span>
+                                    <span class="original-price">₹<%= p.regularPrice %></span>
                                     <span class="discount-text"><%= p.offerPercentage %>% OFF</span>
                                 <% } else { %>
                                     <span class="sale-price">$<%= p.price %></span>

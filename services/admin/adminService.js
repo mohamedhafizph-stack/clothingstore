@@ -54,20 +54,37 @@ export const toggleBlockStatus = async (userId) => {
 };
 
 export const getDashboardData = async () => {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
     const [salesStats, orderCount, recentOrders, weeklySales] = await Promise.all([
         Orders.aggregate([
-            { $match: { status: "Delivered" } },
+            { $match: { status: "Delivered", paymentStatus: "Paid" } },
             { $group: { _id: null, total: { $sum: "$totalPrice" } } }
         ]),
-        Orders.countDocuments(),
-        Orders.find().sort({ createdAt: -1 }).limit(5).populate('user', 'name'),
+
+        Orders.countDocuments({ status: { $nin: ["Cancelled", "Returned"] } }),
+
+        Orders.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate('user', 'name'),
+
         Orders.aggregate([
-            { $match: { createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } },
-            { $group: { 
-                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
-                dailySales: { $sum: "$totalPrice" },
-                dailyOrders: { $sum: 1 }
-            }},
+            { 
+                $match: { 
+                    createdAt: { $gte: sevenDaysAgo },
+                    status: { $nin: ["Cancelled", "Returned"] }
+                } 
+            },
+            { 
+                $group: { 
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
+                    dailySales: { $sum: "$totalPrice" },
+                    dailyOrders: { $sum: 1 },
+                    dailyDiscounts: { $sum: { $add: ["$couponDiscount", { $subtract: ["$subtotal", "$totalPrice"] }] } }
+                }
+            },
             { $sort: { "_id": 1 } }
         ])
     ]);
@@ -76,13 +93,13 @@ export const getDashboardData = async () => {
 
     return {
         stats: {
-            sales: totalRevenue,
-            orders: orderCount,
             revenue: totalRevenue,
-            avgValue: orderCount > 0 ? (totalRevenue / orderCount).toFixed(2) : 0
+            orders: orderCount,
+            avgValue: orderCount > 0 ? (totalRevenue / orderCount).toFixed(2) : 0,
+            totalSales: totalRevenue 
         },
         recentActivity: recentOrders.map(order => ({
-            id: order._id.toString().slice(-6).toUpperCase(),
+            id: order.orderId, 
             customer: order.user?.name || 'Guest',
             amount: order.totalPrice,
             status: order.status
