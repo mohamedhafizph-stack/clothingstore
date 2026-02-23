@@ -1,6 +1,6 @@
 import { productService } from '../../services/user/productService.js';
-
-const loadShirts = async (req, res) => {
+import Product from '../../model/Product.js';
+const loadProducts = async (req, res) => {
   try {
     const { category } = req.params;
     const result = await productService.getProductsByCategory(category, req.query);
@@ -50,10 +50,50 @@ const loadProductDetails = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+import User from '../../model/User.js';
+
+export const addProductReview = async (req, res) => {
+    try {
+        const { productId, rating, comment } = req.body;
+        const userId = req.session.user?.id||req.user._id; 
+        const user = await User.findById(userId)
+        const userName=user.name
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found." });
+        }
+
+        const newReview = {
+            userId,
+            userName,
+            rating: Number(rating),
+            comment
+        };
+
+        product.reviews.push(newReview);
+ 
+        const totalRating = product.reviews.reduce((sum, item) => item.rating + sum, 0);
+        product.averageRating = (totalRating / product.reviews.length).toFixed(1);
+
+        await product.save();
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Review shared successfully!",
+            averageRating: product.averageRating 
+        });
+
+    } catch (error) {
+        console.error("Review Error:", error);
+        res.status(500).json({ success: false, message: "Failed to post review." });
+    }
+};
 
 const productController = {
-  loadShirts,
-  loadProductDetails
+  loadProducts,
+  loadProductDetails,
+  addProductReview
 };
 
 export default productController;

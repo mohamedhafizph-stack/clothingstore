@@ -80,7 +80,7 @@ export const placeOrder = async (req, res) => {
                 product: i.product._id,
                 quantity: i.quantity,
                 price: i.price,
-                originalPrice : i.realPrice,
+                realPrice : i.realPrice,
                 size: i.size
             })),
             shippingAddress: {

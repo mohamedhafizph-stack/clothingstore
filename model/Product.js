@@ -4,7 +4,13 @@ const variantSchema = new mongoose.Schema({
   size: { type: String, required: true, uppercase: true, trim: true },
   stock: { type: Number, required: true, min: 0, default: 0 }
 });
-
+const reviewSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    userName: { type: String, required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    comment: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   
@@ -13,7 +19,7 @@ const productSchema = new mongoose.Schema({
     ref: 'Category', 
     required: true 
   },
-  
+  reviews: [reviewSchema],
   price: { type: Number, required: true, min: 0 },
   
   regularPrice: { type: Number }, 

@@ -6,6 +6,90 @@
     <title>Order Details | Wearify</title>
     <link rel="stylesheet" href="/css/order-details.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* --- Integrated Review Styles --- */
+        .btn-item-review {
+            background: transparent;
+            color: #ffc107;
+            border: 1px solid #ffc107;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-item-review:hover { background: rgba(255, 193, 7, 0.1); }
+
+        .modal-overlay-review {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content-review {
+            background: #161b22;
+            width: 90%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+            text-align: center;
+            color: #fff;
+        }
+
+        .rating-stars {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 8px;
+        }
+        .rating-stars input { display: none; }
+        .rating-stars label {
+            font-size: 35px;
+            color: #30363d;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .rating-stars label:hover,
+        .rating-stars label:hover ~ label,
+        .rating-stars input:checked ~ label {
+            color: #ffc107;
+        }
+
+        #reviewComment {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            resize: none;
+        }
+
+        .btn-submit-review {
+            width: 100%;
+            padding: 14px;
+            background: #007aff;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-submit-review:hover { background: #0056b3; }
+    </style>
 </head>
 <body class="dark-theme">
 
@@ -52,10 +136,6 @@
                 <% }); %>
             </div>
         </section>
-        <% } else if (order.status === 'Cancelled') { %>
-            <div class="alert-card danger">
-                <i class="fas fa-times-circle"></i> This order was cancelled and a refund (if applicable) has been processed to your wallet.
-            </div>
         <% } %>
 
         <div class="details-grid">
@@ -79,6 +159,12 @@
                             <p class="item-sub">Quantity: <%= item.quantity %> • Price: $<%= item.price.toFixed(2) %></p>
                             
                             <div class="item-footer-actions">
+                                <% if (order.status === 'Delivered' && item.status === 'Delivered') { %>
+                                    <button onclick="openReviewModal('<%= item.product._id %>', '<%= item.product.name %>')" class="btn-item-review">
+                                        <i class="fas fa-star"></i> Write Review
+                                    </button>
+                                <% } %>
+
                                 <% if (['Pending', 'Processing'].includes(order.status) && item.status !== 'Cancelled') { %>
                                     <button onclick="cancelItem('<%= order._id %>', '<%= item._id %>')" class="btn-item-cancel">
                                         <i class="fas fa-times"></i> Cancel Item
@@ -89,12 +175,6 @@
                                     <button onclick="requestItemReturn('<%= order._id %>', '<%= item._id %>')" class="btn-item-return">
                                         <i class="fas fa-undo"></i> Return Item
                                     </button>
-                                <% } %>
-
-                                <% if (['Cancelled', 'Returned', 'Return Requested', 'Rejected'].includes(item.status)) { %>
-                                    <span class="status-notice">
-                                        <i class="fas fa-info-circle"></i> Item <%= item.status %>
-                                    </span>
                                 <% } %>
                             </div>
                         </div>
@@ -126,15 +206,30 @@
                         <span class="val">$<%= order.totalPrice.toFixed(2) %></span>
                     </div>
                 </div>
-
-                <% if (order.status === 'Delivered' && !order.items.every(i => i.status === 'Returned')) { %>
-                    <button onclick="initiateFullOrderReturn('<%= order._id %>')" class="btn-full-return">
-                        <i class="fas fa-undo"></i> Return Entire Order
-                    </button>
-                <% } %>
             </div>
         </div>
     </main>
+
+    <div id="reviewModal" class="modal-overlay-review">
+        <div class="modal-content-review">
+            <h2 id="modalProductName" style="margin-bottom: 5px;">Product Name</h2>
+            <p style="color: #8b949e; font-size: 0.9rem; margin-bottom: 20px;">Rate your purchase</p>
+            
+            <form id="reviewForm">
+                <input type="hidden" id="modalProductId">
+                <div class="rating-stars">
+                    <input type="radio" name="rating" value="5" id="s5"><label for="s5">★</label>
+                    <input type="radio" name="rating" value="4" id="s4"><label for="s4">★</label>
+                    <input type="radio" name="rating" value="3" id="s3"><label for="s3">★</label>
+                    <input type="radio" name="rating" value="2" id="s2"><label for="s2">★</label>
+                    <input type="radio" name="rating" value="1" id="s1"><label for="s1">★</label>
+                </div>
+                <textarea id="reviewComment" rows="4" placeholder="What did you think of this item?" required></textarea>
+                <button type="submit" class="btn-submit-review">Submit Review</button>
+                <button type="button" onclick="closeReviewModal()" style="background:transparent; border:none; color:#8b949e; margin-top:15px; cursor:pointer;">Maybe Later</button>
+            </form>
+        </div>
+    </div>
 
     <footer class="footer">
         <p>© 2026 Wearify. Handcrafted with care.</p>
@@ -142,7 +237,96 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // 1. Single Item Return
+      /* --- Review Modal Logic --- */
+
+// 1. Better Close Function: Checks if elements exist to prevent silent crashes
+function closeReviewModal() {
+    const modal = document.getElementById('reviewModal');
+    const form = document.getElementById('reviewForm');
+    
+    if (modal) modal.style.display = 'none';
+    if (form) form.reset();
+}
+
+// 2. Open Function: Ensure IDs match your EJS/HTML exactly
+function openReviewModal(id, name) {
+    const modal = document.getElementById('reviewModal');
+    const inputId = document.getElementById('modalProductId');
+    const nameDisplay = document.getElementById('modalProductName');
+
+    if (inputId) inputId.value = id;
+    if (nameDisplay) nameDisplay.innerText = name;
+    if (modal) modal.style.display = 'flex';
+}
+
+// 3. Form Submission with Improved Error Handling
+const reviewForm = document.getElementById('reviewForm');
+
+if (reviewForm) {
+    reviewForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Use standard query selector for stars
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        const productId = document.getElementById('modalProductId')?.value;
+        const comment = document.getElementById('reviewComment')?.value;
+
+        // Frontend Validation
+        if (!rating) {
+            return Swal.fire({
+                title: 'Missing Rating',
+                text: 'Please select a star rating.',
+                icon: 'warning',
+                background: '#161b22',
+                color: '#fff'
+            });
+        }
+
+        try {
+            // Add a "Loading" state to the button (optional but recommended)
+            const submitBtn = reviewForm.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            const response = await fetch('/product/add-review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, rating, comment })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Close the modal first so the user sees progress
+                closeReviewModal();
+
+                await Swal.fire({
+                    title: 'Success!',
+                    text: 'Thank you for your review!',
+                    icon: 'success',
+                    background: '#161b22',
+                    color: '#fff'
+                });
+
+                location.reload();
+            } else {
+                throw new Error(data.message || 'Failed to post review');
+            }
+        } catch (err) {
+            console.error('Review Submission Error:', err);
+            Swal.fire({
+                title: 'Error',
+                text: err.message || 'Something went wrong',
+                icon: 'error',
+                background: '#161b22',
+                color: '#fff'
+            });
+        } finally {
+            // Re-enable button if something fails
+            const submitBtn = reviewForm.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    });
+}    // --- Original Logic ---
         async function requestItemReturn(orderId, itemId) {
             const { value: reason } = await Swal.fire({
                 title: 'Return Item',
@@ -156,10 +340,9 @@
                 inputPlaceholder: 'Reason for return',
                 showCancelButton: true,
                 background: '#161b22',
-                color: '#3fb950',
+                color: '#fff',
                 confirmButtonColor: '#3fb950'
             });
-
             if (reason) {
                 try {
                     const response = await fetch('/orders/return-item', {
@@ -168,42 +351,11 @@
                         body: JSON.stringify({ orderId, itemId, reason })
                     });
                     const data = await response.json();
-                    if (data.success) {
-                        Swal.fire('Success', 'Return request sent', 'success').then(() => location.reload());
-                    }
+                    if (data.success) Swal.fire('Success', 'Return request sent', 'success').then(() => location.reload());
                 } catch (err) { console.error(err); }
             }
         }
 
-        // 2. Full Order Return
-        async function initiateFullOrderReturn(orderId) {
-            const { value: reason } = await Swal.fire({
-                title: 'Return Full Order',
-                text: "Tell us why you're returning the whole order:",
-                input: 'textarea',
-                inputPlaceholder: 'Type your reason here...',
-                showCancelButton: true,
-                background: '#161b22',
-                color: '#fff',
-                confirmButtonColor: '#f85149'
-            });
-
-            if (reason) {
-                try {
-                    const response = await fetch('/orders/return-full-order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ orderId, reason })
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        Swal.fire('Requested', 'Our team will contact you shortly.', 'success').then(() => location.reload());
-                    }
-                } catch (err) { console.error(err); }
-            }
-        }
-
-        // 3. Cancel Item
         async function cancelItem(orderId, itemId) {
             const result = await Swal.fire({
                 title: 'Are you sure?',
@@ -216,7 +368,6 @@
                 cancelButtonColor: '#30363d',
                 confirmButtonText: 'Yes, cancel it'
             });
-
             if (result.isConfirmed) {
                 try {
                     const response = await fetch('/orders/cancel-item', {
@@ -225,11 +376,7 @@
                         body: JSON.stringify({ orderId, itemId })
                     });
                     const data = await response.json();
-                    if (data.success) {
-                        Swal.fire('Cancelled', 'Item has been removed from order.', 'success').then(() => location.reload());
-                    } else {
-                        Swal.fire('Error', data.message, 'error');
-                    }
+                    if (data.success) Swal.fire('Cancelled', 'Item removed.', 'success').then(() => location.reload());
                 } catch (err) { console.error(err); }
             }
         }

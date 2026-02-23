@@ -207,3 +207,61 @@ td {
 .page-link:hover:not(.active) {
     background: #27272a;
 }
+/* Container for the page links */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 30px 0;
+    padding: 10px;
+}
+
+/* Individual page buttons */
+.page-num {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 8px;
+    text-decoration: none;
+    color: #4b5563; /* Dark gray */
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb; /* Light border */
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+/* Hover effect for buttons */
+.page-num:hover {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+}
+
+/* Style for the active/current page */
+.page-num.active {
+    background-color: #000000; /* Or your theme color */
+    color: #ffffff;
+    border-color: #000000;
+    cursor: default;
+}
+
+/* Special styling for arrows « » */
+.page-num:first-child, 
+.page-num:last-child {
+    font-size: 18px;
+    background-color: #f3f4f6;
+}
+
+/* Mobile responsive tweak */
+@media (max-width: 480px) {
+    .page-num {
+        min-width: 35px;
+        height: 35px;
+        font-size: 13px;
+    }
+}

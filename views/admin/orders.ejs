@@ -264,7 +264,7 @@
                                     <div style="font-weight: 600;"><%= order.user?.name %></div>
                                     <div style="font-size: 12px; color: var(--text-dim);"><%= order.user?.email %></div>
                                 </td>
-                                <td style="font-weight: bold;">$<%= order.totalPrice.toFixed(2) %></td>
+                                <td style="font-weight: bold;">₹<%= order.totalPrice.toFixed(2) %></td>
                                 <td>
                                     <span class="payment-status <%= order.paymentStatus.toLowerCase() %>">
                                         <i class="fas <%= order.paymentStatus === 'Paid' ? 'fa-check-circle' : 'fa-clock' %>"></i>

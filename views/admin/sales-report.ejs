@@ -57,7 +57,7 @@
                 </a>
             </div>
         </div>
-
+<% let  totaloffer=0 %> 
         <div class="filter-wrapper">
             <form action="/admin/reports" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
                 <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -124,7 +124,7 @@
     <% orders.forEach(order => { 
         // 1. Calculate the Gross Original Price (Sum of MRP * Quantity)
         const grossOriginal = order.items.reduce((acc, item) => {
-            return acc + (item.originalPrice * item.quantity);
+            return acc + (item.realPrice * item.quantity);
         }, 0);
 
         // 2. Calculate Offer Discount (Original Sum - Price before Coupon)

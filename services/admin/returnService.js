@@ -39,7 +39,7 @@ export const fetchReturnRequests = async (search, status) => {
 };
 
 export const processSingleReturn = async (orderId, itemId, action) => {
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate('items.product');
     if (!order) throw new Error("Order not found");
 
     const item = order.items.id(itemId);
@@ -47,13 +47,11 @@ export const processSingleReturn = async (orderId, itemId, action) => {
 
     if (action === 'Approve') {
         const itemOriginalTotal = Number(item.price) * Number(item.quantity);
-
         let refundAmount = itemOriginalTotal;
 
         if (order.couponDiscount > 0 && order.subtotal > 0) {
             const discountRatio = order.couponDiscount / order.subtotal;
             const itemShareOfDiscount = itemOriginalTotal * discountRatio;
-            
             refundAmount = itemOriginalTotal - itemShareOfDiscount;
         }
 
@@ -62,7 +60,7 @@ export const processSingleReturn = async (orderId, itemId, action) => {
         item.status = 'Returned';
 
         await Product.updateOne(
-            { _id: item.product, "variants.size": item.size },
+            { _id: item.product._id, "variants.size": item.size },
             { 
                 $inc: { 
                     "variants.$.stock": item.quantity, 
@@ -71,13 +69,14 @@ export const processSingleReturn = async (orderId, itemId, action) => {
             }
         );
 
+        const productName = item.product.name || "Product";
         await User.findByIdAndUpdate(order.user, {
             $inc: { wallet: refundAmount },
             $push: { 
                 walletHistory: { 
                     amount: refundAmount, 
                     type: 'Credit', 
-                    reason: `Refund for Item Return: ${item.product.name} (ORD${order.orderId})`, 
+                    reason: `Refund for Item Return: ${productName} (ID: ${order.orderId})`, 
                     date: new Date()
                 }
             }
@@ -90,8 +89,7 @@ export const processSingleReturn = async (orderId, itemId, action) => {
     }
 
     const activeItems = order.items.filter(i => 
-        i.status !== 'Returned' && 
-        i.status !== 'Cancelled'
+        !['Returned', 'Cancelled'].includes(i.status)
     );
     
     order.status = activeItems.length === 0 ? 'Returned' : 'Delivered';

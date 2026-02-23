@@ -4,7 +4,7 @@ export const applyCoupon = async (req, res) => {
     try {
         const { code, subtotal } = req.body;
         
-        const userId = req.user ? req.user._id : null;
+        const userId = req.session?.user?.id || req.user._id
 
         if (!subtotal || isNaN(subtotal)) {
             return res.status(400).json({ success: false, message: "Invalid subtotal provided." });

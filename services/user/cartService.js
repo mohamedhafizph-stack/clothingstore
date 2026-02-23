@@ -12,7 +12,7 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
 
     const effectivePrice = (product.salePrice && product.salePrice < product.price) 
         ? product.salePrice 
-        : (product.price || product.Price);
+        : (product.price || product.price);
 
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
@@ -37,7 +37,7 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
     if (existingItem) {
         existingItem.quantity += requestedQty;
         existingItem.price = effectivePrice; 
-        existingItem.realPrice=product.Price
+        existingItem.realPrice=product.price
     } else {
         cart.items.push({
             product: productId,

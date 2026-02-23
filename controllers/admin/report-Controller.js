@@ -55,7 +55,7 @@ export const loadReportPage = async (req, res) => {
         const totalPages = Math.ceil(totalOrdersCount / limit);
 
         res.render('admin/sales-report', {
-            report: reportData[0] || { totalSalesCount: 0, totalOrderAmount: 0, totalDiscount: 0 },
+            report: reportData[0] || { totalSalesCount: 0, totalOrderAmount: 0, totalDiscount: 0 ,totalOffers:0 },
             orders,
             filter: filter || 'all',
             startDate: startDate || '',

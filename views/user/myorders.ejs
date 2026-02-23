@@ -51,9 +51,7 @@
                                         <a href="/user/orders/<%= order._id %>" class="view-link">View Details</a>
                                         
                                         <% if (order.status === 'Pending' || order.status === 'Processing') { %>
-                                            <button class="btn-cancel-table" onclick="confirmCancel('<%= order._id %>')">
-    Cancel Order
-</button>
+                                           
                                         <% } %>
                                         
                                     </div>
@@ -71,7 +69,7 @@
     </main>
 
     <footer class="footer">
-        <div class="footer-links"><a href="#">About</a><a href="#">Contact</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+        <div class="footer-links"><a href="/about-us">About</a><a href="/contact">Contact</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
         <div class="social-icons"><i class="fab fa-twitter"></i><i class="fab fa-instagram"></i><i class="fab fa-facebook"></i></div>
         <p>© 2026 Wearify. All rights reserved.</p>
     </footer>

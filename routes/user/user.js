@@ -61,7 +61,7 @@ router.get('/profile/adresses/edit/:id',userAuth,userController.LoadeditAdressPa
 router.put('/profile/adresses/:id',userAuth,userController.updateAdress)
 router.delete('/profile/adresses/:id',userAuth,userController.deleteAdress)
 router.post('/profile/adresses/set-default/:id',userAuth,userController.setDefaultAdress)
-router.get('/shop/:category',userAuth,productController.loadShirts)
+router.get('/shop/:category',userAuth,productController.loadProducts)
 router.get('/shop/details/:id',userAuth,productController.loadProductDetails)
 router.post('/shop/details/:product_id',userAuth,cartController.addtoCart)
 router.get('/home/cart',userAuth,cartController.loadCart)
@@ -92,5 +92,6 @@ router.post('/wallet/verify-payment', userAuth, walletController.verifyWalletPay
 router.post('/order/apply-coupon',userAuth,couponApplyController.applyCoupon)
 router.get('/about-us',userAuth,homeController.loadAboutUs)
 router.get('/contact',userAuth,homeController.loadcontact)
+router.post('/product/add-review',userAuth,productController.addProductReview);
 
 export default router

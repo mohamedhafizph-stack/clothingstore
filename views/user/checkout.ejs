@@ -229,76 +229,80 @@
 
     
     async function placeOrder() {
-        const addressId = document.querySelector('input[name="addressId"]:checked')?.value;
-        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const addressId = document.querySelector('input[name="addressId"]:checked')?.value;
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    
+    // FIX: Grab the code from the variable we updated in applyCouponCode()
+    // OR from the manual input field as a fallback.
+    const couponCode = currentAppliedCoupon || document.getElementById('manualCoupon')?.value || "";
 
-        if (!addressId || !paymentMethod) return Swal.fire('Error', 'Please select address and payment method', 'warning');
+    if (!addressId || !paymentMethod) return Swal.fire('Error', 'Please select address and payment method', 'warning');
 
-        Swal.fire({
-            title: 'Processing...',
-            text: 'Preparing your order',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
+    Swal.fire({
+        title: 'Processing...',
+        text: 'Preparing your order',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+
+    try {
+        const response = await fetch('/order/place', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            // FIX: Pass couponCode here so the backend can see it
+            body: JSON.stringify({ addressId, paymentMethod, couponCode })
         });
 
-        try {
-            const response = await fetch('/order/place', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ addressId, paymentMethod })
-            });
+        const result = await response.json();
 
-            const result = await response.json();
+        if (!result.success) return Swal.fire('Error', result.message, 'error');
 
-            if (!result.success) return Swal.fire('Error', result.message, 'error');
+        if (paymentMethod === 'Razorpay') {
+            const options = {
+                key: result.rzpKey,
+                amount: result.amount, // This amount will now be the discounted one
+                currency: "INR",
+                name: "Wearify",
+                order_id: result.rzpOrderId,
+                handler: async function (res) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Received!',
+                        text: 'Generating your invoice...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
 
-            if (paymentMethod === 'Razorpay') {
-                const options = {
-                    key: result.rzpKey,
-                    amount: result.amount,
-                    currency: "INR",
-                    name: "Wearify",
-                    order_id: result.rzpOrderId,
-                    handler: async function (res) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Payment Received!',
-                            text: 'Generating your invoice...',
-                            allowOutsideClick: false,
-                            didOpen: () => { Swal.showLoading(); }
-                        });
+                    const vRes = await fetch('/order/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...res, orderId: result.orderId })
+                    });
+                    const vData = await vRes.json();
 
-                        const vRes = await fetch('/order/verify', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ ...res, orderId: result.orderId })
-                        });
-                        const vData = await vRes.json();
-
-                        if (vData.success) {
-                            // Success Step 2: Redirect to Order Success Page
-                            window.location.href = `/cart/checkout/success/${vData.customOrderId}`;
-                        } else {
-                            Swal.fire('Error', 'Verification failed', 'error');
-                        }
-                    },
-                    prefill: { name: "<%= user.name %>", email: "<%= user.email %>" },
-                    theme: { color: "#000000" },
-                    modal: { ondismiss: () => { Swal.close(); } }
-                };
-                const rzp = new Razorpay(options);
-                rzp.open();
-           } else {
-    if (result.success && result.customOrderId) {
-        window.location.href = `/cart/checkout/success/${result.customOrderId}`;
-    } else {
-        Swal.fire('Error', 'Order created but redirect failed', 'error');
+                    if (vData.success) {
+                        window.location.href = `/cart/checkout/success/${vData.customOrderId}`;
+                    } else {
+                        Swal.fire('Error', 'Verification failed', 'error');
+                    }
+                },
+                prefill: { name: "<%= user.name %>", email: "<%= user.email %>" },
+                theme: { color: "#000000" },
+                modal: { ondismiss: () => { Swal.close(); } }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+        } else {
+            if (result.success && result.customOrderId) {
+                window.location.href = `/cart/checkout/success/${result.customOrderId}`;
+            } else {
+                Swal.fire('Error', 'Order created but redirect failed', 'error');
+            }
+        }
+    } catch (err) {
+        Swal.fire('Error', 'Network error occurred', 'error');
     }
 }
-        } catch (err) {
-            Swal.fire('Error', 'Network error occurred', 'error');
-        }
-    }
 </script>
 </body>
 </html>

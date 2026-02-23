@@ -7,6 +7,18 @@
   <link rel="stylesheet" href="/css/product-details.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
+    /* Reviews Section Styling */
+    .reviews-section { margin-top: 50px; border-top: 1px solid #30363d; padding-top: 30px; }
+    .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .avg-rating-box { display: flex; align-items: center; gap: 10px; }
+    .avg-stars { color: #ffc107; font-size: 1.4rem; }
+    .review-card { background: #161b22; border: 1px solid #30363d; padding: 20px; border-radius: 12px; margin-bottom: 15px; }
+    .review-user-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .user-name { font-weight: 600; color: #f0f6fc; }
+    .review-date { font-size: 0.85rem; color: #8b949e; }
+    .review-stars { color: #ffc107; margin-bottom: 8px; }
+    .review-text { color: #c9d1d9; line-height: 1.5; font-size: 0.95rem; }
+    .no-reviews { text-align: center; padding: 40px; color: #8b949e; background: #0d1117; border-radius: 12px; border: 1px dashed #30363d; }
     /* Offer & Price Styling */
     .price-container { margin: 15px 0; display: flex; align-items: baseline; gap: 12px; }
     .sale-price { color: #2ea043; font-weight: bold; font-size: 2.2rem; margin: 0; }
@@ -95,7 +107,40 @@
       </div>
     </div>
   </section>
+<section class="reviews-section">
+    <div class="review-header">
+      <h3>Customer Reviews</h3>
+      <% if (product.reviews && product.reviews.length > 0) { %>
+        <div class="avg-rating-box">
+          <span class="avg-stars">★ <%= product.averageRating || 0 %></span>
+          <span style="color: #8b949e;">(<%= product.reviews.length %> reviews)</span>
+        </div>
+      <% } %>
+    </div>
 
+    <div class="reviews-container">
+      <% if (product.reviews && product.reviews.length > 0) { %>
+        <% product.reviews.reverse().forEach(review => { %>
+          <div class="review-card">
+            <div class="review-user-row">
+              <span class="user-name"><%= review.userName %></span>
+              <span class="review-date"><%= new Date(review.createdAt).toLocaleDateString() %></span>
+            </div>
+            <div class="review-stars">
+              <% for(let i=1; i<=5; i++) { %>
+                <span style="color: <%= i <= review.rating ? '#ffc107' : '#30363d' %>">★</span>
+              <% } %>
+            </div>
+            <p class="review-text"><%= review.comment %></p>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="no-reviews">
+          <p>No reviews yet. Be the first to share your thoughts!</p>
+        </div>
+      <% } %>
+    </div>
+  </section>
   <% if ((relatedProducts || []).length > 0) { %>
     <section class="related">
       <h3>Related Products</h3>

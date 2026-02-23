@@ -1,6 +1,6 @@
 import Coupon from "../../model/Coupons.js";
 export const getCoupons = async (queryData) => {
-    const { search, status, page = 1, limit = 10 } = queryData;
+    const { search, status, page = 1, limit = 2 } = queryData;
     const skip = (page - 1) * limit;
 
     let query = {};

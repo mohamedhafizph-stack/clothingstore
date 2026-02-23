@@ -47,35 +47,57 @@ export const createNewProduct = async (productData, files) => {
 };
 
 export const updateProductDetails = async (id, updateData, files) => {
-    let finalImages = [];
     const { name, category, price, discount, description } = updateData;
 
-    if (updateData.existingImages) {
-        finalImages = Array.isArray(updateData.existingImages)
-            ? updateData.existingImages.filter(img => img)
-            : [updateData.existingImages].filter(img => img);
-    }
-
-    if (files && files.length > 0) {
-        const newImages = files.map(file => file.path);
-        finalImages = [...finalImages, ...newImages];
-    }
-     if (!name || !category || !price) {
+    if (!name || !category || !price) {
         throw new Error("Product Name, Category, and Price are required.");
     }
+    if (Number(price) <= 0) throw new Error("Price must be positive");
 
-    if(price<=0){
-        throw new Error("Price must be positive")
+    const categoryDoc = await Category.findOne({ name: category });
+    if (!categoryDoc) throw new Error("Selected category not found.");
+
+    let finalImages = [];
+    const existing = Array.isArray(updateData.existingImages) 
+        ? updateData.existingImages 
+        : [updateData.existingImages];
+    let fileIdx = 0;
+    for (let i = 0; i < 4; i++) {
+        if (files && files[i]) {
+            finalImages.push(files[i].path);
+        } else if (existing[i]) {
+            finalImages.push(existing[i]);
+        }
     }
-    
+
+    const regPrice = Number(price);
+    const disc = Number(discount) || 0;
+    const sPrice = regPrice - (regPrice * (disc / 100));
+
     const updateBody = {
-        ...updateData,
-        price: Number(updateData.price),
-        discount: Number(updateData.discount) || 0,
-        images: finalImages
+        name: name.trim(),
+        category: categoryDoc._id, 
+        price: regPrice,
+        regularPrice: regPrice,
+        salePrice: Math.round(sPrice),
+        discount: disc,
+        description: description,
+        images: finalImages.filter(img => img !== "") 
     };
 
-    return await Product.findByIdAndUpdate(id, updateBody, { new: true });
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+        id, 
+        { $set: updateBody }, 
+        { new: true, runValidators: true }
+    );
+
+    if (updatedProduct.variants) {
+        updatedProduct.totalStock = updatedProduct.variants.reduce((acc, v) => acc + v.stock, 0);
+        await updatedProduct.save();
+    }
+
+    return updatedProduct;
 };
 
 export const updateVariantStock = async (id, size, stock) => {
