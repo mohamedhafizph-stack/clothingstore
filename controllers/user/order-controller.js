@@ -384,7 +384,7 @@ export const downloadInvoice = async (req, res) => {
         doc.text(`- INR ${productDiscount.toFixed(2)}`, 320, footerTop + 30, { align: 'right' });
 
         if (order.couponDiscount > 0) {
-            doc.text(`COUPON (${order.couponCode})`, 320, footerTop + 45);
+            doc.text(`COUPON`, 320, footerTop + 45);
             doc.text(`- INR ${order.couponDiscount.toFixed(2)}`, 320, footerTop + 45, { align: 'right' });
         }
 
