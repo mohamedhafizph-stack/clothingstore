@@ -91,26 +91,12 @@
                         </tbody>
                     </table>
 
-                    <% if (totalPages > 1) { %>
-                        <div class="pagination">
-                            <% if (currentPage > 1) { %>
-                                <a href="?page=<%= currentPage - 1 %>&search=<%= search %>&status=<%= currentStatus %>" class="page-num">«</a>
-                            <% } %>
+                    <div class="transaction-list">
+    </div>
 
-                            <% for(let i = 1; i <= totalPages; i++) { %>
-                                <a href="?page=<%= i %>&search=<%= search %>&status=<%= currentStatus %>" 
-                                   class="page-num <%= i === currentPage ? 'active' : '' %>">
-                                    <%= i %>
-                                </a>
-                            <% } %>
-
-                            <% if (currentPage < totalPages) { %>
-                                <a href="?page=<%= currentPage + 1 %>&search=<%= search %>&status=<%= currentStatus %>" class="page-num">»</a>
-                            <% } %>
-                        </div>
-                    <% } %>
-                </div>
-            </section>
+</div>
+</section>
+<%- include('../partials/pagination', { currentPage, totalPages }) %>
         </div>
     </div>
 

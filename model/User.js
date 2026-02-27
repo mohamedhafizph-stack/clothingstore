@@ -13,6 +13,12 @@ const userSchema = new mongoose.Schema({
   profilePic: { type: String, default: null },
 
   wallet: { type: Number, default: 0 },
+  walletHistory: [{
+    amount: { type: Number, required: true },
+    type: { type: String, enum: ['credit', 'debit'], required: true },
+    reason: { type: String, required: true },
+    date: { type: Date, default: Date.now }
+}],
   referralCode: { type: String, unique: true },
   referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }
 

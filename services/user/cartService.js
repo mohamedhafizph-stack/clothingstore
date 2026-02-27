@@ -60,26 +60,23 @@ export const getCartData = async (userId) => {
         return { items: [], totalPrice: 0, totalSavings: 0, originalSubtotal: 0 };
     }
 
-    let actualTotal = 0; 
+    let actualTotal = 0;     
     let originalSubtotal = 0; 
 
     cart.items.forEach(item => {
         const qty = Number(item.quantity) || 0;
         
-        const currentSalePrice = Number(item.price) || 0;
-        
-        const originalPrice = Number(item.product.regularPrice) || currentSalePrice;
+        const liveSalePrice = Number(item.product.salePrice) || Number(item.product.price);
+        const liveRegularPrice = Number(item.product.regularPrice) || liveSalePrice;
 
-        actualTotal += currentSalePrice * qty;
-        originalSubtotal += originalPrice * qty;
+        actualTotal += liveSalePrice * qty;
+        originalSubtotal += liveRegularPrice * qty;
     });
-
-    const totalSavings = originalSubtotal - actualTotal;
 
     const cartObj = cart.toObject();
     cartObj.totalPrice = actualTotal;        
     cartObj.originalSubtotal = originalSubtotal; 
-    cartObj.totalSavings = totalSavings;     
+    cartObj.totalSavings = originalSubtotal - actualTotal; 
 
     return cartObj;
 };

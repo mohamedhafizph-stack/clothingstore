@@ -32,6 +32,95 @@
         .status-indicator { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .status-online { background: var(--success); box-shadow: 0 0 8px var(--success); }
         .status-offline { background: var(--danger); }
+        Universal Pagination Style
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+    gap: 8px;
+}
+
+.page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 8px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #8b949e;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.page-link:hover {
+    border-color: #58a6ff;
+    color: #fff;
+    background: #1c2128;
+}
+
+.page-link.active {
+    background: #007aff;
+    border-color: #007aff;
+    color: #fff;
+}
+
+.page-link.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+/* Universal Pagination Centering */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center; /* Horizontally centers the items */
+    align-items: center;     /* Vertically centers the items */
+    width: 100%;             /* Ensures it spans the full container width */
+    margin: 40px auto;       /* Adds space above/below and centers the block */
+    gap: 10px;               /* Space between buttons */
+    padding-bottom: 20px;
+}
+
+.page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    padding: 0 15px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-link:hover:not(.disabled) {
+    border-color: #58a6ff;
+    color: #fff;
+    background: #1c2128;
+    transform: translateY(-2px);
+}
+
+.page-link.active {
+    background: #238636; /* Using your Green theme from Add Money button */
+    border-color: #2ea043;
+    color: #fff;
+    cursor: default;
+}
+
+.page-link.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
     </style>
 </head>
 <body>
@@ -118,23 +207,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="pagination-container" style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 5px;">
-    <% if (currentPage > 1) { %>
-        <a href="?page=<%= currentPage - 1 %>&search=<%= search %>&type=<%= type %>" class="btn-primary" style="padding: 5px 12px;">Prev</a>
-    <% } %>
-
-    <% for(let i = 1; i <= totalPages; i++) { %>
-        <a href="?page=<%= i %>&search=<%= search %>&type=<%= type %>" 
-           class="btn-primary" 
-           style="padding: 5px 12px; <%= i === currentPage ? 'background: var(--accent-blue)' : 'background: #222' %>">
-           <%= i %>
-        </a>
-    <% } %>
-
-    <% if (currentPage < totalPages) { %>
-        <a href="?page=<%= currentPage + 1 %>&search=<%= search %>&type=<%= type %>" class="btn-primary" style="padding: 5px 12px;">Next</a>
-    <% } %>
-</div>
+       <%- include('../partials/pagination', { currentPage, totalPages }) %>
     </main>
 
     <div id="offerModal" class="modal-overlay">

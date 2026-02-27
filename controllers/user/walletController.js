@@ -67,15 +67,23 @@ export const verifyWalletPayment = async (req, res) => {
 
         if (generatedSignature === response.razorpay_signature) {
             await User.findByIdAndUpdate(userId, { 
-                $inc: { wallet: parseFloat(amount) } 
+                $inc: { wallet: parseFloat(amount) },
+                $push: { 
+                    walletHistory: { 
+                        amount: parseFloat(amount), 
+                        type: 'credit', 
+                        reason: 'Added funds via Razorpay',
+                        date: new Date()
+                    } 
+                }
             });
 
-            res.json({ success: true, message: "Wallet updated successfully!" });
+            res.json({ success: true, message: "₹" + amount + " added to wallet!" });
         } else {
-            res.status(400).json({ success: false, message: "Invalid signature" });
+            res.status(400).json({ success: false, message: "Invalid payment signature" });
         }
     } catch (error) {
-        console.error(error);
+        console.error("Wallet Verification Error:", error);
         res.status(500).json({ success: false, message: "Payment verification failed" });
     }
 };

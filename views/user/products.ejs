@@ -6,6 +6,8 @@
     <title>Wearify - Shop</title>
     <link rel="stylesheet" href="/css/shirt.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     
     <style>
         /* CSS for the Offer UI */
@@ -87,6 +89,21 @@
             background: #111 !important;
             padding: 15px !important;
         }
+        /* Fix for Profile Picture Visibility */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: block; /* Ensures it's not hidden by global img styles */
+}
+
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
     </style>
 </head>
 
@@ -111,12 +128,29 @@
             <input type="text" id="shopSearch" placeholder="Search products..." value="<%= selectedFilters.search || '' %>">
         </div>
 
-        <div class="icons">
-            <a href="/wishlist" class="icon" style="text-decoration: none;">❤️</a>
-            <a href="/home/cart" class="icon" style="text-decoration: none;">🛒</a>
-        </div>
-    </div>
-</header>
+         <div class="header-icons">
+        <button class="icon-btn hamburger" onclick="toggleMenu()">
+            <i class="ph ph-list"></i>
+        </button>
+
+        <a href="/home/cart">
+            <button class="icon-btn">
+                <i class="ph ph-shopping-bag"></i>
+            </button>
+        </a>
+        <a href="/wishlist">
+            <button class="icon-btn">
+                <i class="ph ph-heart"></i>
+            </button>
+        </a>
+         <a href="/profile">
+            <img
+                src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Guest'}` %>"
+                class="avatar"
+                alt="Profile"
+            >
+        </a>
+    </div></header>
 
 <div class="shop-container">
     <aside class="sidebar">
@@ -209,6 +243,7 @@
         </div>
     </main>
 </div>
+<%- include('../partials/footer') %>
 
 <script>
 const categorySlug = "<%= category.name %>";

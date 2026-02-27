@@ -1,0 +1,193 @@
+<style>
+    :root {
+        --error-red: #ff3b3b;
+        --bg-dark: #0a0a0a;
+        --glass-white: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+        background-color: var(--bg-dark);
+        margin: 0;
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    .failure-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 40px 20px;
+        background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+        color: #fff;
+    }
+
+    .status-container {
+        background: var(--glass-white);
+        padding: 60px 40px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        max-width: 450px;
+        width: 100%;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .error-icon-wrap {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 30px;
+    }
+
+    .error-circle {
+        width: 100%;
+        height: 100%;
+        border: 2px solid var(--error-red);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--error-red);
+        font-size: 42px;
+        font-weight: 300;
+        animation: pulseRed 2s infinite;
+    }
+
+    @keyframes pulseRed {
+        0% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.4); }
+        70% { box-shadow: 0 0 0 20px rgba(255, 59, 59, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0); }
+    }
+
+    h1 {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin-bottom: 12px;
+    }
+
+    .reason-text {
+        color: #999;
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        padding: 0 20px;
+    }
+
+    .btn-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .retry-btn {
+        background: #fff;
+        color: #000;
+        padding: 16px 30px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 15px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    }
+
+    .retry-btn:hover {
+        background: #e6e6e6;
+        transform: translateY(-2px);
+    }
+
+    .back-btn {
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+
+    .back-btn:hover {
+        color: #fff;
+    }
+
+    .order-id-tag {
+        font-family: monospace;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #555;
+        margin-top: 20px;
+        display: inline-block;
+    }
+</style>
+
+<div class="failure-box">
+    <div class="status-container">
+        <div class="error-icon-wrap">
+            <div class="error-circle">✕</div>
+        </div>
+        
+        <h1>Payment Declined</h1>
+        <p class="reason-text">
+            <%= reason || "Your bank or card issuer declined the transaction. Please try again or use a different method." %>
+        </p>
+        
+        <div class="btn-stack">
+            <button onclick="retryPayment('<%= orderId %>')" class="retry-btn">
+                Retry Payment Now
+            </button>
+            <a href="/home/cart" class="back-btn">Return to Cart</a>
+        </div>
+
+        <div class="order-id-tag">REF: #<%= orderId %></div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+async function retryPayment(orderId) {
+    try {
+        // 1. Get existing order details and a NEW Razorpay Order ID
+        const response = await fetch(`/order/retry-payment/${orderId}`, { method: 'POST' });
+        const result = await response.json();
+
+        if (!result.success) return alert(result.message);
+
+        // 2. Open Razorpay Modal
+        const options = {
+            key: result.rzpKey,
+            amount: result.amount,
+            currency: "INR",
+            name: "Wearify",
+            order_id: result.rzpOrderId, // The new RZP ID for the same database order
+            handler: async function (res) {
+                // Same verification logic as checkout
+                const vRes = await fetch('/order/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...res, orderId: result.orderId })
+                });
+                const vData = await vRes.json();
+                if (vData.success) {
+                    window.location.href = `/cart/checkout/success/${vData.customOrderId}`;
+                }
+            },
+            theme: { color: "#000000" }
+        };
+        const rzp = new Razorpay(options);
+        rzp.open();
+    } catch (err) {
+        console.error(err);
+    }
+}
+</script>

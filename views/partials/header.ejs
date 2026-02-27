@@ -1,0 +1,183 @@
+<style>
+    /* --- Wearify Premium Dark Header --- */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 5%;
+    background: rgba(13, 17, 23, 0.8); /* Semi-transparent dark */
+    backdrop-filter: blur(12px);      /* Glassmorphism effect */
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #30363d;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 70px;
+}
+
+/* Logo Styling */
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+/* Category Navigation */
+.desktop-categories {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.category-card a {
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+.category-card h3 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #8b949e; /* Muted GitHub-style text */
+    margin: 0;
+    text-transform: capitalize;
+    transition: 0.3s;
+}
+
+.category-card:hover h3 {
+    color: #58a6ff; /* Accent blue on hover */
+    transform: translateY(-1px);
+}
+
+/* Icons and Buttons */
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: #f0f6fc;
+    font-size: 24px; /* Matches Phosphor icons size */
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #58a6ff;
+}
+
+/* Avatar Styling */
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #30363d;
+    transition: 0.3s;
+}
+
+.avatar:hover {
+    border-color: #58a6ff;
+    transform: scale(1.05);
+}
+
+/* Hamburger for Mobile (Hidden by default on desktop) */
+.hamburger {
+    display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .desktop-categories {
+        display: none; /* Hide categories on small screens for the drawer */
+    }
+    .hamburger {
+        display: flex;
+    }
+    .main-header {
+        padding: 0 20px;
+    }
+}
+/* Remove blue underline from all header links */
+.shop-header a, 
+.header-icons a, 
+.categories-wrapper a {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+}
+,
+/* Ensure the avatar link specifically doesn't show a line */
+a:has(.avatar) {
+    text-decoration: none !important;
+    border: none !important;
+}
+
+/* Reset color for all header links so they don't turn blue */
+.shop-header a {
+    color: inherit;
+}
+/* Remove underline and blue color from the logo */
+.logo {
+    text-decoration: none !important;
+    border: none !important;
+    color: white; /* Or your preferred brand color */
+    display: inline-block;
+}
+
+.logo:hover {
+    text-decoration: none !important;
+    color: inherit; /* Prevents the logo from turning blue on hover */
+}
+</style>
+<header class="main-header">
+   <a href="/home"><div class="logo">Wearify</div></a> 
+
+    <div class="desktop-categories">
+        <% if (locals.categories) { %>
+            <% categories.forEach(category => { %>
+                <div class="category-card">
+                    <a href="/shop/<%= category.name %>">
+                        <h3><%= category.name %></h3>
+                    </a>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+
+    <div class="header-icons">
+        <button class="icon-btn hamburger" onclick="toggleMenu()">
+            <i class="ph ph-list"></i>
+        </button>
+
+        <a href="/home/cart">
+            <button class="icon-btn">
+                <i class="ph ph-shopping-bag"></i>
+            </button>
+        </a>
+        <a href="/wishlist">
+            <button class="icon-btn">
+                <i class="ph ph-heart"></i>
+            </button>
+        </a>
+
+        <a href="/profile">
+            <img
+                src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Guest'}` %>"
+                class="avatar"
+                alt="Profile"
+            >
+        </a>
+    </div>
+</header>

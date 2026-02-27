@@ -1,0 +1,18 @@
+<div class="pagination-wrapper">
+    <a href="?page=<%= currentPage - 1 %>" 
+       class="page-link <%= currentPage === 1 ? 'disabled' : '' %>">
+        <i class="fas fa-chevron-left"></i>
+    </a>
+
+    <% for(let i = 1; i <= totalPages; i++) { %>
+        <a href="?page=<%= i %>" 
+           class="page-link <%= currentPage === i ? 'active' : '' %>">
+            <%= i %>
+        </a>
+    <% } %>
+
+    <a href="?page=<%= currentPage + 1 %>" 
+       class="page-link <%= currentPage === totalPages ? 'disabled' : '' %>">
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</div>

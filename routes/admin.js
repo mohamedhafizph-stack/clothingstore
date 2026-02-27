@@ -77,10 +77,12 @@ router.delete('/offers/delete/:id',adminAuth,offerController.deleteOffer)
 router.get('/reports',adminAuth,reportController.loadReportPage)
 router.get('/sales-report/download/pdf',adminAuth, reportController.downloadPDF);
 router.get('/sales-report/download/excel', adminAuth,reportController.downloadExcel);
-router.get('/logout',(req,res)=>{
-    req.session.destroy(()=>{
-        res.redirect('/admin/login')
-    }) 
-})
+router.get('/logout', (req, res) => {
+    if (req.session.admin) {
+        delete req.session.admin;
+    }
+    
+    res.redirect('/admin/login');
+});
  
 export default router 

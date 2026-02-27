@@ -13,46 +13,7 @@
 
 <!-- ================= HEADER ================= -->
 
-<header class="main-header">
-    <div class="logo">Wearify</div>
-
-    <!-- Desktop Categories -->
-    <div class="desktop-categories">
-        <% categories.forEach(category => { %>
-            <div class="category-card">
-                <a href="/shop/<%= category.name %>">
-                    <h3><%= category.name %></h3>
-                </a>
-            </div>
-        <% }) %>
-    </div>
-
-    <div class="header-icons">
-        <!-- Hamburger (mobile) -->
-        <button class="icon-btn hamburger" onclick="toggleMenu()">
-            <i class="ph ph-list"></i>
-        </button>
-
-        <a href="/home/cart">
-            <button class="icon-btn">
-                <i class="ph ph-shopping-bag"></i>
-            </button>
-        </a>
-        <a href="/wishlist">
-            <button class="icon-btn">
-                <i class="ph ph-heart"></i>
-            </button>
-        </a>
-
-        <a href="/profile">
-            <img
-                src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
-                class="avatar"
-                alt="Profile"
-            >
-        </a>
-    </div>
-</header>
+<%- include('../partials/header') %>
 
 <!-- ================= MOBILE MENU ================= -->
 
@@ -120,22 +81,8 @@
 
 <!-- ================= FOOTER ================= -->
 
-<footer class="main-footer">
-    <div class="footer-links">
-        <a href="/about-us">About Us</a>
-        <a href="/contact">Contact</a>
-        <a href="/faq">FAQ</a>
-        <a href="/returns">Returns</a>
-    </div>
+<%- include('../partials/footer') %>
 
-    <div class="social-icons">
-        <i class="ph ph-twitter-logo"></i>
-        <i class="ph ph-instagram-logo"></i>
-        <i class="ph ph-facebook-logo"></i>
-    </div>
-
-    <p class="copyright">© 2024 Wearify. All rights reserved.</p>
-</footer>
 
 <!-- ================= JS ================= -->
 

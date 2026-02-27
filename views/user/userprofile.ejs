@@ -6,6 +6,8 @@
     <title>Wearify | My Profile</title>
     <link rel="stylesheet" href="/css/userprofile.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+        <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     
     <style>
         /* --- Referral Modal Styles --- */
@@ -119,23 +121,8 @@
 </head>
 <body>
 
-    <header class="profile-header">
-        <div class="header-left">
-            <div class="logo"><strong>Wearify</strong></div>
-        </div>
+  <%- include('../partials/header') %>
 
-        <div class="header-right">
-            <button class="icon-btn"><i class="ph ph-heart"></i></button>
-            <a href="/home/cart"> 
-                <button class="icon-btn"><i class="ph ph-shopping-bag"></i></button>
-            </a>
-            <img 
-                src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}` %>"
-                alt="Avatar"
-                style="width:40px;height:40px;border-radius:50%;object-fit:cover; border: 1px solid #ddd;"
-            >
-        </div>
-    </header>
 
     <main class="profile-container">
         <h1>My Profile</h1>
@@ -154,7 +141,7 @@
                     <a href="javascript:void(0)" class="btn-secondary" onclick="openReferralModal()">Referral</a>
                 </div>
 
-                <a href="/auth/logout" class="btn-logout">Logout</a>
+                <a href="/logout" class="btn-logout">Logout</a>
             </div>
 
             <div class="profile-image-section">
@@ -209,17 +196,8 @@
         </div>
     </div>
 
-    <footer class="profile-footer">
-        <div class="footer-nav">
-            <a href="/about">About</a>
-            <a href="/contact">Contact</a>
-            <a href="#">FAQ</a>
-            <a href="#">Shipping & Returns</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-        </div>
-        <p>© 2024 Wearify. All rights reserved.</p>
-    </footer>
+    <%- include('../partials/footer') %>
+
 
     <script>
         const modal = document.getElementById('referralModal');

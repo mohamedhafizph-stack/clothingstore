@@ -2,7 +2,7 @@ import * as wishlistService from "../../services/user/wishlistService.js"
 export const loadWishlistPage = async (req,res)=>{
     const userId = req.session.user?.id || req.user
     const wishlist = await wishlistService.getWishlistData(userId)
-    res.render('user/wishlist',{wishlist})
+    res.render('user/wishlist',{wishlist,user:userId})
 }
 export const addTowishlist = async (req, res) => {
     try {

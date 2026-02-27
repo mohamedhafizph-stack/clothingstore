@@ -7,7 +7,29 @@
     <link rel="stylesheet" href="/css/order-details.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* --- Integrated Review Styles --- */
+       /* Add this to your <style> block if not already in order-details.css */
+.details-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr; /* Adjust ratios for better balance */
+    gap: 25px;
+    align-items: start;
+    margin-top: 30px;
+}
+
+/* Ensure the cards have consistent spacing */
+.glass-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.summary-row span {
+    font-size: 14px;
+}
+       /* --- Integrated Review Styles --- */
         .btn-item-review {
             background: transparent;
             color: #ffc107;
@@ -93,13 +115,8 @@
 </head>
 <body class="dark-theme">
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-left">
-                <a href="/" class="logo"><i class="fas fa-square"></i> Wearify</a>
-            </div>
-        </div>
-    </nav>
+    <%- include('../partials/header') %>
+
 
     <main class="item-details-container">
         <nav class="breadcrumb">
@@ -194,18 +211,43 @@
                         </div>
                     </address>
                 </div>
+<div class="glass-card">
+    <h3 class="section-label">Payment Summary</h3>
+    
+    <div class="summary-row">
+        <span>Method</span>
+        <span class="val"><%= order.paymentMethod %></span>
+    </div>
 
-                <div class="glass-card">
-                    <h3 class="section-label">Payment Details</h3>
-                    <div class="summary-row">
-                        <span>Method</span>
-                        <span class="val"><%= order.paymentMethod %></span>
-                    </div>
-                    <div class="summary-row total-row">
-                        <span>Grand Total</span>
-                        <span class="val">$<%= order.totalPrice.toFixed(2) %></span>
-                    </div>
-                </div>
+    <div class="summary-row">
+        <span>Subtotal</span>
+        <span class="val">₹<%= order.subtotal.toFixed(2) %></span>
+    </div>
+
+    <% if (order.couponDiscount > 0) { %>
+        <div class="summary-row" style="color: #39d353;">
+            <span>Coupon Discount</span>
+            <span class="val">- ₹<%= order.couponDiscount.toFixed(2) %></span>
+        </div>
+    <% } %>
+
+    <div class="summary-row total-row" style="border-top: 1px solid #30363d; margin-top: 10px; padding-top: 10px;">
+        <span style="font-weight: 700; color: #fff;">Grand Total</span>
+        <span class="val" style="font-size: 1.2rem; color: #fff; font-weight: 800;">
+            ₹<%= order.totalPrice.toFixed(2) %>
+        </span>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="/order/download-invoice/<%= order.orderId %>" 
+           class="btn btn-invoice" 
+           style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background-color: #161b22; color: #f0f6fc; border: 1px solid #30363d; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.3s ease;"
+           onmouseover="this.style.backgroundColor='#21262d'; this.style.borderColor='#58a6ff';" 
+           onmouseout="this.style.backgroundColor='#161b22'; this.style.borderColor='#30363d';">
+            <i class="fas fa-file-pdf" style="color: #ef4444;"></i> Download Invoice
+        </a>
+    </div>
+</div>
             </div>
         </div>
     </main>
@@ -340,7 +382,7 @@ if (reviewForm) {
                 inputPlaceholder: 'Reason for return',
                 showCancelButton: true,
                 background: '#161b22',
-                color: '#fff',
+                color: '#3fb950',
                 confirmButtonColor: '#3fb950'
             });
             if (reason) {

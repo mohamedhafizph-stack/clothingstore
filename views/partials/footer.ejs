@@ -1,0 +1,203 @@
+<footer class="main-footer">
+    <div class="footer-container">
+        <div class="footer-section brand-info">
+            <a href="/home" class="footer-logo">Wearify</a>
+            <p>Premium selection for every occasion. We provide high-quality apparel built for the modern lifestyle.</p>
+            <div class="social-links">
+                <a href="#"><i class="ph ph-instagram-logo"></i></a>
+                <a href="#"><i class="ph ph-facebook-logo"></i></a>
+                <a href="#"><i class="ph ph-twitter-logo"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/aboutus">About us</a></li>
+                <li><a href="/shop/Pants">My Cart</a></li>
+                <li><a href="/wishlist">My Wishlist</a></li>
+                <li><a href="/profile/orders">My Orders</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="/contact">Contact Us</a></li>
+                <li><a href="/returns">Returns Policy</a></li>
+                <li><a href="/faq">Privacy Policy</a></li>
+                <li><a href="/terms">Terms of Use</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section newsletter">
+            <h4>Join the Club</h4>
+            <p>Get early access to drops and exclusive offers.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Email Address">
+                <button type="submit">Join</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2026 Wearify Retails Pvt Ltd. All rights reserved.</p>
+    </div>
+
+    <style>
+        /* Footer Styles */
+        .main-footer {
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            padding: 80px 0 30px;
+            font-family: 'Inter', sans-serif;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 100px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+            gap: 40px;
+            padding: 0 40px;
+        }
+
+        .footer-logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .footer-section h4 {
+            color: #ffffff;
+            font-size: 15px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        .footer-section p {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #888;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-section ul li a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #ffffff;
+            padding-left: 5px;
+        }
+
+        /* Newsletter Input Styling */
+        .newsletter-form {
+            display: flex;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .newsletter-form input {
+            background: #151515;
+            border: 1px solid #222;
+            padding: 12px 15px;
+            color: #fff;
+            border-radius: 4px;
+            flex: 1;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .newsletter-form input:focus {
+            border-color: #444;
+        }
+
+        .newsletter-form button {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        .newsletter-form button:hover {
+            background: #cccccc;
+            transform: translateY(-2px);
+        }
+
+        /* Social Icons */
+        .social-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .social-links a {
+            color: #888;
+            font-size: 20px;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #ffffff;
+        }
+
+        /* Bottom Bar */
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 60px auto 0;
+            padding: 30px 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .footer-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .footer-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .newsletter-form {
+                flex-direction: column;
+            }
+            .social-links {
+                justify-content: center;
+            }
+            .footer-section h4 {
+                margin-top: 20px;
+            }
+        }
+    </style>
+</footer>

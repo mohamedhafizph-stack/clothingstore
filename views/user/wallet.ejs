@@ -3,135 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wearify - My Wallet</title>
-    <link rel="stylesheet" href="/css/userSignup.css"> <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>My Wallet | Wearify</title>
+    <link rel="stylesheet" href="/css/userSignup.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
-        .wallet-card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            padding: 30px;
+        :root {
+            --bg-dark: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --accent-green: #238636;
+            --accent-blue: #58a6ff;
+            --danger: #da3633;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+
+        .wallet-container {
+            max-width: 700px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        /* --- Wallet Balance Card --- */
+        .balance-card {
+            background: linear-gradient(135deg, #1c2128 0%, #161b22 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
             text-align: center;
-            max-width: 400px;
-            margin: 50px auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
         }
-        .balance-label { color: #8b949e; font-size: 14px; }
-        .balance-amount { color: #fff; font-size: 48px; font-weight: bold; margin: 10px 0; }
-        .btn-add {
-            background: #238636;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(88, 166, 255, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .balance-label {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 12px;
             font-weight: 600;
-            width: 100%;
-            margin-top: 20px;
+            margin-bottom: 10px;
         }
-        .btn-add:hover { background: #2ea043; }
+
+        .balance-amount {
+            font-size: 56px;
+            font-weight: 800;
+            margin: 15px 0;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-add-funds {
+            background-color: var(--accent-green);
+            color: #fff;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(35, 134, 54, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-add-funds:hover {
+            background-color: #2ea043;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(35, 134, 54, 0.4);
+        }
+
+        /* --- Transaction History --- */
+        .history-section {
+            margin-top: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 5px;
+        }
+
+        .section-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .transaction-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .transaction-list {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #21262d;
+            transition: background 0.2s ease;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tx-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 15px;
+            color: var(--text-main);
+        }
+
+        .tx-info p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .tx-amount {
+            text-align: right;
+        }
+
+        .amount-val {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .amount-val.credit { color: #39d353; }
+        .amount-val.debit { color: var(--danger); }
+
+        .tx-type {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #21262d;
+        }
+
+        /* Custom Scrollbar */
+        .transaction-list::-webkit-scrollbar { width: 6px; }
+        .transaction-list::-webkit-scrollbar-track { background: transparent; }
+        .transaction-list::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { text-decoration: underline; opacity: 0.8; }
     </style>
 </head>
-<body class="auth-page">
-    <div class="auth-container">
-        <div class="wallet-card">
-            <h1 style="color: white;">My Wallet</h1>
-            <p class="balance-label">Current Balance</p>
-            <p class="balance-amount">₹<%= user.wallet.toFixed(2) %></p>
-            
-            <button class="btn-add" onclick="handleAddMoney()">+ Add Money</button>
-            
-            <div style="margin-top: 20px;">
-                <a href="/profile" style="color: #58a6ff; text-decoration: none; font-size: 14px;">Back to Profile</a>
+<body>
+ <%- include('../partials/header') %>
+
+    <div class="wallet-container">
+        
+        <div class="balance-card">
+            <p class="balance-label">Total Balance</p>
+            <div class="balance-amount">
+                <span style="font-size: 32px; color: var(--text-muted); margin-top: 8px;">₹</span>
+                <%= user.wallet.toFixed(2) %>
             </div>
+            <button class="btn-add-funds" onclick="handleAddMoney()">
+                <i class="fas fa-plus-circle"></i> &nbsp;Add Money
+            </button>
+        </div>
+
+        <div class="history-section">
+            <div class="section-header">
+                <h3>Recent Transactions</h3>
+                <span style="color: var(--text-muted); font-size: 13px;">
+                    <i class="fas fa-filter"></i> All Activity
+                </span>
+            </div>
+
+            <div class="transaction-card">
+                <div class="transaction-list">
+                    <% if (user.walletHistory && user.walletHistory.length > 0) { %>
+                        <% user.walletHistory.slice().reverse().forEach(tx => { %>
+                            <div class="transaction-item">
+                                <div class="tx-info">
+                                    <h4><%= tx.reason %></h4>
+                                    <p><%= new Date(tx.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></p>
+                                </div>
+                                <div class="tx-amount">
+                                    <div class="amount-val <%= tx.type %>">
+                                        <%= tx.type === 'credit' ? '+' : '-' %> ₹<%= tx.amount.toFixed(2) %>
+                                    </div>
+                                    <span class="tx-type"><%= tx.type %></span>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div style="padding: 60px 20px; text-align: center;">
+                            <i class="fas fa-wallet" style="font-size: 40px; color: #21262d; margin-bottom: 15px;"></i>
+                            <p style="color: var(--text-muted); margin: 0;">Your transaction history is empty.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="/profile" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Profile
+            </a>
         </div>
     </div>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        // async function handleAddMoney() {
+        async function handleAddMoney() {
             const { value: amount } = await Swal.fire({
                 title: 'Add Funds',
+                text: "How much would you like to add to your wallet?",
                 input: 'number',
-                inputLabel: 'Enter amount to add',
                 inputPlaceholder: 'Enter amount in ₹',
                 showCancelButton: true,
                 background: '#161b22',
                 color: '#fff',
                 confirmButtonColor: '#238636',
+                cancelButtonColor: '#da3633',
                 inputValidator: (value) => {
-                    if (!value || value <= 0) {
-                        return 'Please enter a valid amount!';
-                    }
+                    if (!value || value <= 0) return 'Please enter a valid amount!';
+                    if (value > 50000) return 'Maximum limit per transaction is ₹50,000';
                 }
             });
 
             if (amount) {
-                const response = await fetch('/wallet/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount })
-                });
-                const data = await response.json();
+                try {
+                    // 1. Create Razorpay Order
+                    const orderResponse = await fetch('/wallet/create-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount })
+                    });
+                    const orderData = await orderResponse.json();
 
-                if (data.success) {
-                    Swal.fire({ icon: 'success', title: 'Success', text: data.message, background: '#161b22', color: '#fff' })
-                    .then(() => window.location.reload());
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Failed', text: data.message, background: '#161b22', color: '#fff' });
+                    if (!orderData.success) throw new Error(orderData.message);
+
+                    // 2. Open Razorpay Checkout
+                    const options = {
+                        "key": "<%= process.env.RAZORPAY_KEY_ID %>", 
+                        "amount": orderData.order.amount,
+                        "currency": "INR",
+                        "name": "Wearify",
+                        "description": "Secure Wallet Top-up",
+                        "order_id": orderData.order.id,
+                        "handler": async function (response) {
+                            Swal.showLoading();
+                            // 3. Verify Payment
+                            const verifyRes = await fetch('/wallet/verify-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ response, amount })
+                            });
+                            const verifyData = await verifyRes.json();
+
+                            if (verifyData.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Wallet Updated',
+                                    text: `Successfully added ₹${amount} to your wallet.`,
+                                    background: '#161b22',
+                                    color: '#fff'
+                                }).then(() => window.location.reload());
+                            } else {
+                                throw new Error(verifyData.message);
+                            }
+                        },
+                        "theme": { "color": "#238636" }
+                    };
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                } catch (err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Payment Failed',
+                        text: err.message || 'Something went wrong',
+                        background: '#161b22',
+                        color: '#fff'
+                    });
                 }
             }
         }
     </script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-<script>
-async function handleAddMoney() {
-    const { value: amount } = await Swal.fire({
-        title: 'Add Money',
-        input: 'number',
-        inputLabel: 'Enter amount in ₹',
-        background: '#161b22',
-        color: '#fff',
-        showCancelButton: true
-    });
-
-    if (amount && amount > 0) {
-        // 1. Create Order on Server
-        const orderResponse = await fetch('/wallet/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount })
-        });
-        const orderData = await orderResponse.json();
-
-        if (orderData.success) {
-            const options = {
-                "key": "<%= process.env.RAZORPAY_KEY_ID %>", // Enter your Key ID here
-                "amount": orderData.order.amount,
-                "currency": "INR",
-                "name": "Wearify",
-                "description": "Wallet Top-up",
-                "order_id": orderData.order.id,
-                "handler": async function (response) {
-                    // 2. Verify Payment on Server
-                    const verifyRes = await fetch('/wallet/verify-payment', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ response, amount })
-                    });
-                    const verifyData = await verifyRes.json();
-
-                    if (verifyData.success) {
-                        Swal.fire('Success', '₹' + amount + ' added!', 'success')
-                        .then(() => window.location.reload());
-                    }
-                },
-                "theme": { "color": "#6366f1" }
-            };
-            const rzp = new Razorpay(options);
-            rzp.open();
-        }
-    }
-}
-</script>
 </body>
 </html>

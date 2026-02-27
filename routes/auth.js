@@ -23,10 +23,17 @@ router.get('/google/callback',
 
 
 router.get('/logout', (req, res) => {
-  req.logout(err => {
-    if(err) console.log(err);
-    res.redirect('/login');
-  });
+    // 1. Remove ONLY the user data from the session
+    delete req.session.user; 
+    
+    // 2. If you are using Passport, also clear the passport state
+    // but DON'T destroy the session
+    req.logout((err) => {
+        if (err) console.log(err);
+        
+        // 3. Redirect back to login
+        res.redirect('/login');
+    });
 });
 
 export default router

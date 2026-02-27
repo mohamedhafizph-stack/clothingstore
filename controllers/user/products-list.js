@@ -1,10 +1,12 @@
 import { productService } from '../../services/user/productService.js';
 import Product from '../../model/Product.js';
+import User from '../../model/User.js';
 const loadProducts = async (req, res) => {
   try {
     const { category } = req.params;
     const result = await productService.getProductsByCategory(category, req.query);
-
+    const user = req.session.user?.id || req.user._id
+    const userData = await User.findById(user);
     if (!result) {
       return res.status(404).render('error/404');
     }
@@ -15,12 +17,14 @@ const loadProducts = async (req, res) => {
       currentPage: parseInt(req.query.page) || 1,
       totalPages: result.totalPages,
       category: result.categoryData,
+      showSearch: true,
       selectedFilters: { 
         sizes: req.query.sizes, 
         sort: req.query.sort, 
         maxPrice: req.query.maxPrice, 
         search: req.query.search 
-      }
+      },
+      user:userData
     });
   } catch (error) {
     console.error("Load Shirts Error:", error);
@@ -50,7 +54,6 @@ const loadProductDetails = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
-import User from '../../model/User.js';
 
 export const addProductReview = async (req, res) => {
     try {

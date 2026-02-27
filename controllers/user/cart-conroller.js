@@ -18,7 +18,7 @@ export const loadCart = async (req, res) => {
         if (!userId) return res.redirect('/login');
 
         const cart = await cartService.getCartData(userId);
-        res.render('user/Cart', { cart });
+        res.render('user/Cart', { cart ,user:userId});
     } catch (err) {
         res.status(500).send("Internal Server Error");
     }

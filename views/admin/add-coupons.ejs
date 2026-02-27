@@ -6,6 +6,11 @@
     <title>Wearify Admin | Add Coupon</title>
     <link rel="stylesheet" href="/css/coupon-form.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        #maxDiscountGroup {
+            transition: opacity 0.3s ease;
+        }
+    </style>
 </head>
 <body>
     <div class="main-wrapper">
@@ -44,9 +49,9 @@
                             <input type="number" id="minOrderValue" name="minOrderValue" placeholder="Enter min order value" min="0" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="maxDiscount">Maximum Discount (Optional)</label>
-                            <input type="number" id="maxDiscount" name="maxDiscount" placeholder="For percentage coupons">
+                        <div class="form-group" id="maxDiscountGroup">
+                            <label for="maxDiscount">Maximum Discount (Limit)</label>
+                            <input type="number" id="maxDiscount" name="maxDiscount" placeholder="Max cap for percentage">
                         </div>
                     </div>
 
@@ -75,11 +80,41 @@
                         <a href="/admin/coupons" class="btn-cancel">Cancel</a>
                     </div>
                 </form>
+
                 <footer class="form-footer">
                     <p>Wearify Admin ©</p>
                 </footer>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const discountTypeSelect = document.getElementById('discountType');
+            const maxDiscountGroup = document.getElementById('maxDiscountGroup');
+            const maxDiscountInput = document.getElementById('maxDiscount');
+
+            /**
+             * Controls visibility of the Max Discount field.
+             * It only makes sense to have a "Max Discount" cap when using 
+             * percentages (e.g., 10% off up to $500).
+             */
+            function handleDiscountTypeChange() {
+                if (discountTypeSelect.value === 'Percentage') {
+                    maxDiscountGroup.style.display = 'block';
+                } else {
+                    // Hide the group and clear input for Flat Amount
+                    maxDiscountGroup.style.display = 'none';
+                    maxDiscountInput.value = ''; 
+                }
+            }
+
+            // Initialize on page load
+            handleDiscountTypeChange();
+
+            // Listen for changes
+            discountTypeSelect.addEventListener('change', handleDiscountTypeChange);
+        });
+    </script>
 </body>
 </html>

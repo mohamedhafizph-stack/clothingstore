@@ -117,22 +117,7 @@
                     </tbody>
                 </table>
 
-                <div class="pagination">
-    <% if (currentPage > 1) { %>
-        <a href="?page=<%= currentPage - 1 %><%= searchQuery ? '&search='+searchQuery : '' %><%= selectedCategory ? '&category='+selectedCategory : '' %>" class="pg-arrow">&lt;</a>
-    <% } %>
-
-    <% for(let i = 1; i <= totalPages; i++) { %>
-        <a href="?page=<%= i %><%= searchQuery ? '&search='+searchQuery : '' %><%= selectedCategory ? '&category='+selectedCategory : '' %>" 
-           class="pg-num <%= currentPage === i ? 'active' : '' %>">
-            <%= i %>
-        </a>
-    <% } %>
-
-    <% if (currentPage < totalPages) { %>
-        <a href="?page=<%= currentPage + 1 %><%= searchQuery ? '&search='+searchQuery : '' %><%= selectedCategory ? '&category='+selectedCategory : '' %>" class="pg-arrow">&gt;</a>
-    <% } %>
-</div>
+                <%- include('../partials/pagination', { currentPage, totalPages }) %>
             </section>
         </main>
     </div>

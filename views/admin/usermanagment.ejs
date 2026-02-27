@@ -96,24 +96,7 @@
                     <% }) %>
                 </tbody>
             </table>
-            <div class="pagination">
-  <% if (currentPage > 1) { %>
-    <a href="?page=<%= currentPage - 1 %>&search=<%= search %>" class="page-btn">Prev</a>
-  <% } %>
-
-  <% for (let i = 1; i <= totalPages; i++) { %>
-    <a
-      href="?page=<%= i %>&search=<%= search %>"
-      class="page-btn <%= i === currentPage ? 'active' : '' %>"
-    >
-      <%= i %>
-    </a>
-  <% } %>
-
-  <% if (currentPage < totalPages) { %>
-    <a href="?page=<%= currentPage + 1 %>&search=<%= search %>" class="page-btn">Next</a>
-  <% } %>
-</div>
+    <%- include('../partials/pagination', { currentPage, totalPages }) %>
 
         </div>
     </div>

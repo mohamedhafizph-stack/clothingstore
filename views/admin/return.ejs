@@ -110,27 +110,8 @@
                 </table>
             </section>
 
-            <footer class="pagination">
-    <% if (currentPage > 1) { %>
-        <button class="page-arrow" onclick="changePage(<%= currentPage - 1 %>)">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-    <% } %>
+         <%- include('../partials/pagination', { currentPage, totalPages }) %>
 
-    <% for(let i = 1; i <= totalPages; i++) { %>
-        <button 
-            class="page-num <%= currentPage === i ? 'active' : '' %>" 
-            onclick="changePage(<%= i %>)">
-            <%= i %>
-        </button>
-    <% } %>
-
-    <% if (currentPage < totalPages) { %>
-        <button class="page-arrow" onclick="changePage(<%= currentPage + 1 %>)">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-    <% } %>
-</footer>
         </main>
     </div>
 

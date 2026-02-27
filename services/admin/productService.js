@@ -1,6 +1,7 @@
 import Product from "../../model/Product.js";
 import Category from "../../model/category.js";
 import mongoose from 'mongoose'; 
+import Offer from "../../model/Offer.js";
 export const getProductsList = async (query, page, limit) => {
     const skip = (page - 1) * limit;
     const [products, totalProducts] = await Promise.all([
@@ -14,38 +15,38 @@ export const getProductsList = async (query, page, limit) => {
         totalProducts
     };
 };
+export const updateProductPrices = async (query) => {
+    const now = new Date();
+    const affectedProducts = await Product.find(query);
 
-export const createNewProduct = async (productData, files) => {
-    const { name, category, price, discount, description } = productData;
-    
-    if (!name || !category || !price) {
-        throw new Error("Product Name, Category, and Price are required.");
-    }
+    return Promise.all(affectedProducts.map(async (product) => {
+        let pDisc = 0;
+        let cDisc = 0;
 
-    if (Number(price) <= 0) {
-        throw new Error("Price must be a positive number.");
-    }
+        const bestProductOffer = await Offer.findOne({
+            productId: product._id,
+            isActive: true,
+            expireAt: { $gte: now }
+        }).sort({ discountPercentage: -1 });
+        pDisc = bestProductOffer ? bestProductOffer.discountPercentage : 0;
 
-    if (!mongoose.Types.ObjectId.isValid(category)) {
-        throw new Error("Invalid Category ID. Please select a valid category.");
-    }
+        if (product.category) {
+            const bestCategoryOffer = await Offer.findOne({
+                categoryId: product.category,
+                isActive: true,
+                expireAt: { $gte: now }
+            }).sort({ discountPercentage: -1 });
+            cDisc = bestCategoryOffer ? bestCategoryOffer.discountPercentage : 0;
+        }
 
-    const imageUrls = files ? files.map(file => file.path) : [];
-
-    const product = new Product({
-        name,
-        category, 
-        price: Number(price),
-        discount: Number(discount) || 0,
-        description,
-        images: imageUrls,
-        variants: [],
-        totalStock: 0,
-    });
-
-    return await product.save();
+        const finalDiscount = Math.max(pDisc, cDisc);
+        
+        product.offerPercentage = finalDiscount;
+        product.salePrice = Math.round(product.regularPrice * (1 - finalDiscount / 100));
+        
+        return product.save();
+    }));
 };
-
 export const updateProductDetails = async (id, updateData, files) => {
     const { name, category, price, discount, description } = updateData;
 
@@ -99,6 +100,39 @@ export const updateProductDetails = async (id, updateData, files) => {
 
     return updatedProduct;
 };
+export const createNewProduct = async (productData, files) => {
+    const { name, category, price, discount, description } = productData;
+    
+    if (!name || !category || !price) {
+        throw new Error("Product Name, Category, and Price are required.");
+    }
+
+    if (Number(price) <= 0) {
+        throw new Error("Price must be a positive number.");
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(category)) {
+        throw new Error("Invalid Category ID. Please select a valid category.");
+    }
+
+    const imageUrls = files ? files.map(file => file.path) : [];
+
+    const product = new Product({
+        name,
+        category, 
+        price: Number(price),
+        discount: Number(discount) || 0,
+        description,
+        images: imageUrls,
+        variants: [],
+        totalStock: 0,
+    });
+const savedProduct = await product.save();
+await updateProductPrices({ _id: savedProduct._id });
+return await Product.findById(savedProduct._id);
+};
+
+
 
 export const updateVariantStock = async (id, size, stock) => {
     const product = await Product.findById(id);

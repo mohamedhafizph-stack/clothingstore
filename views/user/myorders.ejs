@@ -6,23 +6,19 @@
     <title>My Orders | Wearify</title>
     <link rel="stylesheet" href="/css/myOrders.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-content">
-            <div class="logo">Wearify</div>
-           
-            <div class="nav-actions">
+ <%- include('../partials/header') %>
+
+
+    <main class="container">
+         <div class="nav-actions">
               <div class="search-box">
     <i class="fas fa-search"></i>
     <input type="text" id="orderSearch" placeholder="Search by Order ID..." oninput="debouncedSearch(this.value)">
 </div>
-               
-            </div>
-        </div>
-    </nav>
-
-    <main class="container">
         <h1 class="page-title">My Orders</h1>
         <div class="table-container">
             <table class="orders-table">

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/cart.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         /* Offer Styles */
         .price-wrapper { display: flex; flex-direction: column; }
@@ -19,11 +20,8 @@
 </head>
 <body class="cart-page">
 
-<header class="shop-header">
-    <div class="header-left">
-        <div class="logo">Wearify</div>
-    </div>
-</header>
+   <%- include('../partials/header') %>
+
 
 <main class="container">
     <h1 class="page-title">Your Cart</h1>
@@ -78,50 +76,38 @@
         </section>
 
         <aside class="order-summary">
-            <h2>Order Summary</h2>
-            
-            <% 
-                // Calculate total savings for the summary box
-                let totalSavings = 0;
-                if (cart && cart.items) {
-                    cart.items.forEach(item => {
-                        if (item.product.salePrice < item.product.regularPrice) {
-                            totalSavings += (item.product.regularPrice - item.product.salePrice) * item.quantity;
-                        }
-                    });
-                }
-            %>
+    <h2>Order Summary</h2>
+    
+    <div class="summary-row">
+        <span>Subtotal</span>
+        <span>₹<%= cart.originalSubtotal %></span>
+    </div>
 
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <span>₹<%= cart ? (cart.totalPrice+totalSavings ) : 0 %></span>
-            </div>
+    <% if (cart.totalSavings > 0) { %>
+        <div class="summary-row savings">
+            <span>Offer Discount</span>
+            <span>- ₹<%= cart.totalSavings %></span>
+        </div>
+    <% } %>
 
-            <% if (totalSavings > 0) { %>
-                <div class="summary-row savings">
-                    <span>Discount Savings</span>
-                    <span>- ₹<%= totalSavings %></span>
-                </div>
-            <% } %>
+    <div class="summary-row">
+        <span>Shipping</span>
+        <span class="free">Free</span>
+    </div>
 
-            <div class="summary-row">
-                <span>Shipping</span>
-                <span class="free">Free</span>
-            </div>
+    <hr>
+    <div class="summary-row total">
+        <span>Total</span>
+        <span>₹<%= cart.totalPrice %></span>
+    </div>
 
-            <hr>
-            <div class="summary-row total">
-                <span>Total</span>
-                <span>₹<%= cart ? (cart.totalPrice ): 0 %></span>
-            </div>
-
-            <a href="/cart/checkout">
-                <button class="btn-checkout" <%= (!cart || cart.items.length === 0) ? 'disabled' : '' %>>
-                    Proceed to Checkout
-                </button>
-            </a>    
-            <a href="/home" class="continue-link">Continue Shopping</a>
-        </aside>
+    <a href="/cart/checkout">
+        <button class="btn-checkout" <%= (cart.items.length === 0) ? 'disabled' : '' %>>
+            Proceed to Checkout
+        </button>
+    </a>    
+    <a href="/home" class="continue-link">Continue Shopping</a>
+</aside>
     </div>
 </main>
 

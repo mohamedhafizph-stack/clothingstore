@@ -129,6 +129,12 @@ export const placeOrder = async (req, res) => {
                 return res.status(400).json({ success: false, message: "Insufficient Wallet" });
             }
             user.wallet -= finalTotal;
+            user.walletHistory.push({
+        amount: finalTotal,
+        type: 'debit',
+        reason: `Order Placement (#${newOrder.orderId})`, // Links the debit to the specific order
+        date: new Date()
+    });
             await user.save();
             newOrder.paymentStatus = 'Paid';
         }
@@ -211,6 +217,62 @@ export const verifyPayment = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal Server Error during verification" });
     }
 };
+// orderController.js
+export const retryOrderPayment = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const order = await Order.findById(orderId).populate('items.product');
+
+        if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+        for (const item of order.items) {
+            const variant = item.product.variants.find(v => v.size === item.size);
+            if (!variant || variant.stock < item.quantity) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `Sorry, ${item.product.name} (Size: ${item.size}) is now out of stock.` 
+                });
+            }
+        }
+
+        const rzpOrder = await razorpay.orders.create({
+            amount: Math.round(order.totalPrice * 100),
+            currency: "INR",
+            receipt: `receipt_retry_${order.orderId}`
+        });
+
+        order.razorpayOrderId = rzpOrder.id;
+        await order.save();
+
+        res.json({
+            success: true,
+            rzpKey: process.env.RAZORPAY_KEY_ID,
+            rzpOrderId: rzpOrder.id,
+            amount: rzpOrder.amount,
+            orderId: order._id // The MongoDB ID
+        });
+    } catch (error) {
+        console.error("Retry Error:", error);
+        res.status(500).json({ success: false, message: "Could not initiate retry" });
+    }
+};
+
+
+export const getFailurePage = async (req, res) => {
+    try {
+        const { orderId, reason } = req.query;
+        
+        await Order.findByIdAndUpdate(orderId, { paymentStatus: 'Failed' });
+
+        res.render('user/payment-failure', { 
+            orderId, 
+            reason: reason || "Payment was cancelled or declined.",
+            user: req.session?.user || req.user 
+        });
+    } catch (err) {
+        res.redirect('/home');
+    }
+};
 
 export const loadOrderSuccess = async (req, res) => {
     try {
@@ -256,105 +318,101 @@ export const downloadInvoice = async (req, res) => {
         doc.pipe(res);
 
         // --- BRANDING HEADER ---
-        // Black sidebar/topbar accent
         doc.rect(0, 0, 612, 40).fill('#000000'); 
-        
-        doc.fillColor('#ffffff')
-           .fontSize(14)
-           .text('OFFICIAL PURCHASE INVOICE', 50, 15, { characterSpacing: 2 });
+        doc.fillColor('#ffffff').fontSize(14).text('OFFICIAL PURCHASE INVOICE', 50, 15, { characterSpacing: 2 });
 
-        // Logo and Company Info
-        doc.fillColor('#000000')
-           .fontSize(24)
-           .text('WEARIFY', 50, 70, { bold: true, characterSpacing: 1 });
-        
-        doc.fontSize(9)
-           .fillColor('#777777')
+        doc.fillColor('#000000').fontSize(24).text('WEARIFY', 50, 70, { bold: true });
+        doc.fontSize(9).fillColor('#777777')
            .text('WEARIFY RETAILS PVT LTD', 50, 100)
            .text('123 Fashion Street, Cyber Park, Kerala, IN')
            .text('GSTIN: 32AAAAA0000A1Z5');
 
-        // Invoice Meta Info (Right Aligned)
-        doc.fillColor('#000000')
-           .fontSize(10)
+        doc.fillColor('#000000').fontSize(10)
            .text(`INVOICE ID: #${order.orderId}`, 400, 75, { align: 'right' })
            .text(`DATE: ${new Date(order.createdAt).toLocaleDateString()}`, 400, 90, { align: 'right' })
-           .text(`STATUS: ${order.paymentStatus.toUpperCase()}`, 400, 105, { align: 'right' });
+           .text(`PAYMENT: ${order.paymentMethod}`, 400, 105, { align: 'right' });
 
         doc.moveTo(50, 130).lineTo(550, 130).strokeColor('#eeeeee').stroke();
 
-        // --- CLIENT & SHIPPING SECTION ---
+        // --- SHIPPING SECTION ---
         doc.fillColor('#000000').fontSize(10).text('BILL TO:', 50, 150, { bold: true });
-        doc.fillColor('#444444')
-           .text(order.shippingAddress.fullName, 50, 165)
-           .text(order.shippingAddress.addressLine)
-           .text(`${order.shippingAddress.city}, ${order.shippingAddress.state}`)
-           .text(`PIN: ${order.shippingAddress.pincode}`)
-           .text(`PH: ${order.shippingAddress.phone}`);
+        doc.fillColor('#444444').text(order.shippingAddress.fullName, 50, 165)
+           .text(`${order.shippingAddress.addressLine}, ${order.shippingAddress.city}`)
+           .text(`${order.shippingAddress.state} - ${order.shippingAddress.pincode}`);
 
         // --- TABLE SECTION ---
-        const tableTop = 260;
-        
-        // Table Header Background
+        const tableTop = 240;
         doc.rect(50, tableTop, 500, 20).fill('#f9f9f9');
         doc.fillColor('#000000').fontSize(9);
-        
         doc.text('DESCRIPTION', 60, tableTop + 6);
-        doc.text('SIZE', 280, tableTop + 6);
+        doc.text('MRP', 250, tableTop + 6); // Original Price
         doc.text('QTY', 340, tableTop + 6);
-        doc.text('UNIT PRICE', 400, tableTop + 6);
+        doc.text('OFFER PRICE', 400, tableTop + 6); // Discounted Price
         doc.text('TOTAL', 480, tableTop + 6, { align: 'right' });
 
         let i = 0;
-        doc.fillColor('#444444');
+        let totalMRP = 0; // Total before any discounts
 
         order.items.forEach(item => {
             const y = tableTop + 35 + (i * 35);
-            const productName = item.product ? (item.product.name || item.product.productName) : "Archived Item";
+            const productName = item.product ? (item.product.name || item.product.productName) : "Product";
             
-            // Draw thin line between items
-            if(i > 0) {
-                doc.moveTo(50, y - 10).lineTo(550, y - 10).strokeColor('#f0f0f0').lineWidth(0.5).stroke();
-            }
+            // Calculate total MRP for this line item
+            totalMRP += (item.realPrice * item.quantity);
 
-            doc.text(productName.toUpperCase(), 60, y, { width: 200 });
-            doc.text(item.size, 280, y);
+            doc.fillColor('#444444').fontSize(9);
+            doc.text(productName.toUpperCase(), 60, y, { width: 180 });
+            doc.text(`INR ${item.realPrice.toFixed(2)}`, 250, y);
             doc.text(item.quantity.toString(), 340, y);
-            doc.text(`$${item.price.toFixed(2)}`, 400, y);
-            doc.text(`$${(item.price * item.quantity).toFixed(2)}`, 50, y, { align: 'right' });
-            
+            doc.text(`INR ${item.price.toFixed(2)}`, 400, y);
+            doc.text(`INR ${(item.price * item.quantity).toFixed(2)}`, 50, y, { align: 'right' });
             i++;
         });
 
         // --- SUMMARY SECTION ---
         const footerTop = tableTop + 60 + (i * 35);
-        
-        doc.rect(350, footerTop, 200, 80).fill('#f9f9f9');
-        
-        doc.fillColor('#777777').fontSize(10).text('SUBTOTAL', 370, footerTop + 15);
-        doc.text(`$${order.totalPrice.toFixed(2)}`, 370, footerTop + 15, { align: 'right' });
-        
-        doc.text('SHIPPING', 370, footerTop + 30);
-        doc.text('FREE', 370, footerTop + 30, { align: 'right' });
+        const productDiscount = totalMRP - order.subtotal; // Subtotal in your schema seems to be sum of (price * qty)
 
-        doc.fillColor('#000000').fontSize(12).text('TOTAL PAID', 370, footerTop + 55, { bold: true });
-        doc.text(`$${order.totalPrice.toFixed(2)}`, 370, footerTop + 55, { align: 'right', bold: true });
+        doc.rect(300, footerTop, 250, 110).fill('#fdfdfd').stroke('#eeeeee');
+        
+        doc.fillColor('#777777').fontSize(9);
+        doc.text('GROSS TOTAL (MRP)', 320, footerTop + 15);
+        doc.text(`INR ${totalMRP.toFixed(2)}`, 320, footerTop + 15, { align: 'right' });
 
-        // --- FOOTER NOTES ---
+        doc.fillColor('#e63946'); // Red for discounts
+        doc.text('PRODUCT OFFERS', 320, footerTop + 30);
+        doc.text(`- INR ${productDiscount.toFixed(2)}`, 320, footerTop + 30, { align: 'right' });
+
+        if (order.couponDiscount > 0) {
+            doc.text(`COUPON (${order.couponCode})`, 320, footerTop + 45);
+            doc.text(`- INR ${order.couponDiscount.toFixed(2)}`, 320, footerTop + 45, { align: 'right' });
+        }
+
+        doc.fillColor('#777777');
+        doc.text('SHIPPING CHARGES', 320, footerTop + 65);
+        doc.text('FREE', 320, footerTop + 65, { align: 'right' });
+
+        doc.moveTo(320, footerTop + 80).lineTo(530, footerTop + 80).stroke('#dddddd');
+
+        doc.fillColor('#000000').fontSize(11).text('NET AMOUNT PAID', 320, footerTop + 90, { bold: true });
+        doc.text(`INR ${order.totalPrice.toFixed(2)}`, 320, footerTop + 90, { align: 'right', bold: true });
+
+        // --- FOOTER ---
         doc.fontSize(8).fillColor('#aaaaaa')
-           .text('Thank you for choosing WEARIFY. Goods once sold can be returned within 7 days in original condition.', 50, 750, { align: 'center' })
-           .text('This is a computer generated invoice and does not require a physical signature.', 50, 765, { align: 'center' });
+           .text('Thank you for shopping with WEARIFY!', 50, 750, { align: 'center' })
+           .text('This is a computer-generated invoice.', 50, 762, { align: 'center' });
 
         doc.end();
 
     } catch (error) {
         console.error("PDF Gen Error:", error);
-        res.status(500).send("Critical error during PDF generation.");
+        res.status(500).send("Error generating invoice.");
     }
 };
 export const getOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.id;
+        const user = req.session.user?.id||req.user._id
         const order = await Order.findById(orderId).populate({
             path: 'items.product',
             model: 'Product' 
@@ -363,7 +421,7 @@ export const getOrderDetails = async (req, res) => {
         if (!order) {
             return res.status(404).render('user/404', { message: "Order not found" });
         }
-        res.render('user/orderdetails', { order });
+        res.render('user/orderdetails', { order,user });
     } catch (error) {
         console.error("Error fetching order:", error);
         res.status(500).redirect('/user/orders');
@@ -392,7 +450,8 @@ export const getMyOrders = async (req, res) => {
             orders,
             currentPage: page,
             totalPages: Math.ceil(totalOrders / limit),
-            searchTerm 
+            searchTerm ,
+            user:userId
         });
     } catch (error) {
         console.error("Search Error:", error);
@@ -654,7 +713,7 @@ export const requestFullOrderReturn = async (req, res) => {
     }
 };
 const orderController = {placeOrder,loadOrderSuccess,downloadInvoice,getOrderDetails,getMyOrders,getItemDetails,cancelOrder,getReturnPage
-    ,requestReturn,requestItemReturn,cancelSingleItem,requestFullOrderReturn,verifyPayment
+    ,requestReturn,requestItemReturn,cancelSingleItem,requestFullOrderReturn,verifyPayment,getFailurePage,retryOrderPayment
 }
 
 export default orderController

@@ -6,6 +6,8 @@
   <title>Wearify - <%= product.name %></title>
   <link rel="stylesheet" href="/css/product-details.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
   <style>
     /* Reviews Section Styling */
     .reviews-section { margin-top: 50px; border-top: 1px solid #30363d; padding-top: 30px; }
@@ -38,14 +40,8 @@
 
 <body class="details-page">
 
-<header class="shop-header">
-  <div class="logo">Wearify</div>
+<%- include('../partials/header') %>
 
-  <div class="icons">
-            <a href="/wishlist" class="icon" style="text-decoration: none;">❤️</a>
-            <a href="/home/cart" class="icon" style="text-decoration: none;">🛒</a>
-        </div>
-</header>
 
 <main class="container">
 
@@ -165,6 +161,7 @@
     </section>
   <% } %>
 </main>
+<%- include('../partials/footer') %>
 
 <script>
   let selectedStock = 0;

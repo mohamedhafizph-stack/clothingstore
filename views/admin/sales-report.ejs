@@ -14,11 +14,13 @@
         }
         body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; }
         .main-content-wrapper { padding: 2rem; margin-left: 250px; }
+        
         .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
         
         /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-3px); border-color: #333; }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
         .stat-value { font-size: 1.5rem; font-weight: 700; }
 
@@ -26,17 +28,29 @@
         .table-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
         .admin-table { width: 100%; border-collapse: collapse; }
         .admin-table th { background: #080808; padding: 1rem; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
-        .admin-table td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        .admin-table td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; vertical-align: top; }
         
         /* Form Elements */
         .filter-wrapper { background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; }
-        input, select { background: #000; border: 1px solid #222; padding: 0.7rem; color: #fff; border-radius: 6px; font-size: 0.9rem; }
-        .btn-primary { background: var(--accent-blue); border: none; color: #fff; padding: 0.7rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-secondary { background: #222; border: none; color: #fff; padding: 0.7rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; }
+        input, select { background: #000; border: 1px solid #222; padding: 0.7rem; color: #fff; border-radius: 6px; font-size: 0.9rem; outline: none; }
+        input:focus, select:focus { border-color: var(--accent-blue); }
         
+        .btn-primary { background: var(--accent-blue); border: none; color: #fff; padding: 0.7rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-secondary { background: #222; border: none; color: #fff; padding: 0.7rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        
+        .status-pill { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+        .status-cancelled { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .status-success { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+
         .hidden { display: none !important; }
         .text-success { color: var(--success); }
         .text-danger { color: var(--danger); }
+
+        /* Pagination Centering */
+        .pagination-wrapper { display: flex; justify-content: center; align-items: center; padding: 2rem; gap: 10px; }
+        .page-link { padding: 8px 16px; background: #161b22; border: 1px solid #30363d; color: #8b949e; text-decoration: none; border-radius: 6px; font-weight: 600; }
+        .page-link.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+        .page-link.disabled { opacity: 0.3; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -46,28 +60,28 @@
         <div class="page-header">
             <div>
                 <h1>Sales Report</h1>
-                <p>Track business performance and revenue metrics.</p>
+                <p style="color: var(--text-muted);">Real-time revenue tracking and performance analytics.</p>
             </div>
             <div style="display: flex; gap: 10px;">
                 <a href="/admin/sales-report/download/pdf?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn-secondary">
-                    <i class="fas fa-file-pdf"></i> PDF
+                    <i class="fas fa-file-pdf"></i> Export PDF
                 </a>
                 <a href="/admin/sales-report/download/excel?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn-secondary">
-                    <i class="fas fa-file-excel"></i> Excel
+                    <i class="fas fa-file-excel"></i> Export Excel
                 </a>
             </div>
         </div>
-<% let  totaloffer=0 %> 
+
         <div class="filter-wrapper">
             <form action="/admin/reports" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">REPORT RANGE</label>
                     <select name="filter" id="filterSelect" style="min-width: 180px;">
                         <option value="all" <%= filter === 'all' ? 'selected' : '' %>>All Time</option>
-                        <option value="daily" <%= filter === 'daily' ? 'selected' : '' %>>Daily</option>
-                        <option value="weekly" <%= filter === 'weekly' ? 'selected' : '' %>>Weekly</option>
-                        <option value="monthly" <%= filter === 'monthly' ? 'selected' : '' %>>Monthly</option>
-                        <option value="yearly" <%= filter === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                        <option value="daily" <%= filter === 'daily' ? 'selected' : '' %>>Today</option>
+                        <option value="weekly" <%= filter === 'weekly' ? 'selected' : '' %>>This Week</option>
+                        <option value="monthly" <%= filter === 'monthly' ? 'selected' : '' %>>This Month</option>
+                        <option value="yearly" <%= filter === 'yearly' ? 'selected' : '' %>>This Year</option>
                         <option value="custom" <%= filter === 'custom' ? 'selected' : '' %>>Custom Range</option>
                     </select>
                 </div>
@@ -83,26 +97,28 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary" style="height: 42px;">Apply Filter</button>
+                <button type="submit" class="btn-primary" style="height: 42px;">
+                    <i class="fas fa-sync-alt"></i> Apply Filter
+                </button>
             </form>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Orders Count</div>
+                <div class="stat-label">Successful Orders</div>
                 <div class="stat-value"><%= report.totalSalesCount %></div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Revenue</div>
-                <div class="stat-value">₹<%= report.totalOrderAmount.toLocaleString('en-IN') %></div>
+            <div class="stat-card" style="border-bottom: 3px solid var(--success);">
+                <div class="stat-label">Net Revenue</div>
+                <div class="stat-value text-success">₹<%= report.totalRevenue.toLocaleString('en-IN') %></div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Discount</div>
-                <div class="stat-value text-danger">₹<%= (report.totalDiscount).toLocaleString('en-IN') %></div>
+                <div class="stat-label">Product Offers</div>
+                <div class="stat-value text-danger">₹<%= report.totalProductOffers.toLocaleString('en-IN') %></div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Net Sales</div>
-                <div class="stat-value text-success">₹<%= (report.totalOrderAmount - report.totalDiscount).toLocaleString('en-IN') %></div>
+                <div class="stat-label">Coupon Discounts</div>
+                <div class="stat-value text-danger">₹<%= report.totalCoupons.toLocaleString('en-IN') %></div>
             </div>
         </div>
 
@@ -110,81 +126,64 @@
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Gross Total</th>
-                        <th>Offers</th>
-                        <th>Discount</th>
-                        <th>Final Price</th>
+                        <th>Date & ID</th>
+                        <th>Customer Details</th>
+                        <th>Gross MRP</th>
+                        <th>Product Offer</th>
+                        <th>Coupon</th>
+                        <th>Net Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                   <% if (orders && orders.length > 0) { %>
-    <% orders.forEach(order => { 
-        // 1. Calculate the Gross Original Price (Sum of MRP * Quantity)
-        const grossOriginal = order.items.reduce((acc, item) => {
-            return acc + (item.realPrice * item.quantity);
-        }, 0);
+                    <% if (orders && orders.length > 0) { %>
+                        <% orders.forEach(order => { 
+                            const grossOriginal = order.items.reduce((acc, item) => acc + (item.realPrice * item.quantity), 0);
+                            const productOffer = order.items.reduce((acc, item) => acc + ((item.realPrice - item.price) * item.quantity), 0);
+                            const isCancelled = ['Cancelled', 'Returned'].includes(order.status);
+                        %>
+                            <tr style="<%= isCancelled ? 'opacity: 0.6;' : '' %>">
+                                <td>
+                                    <div style="font-weight: 600;">#<%= order.orderId %></div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);"><%= new Date(order.createdAt).toLocaleDateString('en-GB') %></div>
+                                    <span class="status-pill <%= isCancelled ? 'status-cancelled' : 'status-success' %>">
+                                        <%= order.status %>
+                                    </span>
+                                </td>
 
-        // 2. Calculate Offer Discount (Original Sum - Price before Coupon)
-        // We use order.subtotal here because you saved the discounted subtotal earlier
-        const offerDiscount = grossOriginal - (order.totalPrice + (order.couponDiscount || 0));
-    %>
-        <tr>
-            <td style="color: var(--text-muted)"><%= new Date(order.createdAt).toLocaleDateString('en-GB') %></td>
+                                <td>
+                                    <div style="font-weight: 600;"><%= order.shippingAddress.fullName %></div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">
+                                        <% order.items.forEach(item => { %>
+                                            • <%= item.product ? item.product.name : 'Unknown Product' %> (<%= item.size %>) x<%= item.quantity %><br>
+                                        <% }) %>
+                                    </div>
+                                </td>
 
-            <td style="font-weight: 600;">#<%= order.orderId %></td>
+                                <td>₹<%= grossOriginal.toLocaleString('en-IN') %></td>
 
-            <td>
-                <div style="font-weight: 600;"><%= order.shippingAddress.fullName %></div>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
-                    <% order.items.forEach(item => { %>
-                        • <%= item.product ? item.product.name : 'Product' %> (<%= item.size %>) x<%= item.quantity %><br>
-                    <% }) %>
-                </div>
-            </td>
+                                <td class="text-danger">-₹<%= productOffer.toLocaleString('en-IN') %></td>
 
-            <td>₹<%= grossOriginal.toFixed(2) %></td>
+                                <td class="text-danger">-₹<%= (order.couponDiscount || 0).toLocaleString('en-IN') %></td>
 
-            <td class="text-danger">-₹<%= offerDiscount > 0 ? offerDiscount.toFixed(2) : "0.00" %></td>
-
-            <td class="text-danger">-₹<%= (order.couponDiscount || 0).toFixed(2) %></td>
-
-            <td style="font-weight: 700; color: var(--accent-blue)">₹<%= order.totalPrice.toFixed(2) %></td>
-        </tr>
-    <% }) %>
-<% } else { %>
-    <tr>
-        <td colspan="7" style="text-align:center; padding: 4rem; color: var(--text-muted);">
-            <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 1rem;"></i>
-            No orders found for the selected period.
-        </td>
-    </tr>
-<% } %>
+                                <td style="font-weight: 700; color: var(--accent-blue)">
+                                    ₹<%= order.totalPrice.toLocaleString('en-IN') %>
+                                    <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 400;"><%= order.paymentMethod %></div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding: 5rem; color: var(--text-muted);">
+                                <i class="fas fa-search" style="font-size: 2.5rem; margin-bottom: 1rem; display: block;"></i>
+                                <p>No records match the selected filter criteria.</p>
+                            </td>
+                        </tr>
+                    <% } %>
                 </tbody>
             </table>
-            <div class="pagination-container" style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 5px;">
-    <% if (currentPage > 1) { %>
-        <a href="?page=<%= currentPage - 1 %>&filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn-secondary" style="padding: 8px 15px; text-decoration: none; font-size: 0.8rem;">
-            <i class="fas fa-chevron-left"></i>
-        </a>
-    <% } %>
 
-    <% for(let i = 1; i <= totalPages; i++) { %>
-        <a href="?page=<%= i %>&filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" 
-           class="btn-primary" 
-           style="padding: 8px 15px; text-decoration: none; font-size: 0.8rem; <%= i === currentPage ? 'background: var(--accent-blue)' : 'background: #222' %>">
-            <%= i %>
-        </a>
-    <% } %>
+                 <%- include('../partials/pagination', { currentPage, totalPages }) %>
 
-    <% if (currentPage < totalPages) { %>
-        <a href="?page=<%= currentPage + 1 %>&filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn-secondary" style="padding: 8px 15px; text-decoration: none; font-size: 0.8rem;">
-            <i class="fas fa-chevron-right"></i>
-        </a>
-    <% } %>
-</div>
         </div>
     </main>
 
@@ -197,7 +196,14 @@
                 customDateSection.classList.remove('hidden');
             } else {
                 customDateSection.classList.add('hidden');
-                this.form.submit();
+                this.form.submit(); // Auto-submit for non-custom filters
+            }
+        });
+
+        // If validation fails or page reloads with custom, ensure section is visible
+        window.addEventListener('DOMContentLoaded', () => {
+            if (filterSelect.value === 'custom') {
+                customDateSection.classList.remove('hidden');
             }
         });
     </script>
