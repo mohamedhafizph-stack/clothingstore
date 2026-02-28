@@ -74,7 +74,14 @@ export const toggleUserStatus = async (req, res) => {
         res.status(500).send('Error updating status');
     }
 };
+export const adminLogout = (req, res) => {
+    delete req.session.admin; 
 
+    req.session.save((err) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.redirect('/admin/login');
+    });
+};
 
-const authController = { loadLoginPage, logingIn, loadUserList, toggleUserStatus,loadDashboard };
+const authController = { loadLoginPage, logingIn, loadUserList, toggleUserStatus,loadDashboard,adminLogout };
 export default authController;

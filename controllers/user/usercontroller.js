@@ -308,6 +308,28 @@ export const loadLoggedinHomepage = async(req, res) => {
         res.status(500).send("Internal Server Error");
     }
 }
+export const userLogout = (req, res, next) => {
+    const currentAdmin = req.session.admin;
+
+    req.logout((err) => {
+        if (err) return next(err);
+
+        if (currentAdmin) {
+            req.session.admin = currentAdmin;
+        }
+
+        delete req.session.user;
+        if (req.session.passport) {
+            delete req.session.passport.user;
+        }
+
+        req.session.save((saveErr) => {
+            if (saveErr) return next(saveErr);
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.redirect('/login');
+        });
+    });
+};
 
 export const resendOtp = async (req, res) => {
   try {
@@ -841,6 +863,7 @@ const userController = {
     deleteAdress,
     setDefaultAdress,
     resendForgotOtp,
-    redeemReferral
+    redeemReferral,
+    userLogout
 };
 export default userController;

@@ -574,10 +574,14 @@ export const requestReturn = async (req, res) => {
 export const requestItemReturn = async (req, res) => {
     try {
         const { orderId, itemId, reason } = req.body;
-        
+
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        if (order.status !== "Delivered" && order.status !== "Partially Returned") {
+            return res.status(400).json({ success: false, message: "Returns only allowed after delivery" });
         }
 
         const item = order.items.id(itemId);
@@ -585,19 +589,43 @@ export const requestItemReturn = async (req, res) => {
             return res.status(404).json({ success: false, message: "Item not found" });
         }
 
+        if (['Return Requested', 'Returned'].includes(item.status)) {
+            return res.status(400).json({ success: false, message: "Return already initiated for this item" });
+        }
+
+        const itemOriginalTotal = Number(item.price) * Number(item.quantity);
+        let refundAmount = itemOriginalTotal;
+
+        if (order.couponDiscount > 0 && order.subtotal > 0) {
+            const discountRatio = order.couponDiscount / order.subtotal;
+            const itemShareOfDiscount = itemOriginalTotal * discountRatio;
+            refundAmount = itemOriginalTotal - itemShareOfDiscount;
+        }
+        
+        refundAmount = Math.max(0, Number(refundAmount.toFixed(2)));
+       
         item.status = 'Return Requested';
         item.returnReason = reason;
 
+        const hasDeliveredItems = order.items.some(i => i.status === 'Delivered');
         
-        order.status = 'Return Requested';
+        if (!hasDeliveredItems) {
+            order.status = 'Return Requested';
+        } else {
+            order.status = 'Delivered'; 
+        }
 
         await order.save();
 
-        res.json({ success: true, message: "Return request submitted successfully" });
+        res.json({ 
+            success: true, 
+            message: "Return request submitted successfully",
+            potentialRefund: refundAmount 
+        });
 
     } catch (error) {
-        console.error("Return Request Error:", error);
-        res.status(500).json({ success: false, message: "Server error occurred" });
+        console.error("RETURN_REQUEST_ERROR:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
 export const cancelSingleItem = async (req, res) => {

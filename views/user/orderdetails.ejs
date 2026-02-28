@@ -120,20 +120,20 @@
 
     <main class="item-details-container">
         <nav class="breadcrumb">
-            <a href="/user/profile">Profile</a> / 
+            <a href="/profile">Profile</a> / 
             <a href="/user/orders">Orders</a> / 
             <span class="active">Order Details</span>
         </nav>
 
-        <header class="order-header">
-            <div class="header-main">
-                <h1>Order #<%= order.orderId %></h1>
-                <span class="status-pill status-<%= order.status.toLowerCase().replace(' ', '-') %>">
-                    <%= order.status %>
-                </span>
-            </div>
-            <p class="order-date">Placed on <%= new Date(order.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) %></p>
-        </header>
+       <header class="order-header">
+    <div class="header-main">
+        <h1>Order #<%= order.orderId %></h1>
+        <span class="status-pill status-<%= order.status.toLowerCase().replace(' ', '-') %>">
+            <%= order.status %>
+        </span>
+    </div>
+    <p class="order-date">Placed on <%= new Date(order.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) %></p>
+</header>
 
         <% if (order.status !== 'Cancelled' && !['Return Requested', 'Returned'].includes(order.status)) { %>
         <section class="tracking-wrapper">

@@ -11,29 +11,21 @@ router.get('/google',
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
+    req.session.user = { id: req.user._id };
 
-    req.session.user = {
-      id: req.user._id
-    };
-
-    res.redirect('/home');  
+    req.session.save(() => {
+        res.redirect('/home');
+    });
   } 
 );
 
 
 
 router.get('/logout', (req, res) => {
-    // 1. Remove ONLY the user data from the session
-    delete req.session.user; 
-    
-    // 2. If you are using Passport, also clear the passport state
-    // but DON'T destroy the session
-    req.logout((err) => {
-        if (err) console.log(err);
-        
-        // 3. Redirect back to login
-        res.redirect('/login');
-    });
+  req.logout(err => {
+    if(err) console.log(err);
+    res.redirect('/login');
+  });
 });
 
 export default router

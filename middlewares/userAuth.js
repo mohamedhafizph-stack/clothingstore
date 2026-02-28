@@ -25,5 +25,6 @@ console.log(error)
     }
 
 }
+export default userAuth
 
 

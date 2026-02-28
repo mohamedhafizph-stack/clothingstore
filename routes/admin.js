@@ -6,7 +6,6 @@ import user from '../controllers/admin/customer.js'
 import { isLoggedIn } from '../middlewares/isloggedinAdmin.js';
 import categoryController from '../controllers/admin/categoryController.js';
 import productController from '../controllers/admin/productController.js';
-//import { uploadProductImages } from '../config/productMulter.js';
 import upload from "../config/productMulter.js";
 import orderController from '../controllers/admin/order-managment.js';
 import returnController from '../controllers/admin/return-controller.js';
@@ -15,19 +14,6 @@ import offerController, { editOffer } from '../controllers/admin/offer-Controlle
 import reportController from '../controllers/admin/report-Controller.js';
 router.get('/login',isLoggedIn,authController.loadLoginPage);
 router.post('/login',isLoggedIn,authController.logingIn);
-
-
-// router.get('/dashboard', (req, res) => {
-//     const data = {
-//         stats: { sales: '12,500', orders: 350, revenue: '25,000', avgValue: '71.43' },
-//         activity: [
-//             { id: '#12345', customer: 'Ethan Harper', amount: 150, status: 'Shipped' },
-//             { id: '#12346', customer: 'Olivia Bennett', amount: 200, status: 'Processing' },
-           
-//         ]
-//     };
-//     res.render('admin/dashboard', data);
-// });
 
 router.get('/dashboard',adminAuth,authController.loadDashboard)
 
@@ -77,12 +63,6 @@ router.delete('/offers/delete/:id',adminAuth,offerController.deleteOffer)
 router.get('/reports',adminAuth,reportController.loadReportPage)
 router.get('/sales-report/download/pdf',adminAuth, reportController.downloadPDF);
 router.get('/sales-report/download/excel', adminAuth,reportController.downloadExcel);
-router.get('/logout', (req, res) => {
-    if (req.session.admin) {
-        delete req.session.admin;
-    }
-    
-    res.redirect('/admin/login');
-});
+router.get('/logout', authController.adminLogout);
  
 export default router 

@@ -95,19 +95,5 @@ router.get('/contact',userAuth,homeController.loadcontact)
 router.post('/product/add-review',userAuth,productController.addProductReview);
 router.get('/cart/checkout/failure',userAuth, orderController.getFailurePage);
 router.post('/order/retry-payment/:orderId', userAuth ,orderController.retryOrderPayment);
-router.get('/logout', (req, res, next) => {
-    if (req.session.user) {
-        delete req.session.user;
-    }
-    if (req.session.passport && req.session.passport.user) {
-        delete req.session.passport.user;
-    }
-    req.session.save((err) => {
-        if (err) {
-            console.error("Logout Save Error:", err);
-            return next(err);
-        }
-        res.redirect('/login');
-    });
-});
+router.get('/logout', userController.userLogout);
 export default router

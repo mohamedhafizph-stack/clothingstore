@@ -1,13 +1,9 @@
- const adminAuth = (req,res,next)=>{
-    if(req.session.admin){
-        next()
-    }else{
-        res.redirect('/admin/login')
-    } 
+export const adminAuth = (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+
+    if (req.session.admin) {
+        return next();
+    }
+    res.redirect('/admin/login');
 };
-
- 
-
-
-
 export default adminAuth
