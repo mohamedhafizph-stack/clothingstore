@@ -67,8 +67,12 @@ export const productService = {
   async getProductDetails(productId, userId) {
     if (!mongoose.Types.ObjectId.isValid(productId)) return null;
 
-    const product = await Product.findById(productId).populate('category');
-    if (!product) return null;
+const product = await Product.findOne({ 
+    _id: productId, 
+    status: "Active"  
+}).populate('category');
+
+if (!product) return null;
 
     const [categories, relatedProducts, user] = await Promise.all([
       Category.find({ status: "active" }),

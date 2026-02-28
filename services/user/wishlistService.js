@@ -10,8 +10,10 @@ export const getWishlistData = async (userId) => {
 }
 
 export const addTowishlistLogic = async (userId, { productId }) => {
-    const product = await Product.findById(productId);
-    if (!product) throw new Error("Product not found");
+const product = await Product.findOne({ 
+    _id: productId, 
+    status: "Active" 
+});    if (!product) throw new Error("Product not found");
 
     let wishlist = await Wishlist.findOne({ user: userId });
     if (!wishlist) {

@@ -7,8 +7,10 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
     const requestedQty = parseInt(quantity);
     const MAX_LIMIT = 4; 
     
-    const product = await Product.findById(productId);
-    if (!product) throw new Error("Product not found");
+const product = await Product.findOne({ 
+    _id: productId, 
+    status: "Active" 
+});    if (!product) throw new Error("Product not found");
 
     const effectivePrice = (product.salePrice && product.salePrice < product.price) 
         ? product.salePrice 

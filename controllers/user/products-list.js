@@ -40,7 +40,9 @@ const loadProductDetails = async (req, res) => {
     const data = await productService.getProductDetails(id, userId);
 
     if (!data) {
-      return res.status(404).render('error/404');
+      return res.status(404).render('error/404',{ 
+                message: "The product you are looking for has been moved or blocked by the admin." 
+            });
     }
 
     res.render('user/products-details', {
