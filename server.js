@@ -10,7 +10,8 @@ import { dirname } from "path";
 
 import connectDB from "./db/connectDB.js";
 import "./config/passport.js";
-
+import { globalLimiter } from "./middlewares/rateLimiter.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 import adminRoutes from "./routes/admin.js";
 import userRoutes from "./routes/user/user.js";
 import authRoutes from "./routes/auth.js";
@@ -23,7 +24,7 @@ const app = express();
 connectDB();
 
 app.set("view engine", "ejs");
-
+app.use(globalLimiter);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
@@ -61,7 +62,7 @@ app.use("/", userRoutes);
 app.get("/o", (req, res) => {
   res.send("Wearify server running 🚀");
 });
-
+app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

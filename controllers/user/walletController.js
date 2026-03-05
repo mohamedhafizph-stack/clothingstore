@@ -59,7 +59,7 @@ export const createWalletOrder = async (req, res) => {
 export const verifyWalletPayment = async (req, res) => {
     try {
         const { response, amount } = req.body;
-        const userId = req.user ? req.user._id : req.session.user;
+        const userId = req.user ? req.user._id : req.session.user?.id;
 
         const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
         hmac.update(response.razorpay_order_id + "|" + response.razorpay_payment_id);

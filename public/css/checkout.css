@@ -529,3 +529,13 @@ textarea { background: var(--card-dark); border: 1px solid var(--border-grey); b
         font-size: 0.9rem;
     }
 }
+.payment-card.insufficient-funds {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f9f9f9;
+    border: 1px dashed #ccc;
+}
+
+.payment-card input[disabled] {
+    cursor: not-allowed;
+}

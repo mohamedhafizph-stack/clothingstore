@@ -711,15 +711,25 @@ export const loadAdressPage = async(req,res)=>{
 
 
   const userId = currentUser._id || currentUser.id
+   let query={}
+  
+  const totalAdress = await Address.countDocuments({userId:userId})
+  console.log(totalAdress)
+ const page  = parseInt(req.query.page)||1
+  const limit = 2
+  const skip = (page-1)* limit
+  const totalPages = Math.ceil(totalAdress/limit)
+  console.log(totalPages)
 
 
   const user = await User.findById(userId)
 
+  const addresses = await Address.find({userId}).skip(skip).limit(limit)
+ 
 
-  const addresses = await Address.find({userId})
+   
 
-
-  res.render('user/myAdress',{user,addresses})
+  res.render('user/myAdress',{user,addresses,totalAdress,currentPage:page,totalPages,skip})
 }
 
 export const loadAddAddressPage = async(req,res)=>{

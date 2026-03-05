@@ -83,13 +83,21 @@
             </div>
         </label>
 
-        <label class="payment-card">
-            <input type="radio" name="paymentMethod" value="Wallet">
-            <div class="payment-content">
-                <i data-lucide="wallet"></i>
-                <span>Wallet Balance</span>
-                        </div>
-        </label>
+      <label class="payment-card <%= (user.wallet < totalPrice) ? 'insufficient-funds' : '' %>">
+    <input type="radio" name="paymentMethod" value="Wallet" <%= (user.wallet < totalPrice) ? 'disabled' : '' %>>
+    <div class="payment-content">
+        <i data-lucide="wallet"></i>
+        <div class="payment-text-wrapper">
+            <span>Wallet Balance</span>
+            <small class="wallet-amount" style="display: block; font-size: 12px; color: <%= (user.wallet >= totalPrice) ? '#16a34a' : '#ef4444' %>;">
+                Available: ₹<%= (user.wallet || 0).toFixed(2) %>
+            </small>
+        </div>
+        <% if (user.wallet < totalPrice) { %>
+            <span class="error-tag" style="font-size: 10px; color: #ef4444;">Insufficient Balance</span>
+        <% } %>
+    </div>
+</label>
     </div>
 </section>
             </div>

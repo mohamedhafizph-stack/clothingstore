@@ -67,7 +67,6 @@
                                         <tr>
                                             <td>RTN<%= item._id.toString().slice(-5).toUpperCase() %></td>
                                             <td>ORD<%= order.orderId %></td>
-                                            <td><%= order.user.name %></td>
                                             <td><%= new Date(order.updatedAt).toISOString().split('T')[0] %></td>
                                             <td><%= item.returnReason %></td>
                                            <td>
