@@ -11,7 +11,7 @@ import { dirname } from "path";
 import connectDB from "./db/connectDB.js";
 import "./config/passport.js";
 import { globalLimiter } from "./middlewares/rateLimiter.js";
-import { errorHandler } from "./middlewares/errorHandler.js";
+import { errorHandler } from "./middlewares/errorhandler.js";
 import adminRoutes from "./routes/admin.js";
 import userRoutes from "./routes/user/user.js";
 import authRoutes from "./routes/auth.js";
