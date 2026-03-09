@@ -77,11 +77,15 @@
 
         <aside class="order-summary">
     <h2>Order Summary</h2>
-    
+    <div class="summary-row">
+        <span>Total Items</span>
+        <span class="qty-badge"><%= cart.totalProducts %> Units</span>
+    </div>
     <div class="summary-row">
         <span>Subtotal</span>
         <span>₹<%= cart.originalSubtotal %></span>
     </div>
+    
 
     <% if (cart.totalSavings > 0) { %>
         <div class="summary-row savings">

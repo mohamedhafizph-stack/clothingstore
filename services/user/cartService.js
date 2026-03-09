@@ -59,11 +59,13 @@ export const getCartData = async (userId) => {
     const cart = await Cart.findOne({ user: userId }).populate('items.product');
     
     if (!cart || !cart.items.length) {
-        return { items: [], totalPrice: 0, totalSavings: 0, originalSubtotal: 0 };
+        return { items: [], totalPrice: 0, totalSavings: 0, originalSubtotal: 0, totalProducts: 0 };
     }
 
     let actualTotal = 0;     
     let originalSubtotal = 0; 
+    
+    let totalProducts = cart.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 
     cart.items.forEach(item => {
         const qty = Number(item.quantity) || 0;
@@ -79,6 +81,7 @@ export const getCartData = async (userId) => {
     cartObj.totalPrice = actualTotal;        
     cartObj.originalSubtotal = originalSubtotal; 
     cartObj.totalSavings = originalSubtotal - actualTotal; 
+    cartObj.totalProducts = totalProducts;
 
     return cartObj;
 };
