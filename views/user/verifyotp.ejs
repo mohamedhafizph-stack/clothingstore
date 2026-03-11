@@ -28,9 +28,14 @@
             </form>
 
             <div class="otp-footer">
-               <a href="/resend-otp"><p class="resend-text">Resend OTP (<span id="timer">60</span>s)</p></a> 
-                <p class="security-note">For your security, this OTP is valid for 5 minutes.</p>
-            </div>
+    <p class="resend-text">
+        Didn't receive code? 
+        <a href="/resend-otp" id="resend-link" class="disabled-link">
+            Resend OTP (<span id="timer">01:00</span>)
+        </a>
+    </p>
+    <p class="security-note">For your security, this OTP is valid for 5 minutes.</p>
+</div>
         </div>
     </main>
 
@@ -59,25 +64,25 @@
   });
 </script>
 <% } %>
-
 <script>
-  let time = 60; // seconds
-
+  let time = 60; // 60 seconds
   const timerEl = document.getElementById("timer");
+  const resendLink = document.getElementById("resend-link");
 
   const interval = setInterval(() => {
     let minutes = Math.floor(time / 60);
     let seconds = time % 60;
 
-    timerEl.textContent =
-      `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
-    time--;
-
-    if (time < 0) {
+    if (time <= 0) {
       clearInterval(interval);
-      timerEl.textContent = "Expired";
+      timerEl.parentElement.textContent = "Resend OTP"; // Clean up text
+      resendLink.classList.remove("disabled-link");
+      resendLink.classList.add("active-link");
     }
+    
+    time--;
   }, 1000);
 </script>
 

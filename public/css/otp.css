@@ -14,7 +14,33 @@ body.otp-page {
     display: flex;
     flex-direction: column;
 }
+.disabled-link {
+    color: #8b949e !important;
+    pointer-events: none; /* Prevents clicking */
+    text-decoration: none;
+    cursor: default;
+}
+/* While the timer is running */
+.disabled-link {
+    color: #8b949e !important; /* Grey color */
+    pointer-events: none;      /* Makes it unclickable */
+    text-decoration: none;
+    cursor: default;
+}
 
+/* When the timer finishes */
+.active-link {
+    color: #2f81f7 !important; /* Blue color */
+    pointer-events: auto;
+    cursor: pointer;
+    font-weight: bold;
+}
+.active-link {
+    color: #2f81f7 !important;
+    pointer-events: auto;
+    cursor: pointer;
+    font-weight: bold;
+}
 /* Header & Logo */
 .otp-header {
     padding: 20px 5%;
