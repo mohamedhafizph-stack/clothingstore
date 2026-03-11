@@ -6,9 +6,8 @@
     <title>Wearify - Shop</title>
     <link rel="stylesheet" href="/css/shirt.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    
     <style>
         /* CSS for the Offer UI */
         .price-wrapper {
@@ -33,77 +32,57 @@
             font-weight: 600 !important;
         }
 
-        /* Wishlist Button Styling */
-        .image-wrapper {
-            position: relative;
-            overflow: hidden;
-        }
-        
+        /* Wishlist & Layout */
+        .image-wrapper { position: relative; overflow: hidden; }
         .floating-discount {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #ef4444;
-            color: white;
-            padding: 4px 8px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            border-radius: 3px;
-            z-index: 2;
+            position: absolute; top: 10px; left: 10px;
+            background: #ef4444; color: white; padding: 4px 8px;
+            font-size: 0.8rem; font-weight: bold; border-radius: 3px; z-index: 2;
         }
-
         .wishlist-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 5; transition: all 0.3s ease;
+        }
+        .wishlist-btn:hover { background: rgba(255, 255, 255, 0.9); transform: scale(1.1); }
+        .product-info { background: #111 !important; padding: 15px !important; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255, 255, 255, 0.2); }
+        .header-icons { display: flex; align-items: center; gap: 15px; }
+
+        /* --- SEARCH & FILTER STYLING --- */
+        .search-wrapper { position: relative; max-width: 400px; }
+        .search-wrapper input {
+            width: 100%; padding: 10px 40px 10px 15px;
+            background-color: #161b22; border: 1px solid #30363d;
+            border-radius: 6px; color: #e6edf3;
+        }
+        .btn-clear-x {
+            position: absolute; right: 10px; top: 50%;
+            transform: translateY(-50%); background: none;
+            border: none; color: #8b949e; font-size: 20px;
             cursor: pointer;
-            z-index: 5;
-            transition: all 0.3s ease;
-            padding: 0;
         }
+        .btn-clear-x:hover { color: #f85149; }
 
-        .wishlist-btn:hover {
-            background: rgba(255, 255, 255, 0.9);
-            transform: scale(1.1);
+        .filter-header {
+            display: flex !important; justify-content: space-between !important;
+            align-items: center !important; border-bottom: 1px solid #30363d;
+            padding-bottom: 15px; margin-bottom: 20px;
         }
-
-        .wishlist-btn:hover .heart-icon {
-            filter: none;
+        .btn-clear-filters {
+            background-color: transparent !important;
+            border: 1px solid #f85149 !important;
+            color: #f85149 !important;
+            padding: 5px 12px; font-size: 12px; font-weight: bold;
+            border-radius: 6px; cursor: pointer; transition: all 0.2s;
         }
-
-        .heart-icon {
-            font-size: 1.2rem;
-            line-height: 1;
+        .btn-clear-filters:hover {
+            background-color: #f85149 !important;
+            color: #fff !important;
         }
-
-        .product-info {
-            background: #111 !important;
-            padding: 15px !important;
-        }
-        /* Fix for Profile Picture Visibility */
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    display: block; /* Ensures it's not hidden by global img styles */
-}
-
-.header-icons {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
     </style>
 </head>
 
@@ -124,42 +103,41 @@
         <button class="cat-toggle-btn" onclick="toggleCategories()">Categories</button>
         <button class="filter-toggle-btn" onclick="toggleFilter()">Filters</button>
 
-        <div class="search-bar">
-            <input type="text" id="shopSearch" placeholder="Search products..." value="<%= selectedFilters.search || '' %>">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" 
+                   placeholder="Search in <%= category.name %>..." 
+                   value="<%= selectedFilters.search || '' %>"
+                   oninput="handleSearchDebounce(this)">
+            <% if (selectedFilters.search) { %>
+                <button type="button" onclick="clearSearch()" class="btn-clear-x">&times;</button>
+            <% } %>
         </div>
 
-         <div class="header-icons">
-        <button class="icon-btn hamburger" onclick="toggleMenu()">
-            <i class="ph ph-list"></i>
-        </button>
-
-        <a href="/home/cart">
-            <button class="icon-btn">
-                <i class="ph ph-shopping-bag"></i>
-            </button>
-        </a>
-        <a href="/wishlist">
-            <button class="icon-btn">
-                <i class="ph ph-heart"></i>
-            </button>
-        </a>
-         <a href="/profile">
-            <img
-                src="<%= user?.profilePic ? user.profilePic : `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Guest'}` %>"
-                class="avatar"
-                alt="Profile"
-            >
-        </a>
-    </div></header>
+        <div class="header-icons">
+            <button class="icon-btn hamburger" onclick="toggleMenu()"><i class="ph ph-list"></i></button>
+            <a href="/home/cart"><button class="icon-btn"><i class="ph ph-shopping-bag"></i></button></a>
+            <a href="/wishlist"><button class="icon-btn"><i class="ph ph-heart"></i></button></a>
+            <a href="/profile">
+                <img src="<%= user?.profilePic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Guest'}` %>" class="avatar" alt="Profile">
+            </a>
+        </div>
+    </div>
+</header>
 
 <div class="shop-container">
     <aside class="sidebar">
+        <div class="filter-header">
+            <h3 style="margin: 0; color: #f0f6fc;">Filters</h3>
+            <button type="button" onclick="clearAllFilters()" class="btn-clear-filters">Clear All</button>
+        </div>
+
         <form id="filterForm">
             <div class="filter-section">
                 <h3>Max Price</h3>
-                <input type="range" name="maxPrice" min="0" max="2000" class="slider" value="<%= selectedFilters.maxPrice || 2000 %>">
+                <input type="range" name="maxPrice" id="priceRange" min="0" max="2000" class="slider" 
+                       value="<%= selectedFilters.maxPrice || 2000 %>" oninput="updatePriceLabel(this.value)">
                 <div class="price-labels">
-                    <span>₹0</span> - <span>₹<%= selectedFilters.maxPrice || 2000 %></span>
+                    <span>₹0</span> - <span id="priceVal">₹<%= selectedFilters.maxPrice || 2000 %></span>
                 </div>
             </div>
 
@@ -203,28 +181,20 @@
                 <% products.forEach(p => { %>
                     <div class="product-card">
                         <div class="image-wrapper">
-                            <% if (p.offerPercentage && p.offerPercentage > 0) { %>
+                            <% if (p.offerPercentage > 0) { %>
                                 <div class="floating-discount"><%= p.offerPercentage %>% OFF</div>
                             <% } %>
-                            
-                            <button class="wishlist-btn" title="Add to Wishlist" onclick="addToWishlist(event, '<%= p._id %>')">
-                                <span class="heart-icon">❤️</span>
-                            </button>
-
-                            <a href="/shop/details/<%= p._id %>">
-                                <img src="<%= p.images[0] %>" alt="<%= p.name %>">
-                            </a>
+                            <button class="wishlist-btn" onclick="addToWishlist(event, '<%= p._id %>')">❤️</button>
+                            <a href="/shop/details/<%= p._id %>"><img src="<%= p.images[0] %>" alt="<%= p.name %>"></a>
                         </div>
-                        
                         <div class="product-info">
                             <h4 style="color: white !important;"><%= p.name %></h4>
                             <div class="price-wrapper">
-                                <% if (p.offerPercentage && p.offerPercentage > 0) { %>
+                                <% if (p.offerPercentage > 0) { %>
                                     <span class="sale-price">₹<%= p.salePrice || p.price %></span>
                                     <span class="original-price">₹<%= p.regularPrice %></span>
-                                    <span class="discount-text"><%= p.offerPercentage %>% OFF</span>
                                 <% } else { %>
-                                    <span class="sale-price">$<%= p.price %></span>
+                                    <span class="sale-price">₹<%= p.price %></span>
                                 <% } %>
                             </div>
                         </div>
@@ -236,97 +206,91 @@
         </div>
 
         <div class="pagination">
-            <% for(let i=1;i<=totalPages;i++){ %>
-                <span class="page-num <%= currentPage===i?'active':'' %>"
-                      onclick="changePage(<%= i %>)"><%= i %></span>
+            <% for(let i=1; i<=totalPages; i++){ %>
+                <span class="page-num <%= currentPage===i?'active':'' %>" onclick="changePage(<%= i %>)"><%= i %></span>
             <% } %>
         </div>
     </main>
 </div>
-<%- include('../partials/footer') %>
 
 <script>
-const categorySlug = "<%= category.name %>";
-const filterForm = document.getElementById('filterForm');
-const searchInput = document.getElementById('shopSearch');
+    const categorySlug = "<%= category.name %>";
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('searchInput');
 
-function debounce(fn, delay){
-    let t;
-    return (...args)=>{
-        clearTimeout(t);
-        t=setTimeout(()=>fn(...args),delay);
-    };
-}
-
-// Wishlist Logic
-async function addToWishlist(event, productId) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    try {
-        const response = await fetch(`/shop/details/${productId}/wishlist`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Wishlist Updated',
-                text: data.message,
-                timer: 1500,
-                showConfirmButton: false,
-                background: '#161b22',
-                color: '#fff'
-            });
-        } else {
-            Swal.fire({
-                icon: 'info',
-                title: 'Note',
-                text: data.message,
-                background: '#161b22',
-                color: '#fff'
-            });
-        }
-    } catch (err) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Unauthorized',
-            text: 'Please login to use the wishlist.',
-            background: '#161b22',
-            color: '#fff'
-        });
+    // 1. Price Label Real-time Update
+    function updatePriceLabel(val) {
+        document.getElementById('priceVal').innerText = '₹' + val;
     }
-}
 
-function applyFilters(page=1){
-    const params = new URLSearchParams();
-    const sizes=[...document.querySelectorAll('input[name=size]:checked')].map(i=>i.value);
-    if(sizes.length) params.set('sizes',sizes.join(','));
-    const sort=document.querySelector('input[name=sort]:checked');
-    if(sort) params.set('sort',sort.value);
-    params.set('maxPrice',document.querySelector('.slider').value);
-    if(searchInput.value) params.set('search',searchInput.value);
-    params.set('page',page);
-    location.href=`/shop/${categorySlug}?${params}`;
-}
+    // 2. Debounce Logic for Search
+    let debounceTimer;
+    function handleSearchDebounce() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => applyFilters(1), 600);
+    }
 
-searchInput.addEventListener('input', debounce(()=>applyFilters(1),500));
-filterForm.addEventListener('change',()=>applyFilters(1));
+    // 3. Master Filter Function
+    function applyFilters(page = 1) {
+        const params = new URLSearchParams();
+        
+        // Sizes
+        const sizes = [...document.querySelectorAll('input[name="size"]:checked')].map(i => i.value);
+        if (sizes.length) params.set('sizes', sizes.join(','));
+        
+        // Sort
+        const sort = document.querySelector('input[name="sort"]:checked');
+        if (sort) params.set('sort', sort.value);
+        
+        // Price
+        params.set('maxPrice', document.getElementById('priceRange').value);
+        
+        // Search
+        if (searchInput.value.trim()) params.set('search', searchInput.value.trim());
+        
+        params.set('page', page);
+        location.href = `/shop/${categorySlug}?${params.toString()}`;
+    }
 
-function changePage(p){ applyFilters(p); }
+    // 4. Clear Functions
+    function clearSearch() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('search');
+        window.location.href = url.toString();
+    }
 
-function toggleCategories() {
-    document.getElementById('categoriesWrapper').classList.toggle('show');
-}
+    function clearAllFilters() {
+        window.location.href = window.location.pathname;
+    }
 
-function toggleFilter() {
-    document.querySelector('.sidebar').classList.toggle('open');
-}
+    // 5. Event Listeners
+    filterForm.addEventListener('change', () => applyFilters(1));
+    function changePage(p) { applyFilters(p); }
+
+    function toggleCategories() { document.getElementById('categoriesWrapper').classList.toggle('show'); }
+    function toggleFilter() { document.querySelector('.sidebar').classList.toggle('open'); }
+
+    // 6. Wishlist logic
+    async function addToWishlist(event, productId) {
+        event.preventDefault(); event.stopPropagation();
+        try {
+            const response = await fetch(`/shop/details/${productId}/wishlist`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId })
+            });
+            const data = await response.json();
+            Swal.fire({
+                icon: data.success ? 'success' : 'info',
+                title: data.success ? 'Updated' : 'Note',
+                text: data.message,
+                timer: 1500, showConfirmButton: false,
+                background: '#161b22', color: '#fff'
+            });
+        } catch (err) {
+            Swal.fire({ icon: 'error', title: 'Unauthorized', text: 'Please login.', background: '#161b22', color: '#fff' });
+        }
+    }
 </script>
-
 </body>
 </html>
