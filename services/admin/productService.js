@@ -59,17 +59,23 @@ export const updateProductDetails = async (id, updateData, files) => {
     if (!categoryDoc) throw new Error("Selected category not found.");
 
     let finalImages = [];
-    const existing = Array.isArray(updateData.existingImages) 
-        ? updateData.existingImages 
-        : [updateData.existingImages];
-    let fileIdx = 0;
-    for (let i = 0; i < 4; i++) {
-        if (files && files[i]) {
-            finalImages.push(files[i].path);
-        } else if (existing[i]) {
-            finalImages.push(existing[i]);
-        }
+
+    if (updateData.existingImages) {
+        const existing = Array.isArray(updateData.existingImages) 
+            ? updateData.existingImages 
+            : [updateData.existingImages];
+        
+        finalImages = existing.filter(img => img && img.trim() !== "");
     }
+
+    if (files && files.length > 0) {
+        const newFiles = Array.isArray(files) ? files : Object.values(files).flat();
+        const newImagePaths = newFiles.map(file => file.path);
+        
+        finalImages = [...finalImages, ...newImagePaths];
+    }
+
+    finalImages = finalImages.slice(0, 4);
 
     const regPrice = Number(price);
     const disc = Number(discount) || 0;
@@ -83,9 +89,8 @@ export const updateProductDetails = async (id, updateData, files) => {
         salePrice: Math.round(sPrice),
         discount: disc,
         description: description,
-        images: finalImages.filter(img => img !== "") 
+        images: finalImages 
     };
-
 
     const updatedProduct = await Product.findByIdAndUpdate(
         id, 
@@ -93,7 +98,9 @@ export const updateProductDetails = async (id, updateData, files) => {
         { new: true, runValidators: true }
     );
 
-    if (updatedProduct.variants) {
+    if (!updatedProduct) throw new Error("Product not found.");
+
+    if (updatedProduct.variants && updatedProduct.variants.length > 0) {
         updatedProduct.totalStock = updatedProduct.variants.reduce((acc, v) => acc + v.stock, 0);
         await updatedProduct.save();
     }
