@@ -403,7 +403,7 @@ const userId = currentUser._id || currentUser.id;
 };
 
 export const loadforgetPassPage = async(req,res)=>{
-    res.render('user/forgotpassword')
+    res.render('user/forgotpassword',{error:null})
 }
 
 export const sendOtpforForgot = async (req, res) => {
@@ -420,7 +420,7 @@ export const sendOtpforForgot = async (req, res) => {
     if (!user) {
       console.log('step4 - invalid email');
       return res.render('user/forgotpassword', {
-        message: "Invalid email"
+        error: "Invalid email"
       });
     }
 
@@ -441,7 +441,7 @@ export const sendOtpforForgot = async (req, res) => {
   } catch (error) {
     console.error('Forgot OTP Error:', error);
     return res.render('user/forgotpassword', {
-      message: "Something went wrong"
+      error: "Something went wrong"
     });
   }
 };
