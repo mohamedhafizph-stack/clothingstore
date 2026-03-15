@@ -526,26 +526,24 @@ export const uploadProfileImage = async (req, res) => {
   try {
     const userId = req.user?._id || req.session.user?._id || req.session.user?.id;
 
-    if (!req.file) {
-      return res.redirect('/profile');
-    }
+    if (!req.file) return res.redirect('/profile');
 
-    
     const imagePath = req.file.path; 
 
-    
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { profilePic: imagePath },
       { new: true }
-    );
+    ).lean(); 
 
-    
     if (req.session.user) {
-      req.session.user = updatedUser;
+      req.session.user.profilePic = updatedUser.profilePic;
     }
 
-    res.redirect('/profile');
+    req.session.save((err) => {
+      if (err) console.error("Session save error:", err);
+      res.redirect('/profile');
+    });
 
   } catch (error) {
     console.log(error);
