@@ -7,51 +7,66 @@ export const addToCartLogic = async (userId, { productId, size, quantity }) => {
     const requestedQty = parseInt(quantity);
     const MAX_LIMIT = 4; 
     
-const product = await Product.findOne({ 
-    _id: productId, 
-    status: "Active" 
-});    if (!product) throw new Error("Product not found");
+    const product = await Product.findOne({ 
+        _id: productId, 
+        status: "Active" 
+    });
+    
+    if (!product) throw new Error("Product not found");
 
-    const effectivePrice = (product.salePrice && product.salePrice < product.price) 
-        ? product.salePrice 
-        : (product.price || product.price);
+    const sizeVariant = product.variants.find(v => v.size === size);
+    if (!sizeVariant) throw new Error(`Size ${size} is not available.`);
 
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
         cart = new Cart({ user: userId, items: [] });
     }
 
-    const currentProductTotal = cart.items
-        .filter(item => item.product.toString() === productId)
-        .reduce((total, item) => total + item.quantity, 0);
-
-    if (currentProductTotal + requestedQty > MAX_LIMIT) {
-        const allowedMore = MAX_LIMIT - currentProductTotal;
-        throw new Error(allowedMore > 0 
-            ? `Limit: 4 per product. You can only add ${allowedMore} more.` 
-            : `Maximum limit of 4 reached for this product.`);
-    }
-    const realPrice = product.price
     const existingItem = cart.items.find(
         item => item.product.toString() === productId && item.size === size
     );
 
+    const currentQtyInCart = existingItem ? existingItem.quantity : 0;
+    const newTotalQty = currentQtyInCart + requestedQty;
+
+    if (newTotalQty > sizeVariant.stock) {
+        if (sizeVariant.stock === 0) throw new Error("This size is out of stock.");
+        if (sizeVariant.stock === 1 && currentQtyInCart === 1) {
+            throw new Error("You already have the last remaining unit in your cart.");
+        }
+        throw new Error(`Only ${sizeVariant.stock} units available. You already have ${currentQtyInCart} in cart.`);
+    }
+
+    const currentProductTotalAcrossSizes = cart.items
+        .filter(item => item.product.toString() === productId)
+        .reduce((total, item) => total + item.quantity, 0);
+
+    if (currentProductTotalAcrossSizes + requestedQty > MAX_LIMIT) {
+        const allowedMore = MAX_LIMIT - currentProductTotalAcrossSizes;
+        throw new Error(allowedMore > 0 
+            ? `Limit: 4 per product. You can only add ${allowedMore} more.` 
+            : `Maximum limit of 4 reached for this product.`);
+    }
+
+    const effectivePrice = (product.salePrice && product.salePrice < product.price) 
+        ? product.salePrice 
+        : product.price;
+
     if (existingItem) {
-        existingItem.quantity += requestedQty;
+        existingItem.quantity = newTotalQty;
         existingItem.price = effectivePrice; 
-        existingItem.realPrice=product.price
+        existingItem.realPrice = product.price;
     } else {
         cart.items.push({
             product: productId,
             size,
             quantity: requestedQty,
             price: effectivePrice,
-            realPrice : realPrice
+            realPrice: product.price
         });
     }
 
     cart.totalPrice = cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-
     return await cart.save();
 };
 
