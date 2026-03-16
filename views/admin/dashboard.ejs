@@ -5,11 +5,9 @@
     <title>Wearify Admin | Dashboard</title>
     <link rel="stylesheet" href="/css/adminDashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Your EXACT CSS Variables and Styles */
         :root {
             --bg-color: #0d0d12;
             --sidebar-bg: #16161d;
@@ -37,8 +35,38 @@
         .header {
             display: flex;
             justify-content: space-between; 
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 30px;
+        }
+
+        /* Filter Styles */
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-container select, .filter-container input {
+            background: var(--bg-color);
+            color: white;
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        #applyFilter {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
         }
 
         .header-profile {
@@ -60,17 +88,7 @@
             cursor: pointer;
         }
 
-        .profile-icon-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .header-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
+        .profile-icon-container img { width: 100%; height: 100%; object-fit: cover; }
 
         .stats-grid {
             display: grid;
@@ -96,7 +114,6 @@
             margin-bottom: 30px;
         }
 
-        /* Chart container fix to prevent infinite growing */
         .chart-container {
             position: relative;
             height: 250px;
@@ -131,10 +148,27 @@
                 <p style="color: var(--text-secondary); margin: 0;">Overview</p>
             </div>
             
-            <div class="header-profile">
-                <span class="header-label">Dashboard</span>
-                <div class="profile-icon-container">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Profile">
+            <div class="filter-container">
+                <select id="dateRange">
+                    <option value="all">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="weekly" selected>This Week</option>
+                    <option value="monthly">This Month</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+
+                <div id="customInputs" style="display: none; align-items: center; gap: 8px;">
+                    <input type="date" id="startDate">
+                    <span style="color: var(--text-secondary)">to</span>
+                    <input type="date" id="endDate">
+                </div>
+
+                <button id="applyFilter">Apply</button>
+
+                <div class="header-profile">
+                    <div class="profile-icon-container">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Profile">
+                    </div>
                 </div>
             </div>
         </header>
@@ -142,7 +176,8 @@
         <div class="stats-grid">
             <div class="card">
                 <h4>Sales Summary</h4>
-<div class="value">₹<%= (stats.revenue || 0).toLocaleString() %></div>            </div>
+                <div class="value">₹<%= (stats.revenue || 0).toLocaleString() %></div>
+            </div>
             <div class="card">
                 <h4>Total Orders</h4>
                 <div class="value"><%= stats.orders %></div>
@@ -165,7 +200,7 @@
                 </div>
             </div>
             <div class="card">
-                <h4>Orders Per Week</h4>
+                <h4>Orders Breakdown</h4>
                 <div class="chart-container">
                     <canvas id="ordersChart"></canvas>
                 </div>
@@ -198,56 +233,122 @@
     </div>
 
     <script>
-        // Soft-coded data from Controller
-        const dbChartData = <%- JSON.stringify(chartData) %>;
+    // 1. Data Initialization
+    const dbChartData = <%- JSON.stringify(chartData) %>;
 
-        // Sales Chart (Line)
-        const ctx1 = document.getElementById('salesChart').getContext('2d');
-        new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: dbChartData.labels,
-                datasets: [{
-                    label: 'Sales',
-                    data: dbChartData.sales,
-                    borderColor: '#6366f1',
-                    tension: 0.4,
-                    fill: false
-                }]
-            },
-            options: { 
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }, 
-                scales: { 
-                    y: { grid: { color: '#2e2e3a' }, ticks: { color: '#a0a0ab' } }, 
-                    x: { grid: { display: false }, ticks: { color: '#a0a0ab' } } 
-                } 
+    // 2. Charts Logic
+    const ctx1 = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: dbChartData.labels,
+            datasets: [{
+                label: 'Sales',
+                data: dbChartData.sales,
+                borderColor: '#6366f1',
+                tension: 0.4,
+                fill: false
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: '#2e2e3a' }, ticks: { color: '#a0a0ab' } },
+                x: { grid: { display: false }, ticks: { color: '#a0a0ab' } }
             }
-        });
+        }
+    });
 
-        // Orders Chart (Bar)
-        const ctx2 = document.getElementById('ordersChart').getContext('2d');
-        new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: dbChartData.labels,
-                datasets: [{
-                    data: dbChartData.orders,
-                    backgroundColor: '#6366f1',
-                    borderRadius: 5
-                }]
-            },
-            options: { 
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    y: { grid: { color: '#2e2e3a' }, ticks: { color: '#a0a0ab' } }, 
-                    x: { grid: { display: false }, ticks: { color: '#a0a0ab' } } 
-                } 
+    const ctx2 = document.getElementById('ordersChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: dbChartData.labels,
+            datasets: [{
+                data: dbChartData.orders,
+                backgroundColor: '#6366f1',
+                borderRadius: 5
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: '#2e2e3a' }, ticks: { color: '#a0a0ab' } },
+                x: { grid: { display: false }, ticks: { color: '#a0a0ab' } }
             }
-        });
-    </script>
+        }
+    });
+
+    // 3. Filter Logic & Future Date Fix
+    const dateRange = document.getElementById('dateRange');
+    const customInputs = document.getElementById('customInputs');
+    const applyBtn = document.getElementById('applyFilter');
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+
+    // Disable future dates in the calendar picker UI
+    const todayStr = new Date().toISOString().split('T')[0];
+    startInput.setAttribute('max', todayStr);
+    endInput.setAttribute('max', todayStr);
+
+    dateRange.addEventListener('change', () => {
+        customInputs.style.display = dateRange.value === 'custom' ? 'flex' : 'none';
+    });
+
+    applyBtn.addEventListener('click', () => {
+        const range = dateRange.value;
+        const params = new URLSearchParams();
+        params.set('range', range);
+
+        if (range === 'custom') {
+            const startVal = startInput.value;
+            const endVal = endInput.value;
+
+            if (!startVal || !endVal) {
+                return Swal.fire({ icon: 'error', title: 'Missing Dates', text: 'Please select both start and end dates.' });
+            }
+
+            const today = new Date().setHours(0, 0, 0, 0);
+            const selectedStart = new Date(startVal).getTime();
+            const selectedEnd = new Date(endVal).getTime();
+
+            // Validation: Future Date
+            if (selectedStart > today || selectedEnd > today) {
+                return Swal.fire({ 
+                    icon: 'warning', 
+                    title: 'Invalid Date', 
+                    text: 'Future dates are not allowed.',
+                    background: '#1c1c24',
+                    color: '#fff'
+                });
+            }
+
+            // Validation: Start after End
+            if (selectedStart > selectedEnd) {
+                return Swal.fire({ icon: 'error', title: 'Invalid Range', text: 'Start date cannot be after the end date.' });
+            }
+
+            params.set('start', startVal);
+            params.set('end', endVal);
+        }
+
+        window.location.href = `/admin/dashboard?${params.toString()}`;
+    });
+
+    // 4. Set state from URL on load
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('range')) {
+        dateRange.value = urlParams.get('range');
+        if (dateRange.value === 'custom') {
+            customInputs.style.display = 'flex';
+            startInput.value = urlParams.get('start');
+            endInput.value = urlParams.get('end');
+        }
+    }
+</script>
 </body>
 </html>

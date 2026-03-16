@@ -53,36 +53,44 @@ export const toggleBlockStatus = async (userId) => {
     return user;
 };
 
-export const getDashboardData = async () => {
+export const getDashboardData = async (filterParams = {}) => {
+    const { range, start, end } = filterParams;
     const now = new Date();
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    let queryFilter = {};
 
-    const [salesStats, orderCount, recentOrders, weeklySales] = await Promise.all([
+    // 1. Build Dynamic Filter
+    if (range === 'today') {
+        queryFilter.createdAt = { $gte: new Date(new Date().setHours(0, 0, 0, 0)) };
+    } else if (range === 'weekly') {
+        queryFilter.createdAt = { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) };
+    } else if (range === 'monthly') {
+        queryFilter.createdAt = { $gte: new Date(now.getFullYear(), now.getMonth(), 1) };
+    } else if (range === 'custom' && start && end) {
+        let endDate = new Date(end);
+        // Backend Safety: Cap future dates to 'now'
+        if (endDate > now) endDate = now;
+        
+        queryFilter.createdAt = { 
+            $gte: new Date(start), 
+            $lte: new Date(endDate.setHours(23, 59, 59, 999)) 
+        };
+    }
+
+    // 2. Database Queries
+    const [salesStats, orderCount, recentOrders, chartAggregation] = await Promise.all([
         Orders.aggregate([
-            { $match: { status: "Delivered", paymentStatus: "Paid" } },
+            { $match: { ...queryFilter, status: "Delivered", paymentStatus: "Paid" } },
             { $group: { _id: null, total: { $sum: "$totalPrice" } } }
         ]),
-
-        Orders.countDocuments({ status: { $nin: ["Cancelled", "Returned"] } }),
-
-        Orders.find()
-            .sort({ createdAt: -1 })
-            .limit(5)
-            .populate('user', 'name'),
-
+        Orders.countDocuments({ ...queryFilter, status: { $nin: ["Cancelled", "Returned"] } }),
+        Orders.find(queryFilter).sort({ createdAt: -1 }).limit(5).populate('user', 'name'),
         Orders.aggregate([
-            { 
-                $match: { 
-                    createdAt: { $gte: sevenDaysAgo },
-                    status: { $nin: ["Cancelled", "Returned"] }
-                } 
-            },
+            { $match: { ...queryFilter, status: { $nin: ["Cancelled", "Returned"] } } },
             { 
                 $group: { 
                     _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
                     dailySales: { $sum: "$totalPrice" },
-                    dailyOrders: { $sum: 1 },
-                    dailyDiscounts: { $sum: { $add: ["$couponDiscount", { $subtract: ["$subtotal", "$totalPrice"] }] } }
+                    dailyOrders: { $sum: 1 }
                 }
             },
             { $sort: { "_id": 1 } }
@@ -95,19 +103,18 @@ export const getDashboardData = async () => {
         stats: {
             revenue: totalRevenue,
             orders: orderCount,
-            avgValue: orderCount > 0 ? (totalRevenue / orderCount).toFixed(2) : 0,
-            totalSales: totalRevenue 
+            avgValue: orderCount > 0 ? (totalRevenue / orderCount).toFixed(2) : 0
         },
         recentActivity: recentOrders.map(order => ({
-            id: order.orderId, 
+            id: order.orderId || order._id.toString().slice(-6),
             customer: order.user?.name || 'Guest',
             amount: order.totalPrice,
             status: order.status
         })),
         chartData: {
-            labels: weeklySales.map(d => d._id),
-            sales: weeklySales.map(d => d.dailySales),
-            orders: weeklySales.map(d => d.dailyOrders)
+            labels: chartAggregation.map(d => d._id),
+            sales: chartAggregation.map(d => d.dailySales),
+            orders: chartAggregation.map(d => d.dailyOrders)
         }
     };
 };

@@ -187,25 +187,78 @@
         </div>
     </main>
 
-    <script>
-        const filterSelect = document.getElementById('filterSelect');
-        const customDateSection = document.getElementById('customDateSection');
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        filterSelect.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                customDateSection.classList.remove('hidden');
-            } else {
-                customDateSection.classList.add('hidden');
-                this.form.submit(); // Auto-submit for non-custom filters
-            }
-        });
+<script>
+    const filterSelect = document.getElementById('filterSelect');
+    const customDateSection = document.getElementById('customDateSection');
+    const reportForm = document.querySelector('form[action="/admin/reports"]');
+    const startInput = document.querySelector('input[name="startDate"]');
+    const endInput = document.querySelector('input[name="endDate"]');
 
-        // If validation fails or page reloads with custom, ensure section is visible
-        window.addEventListener('DOMContentLoaded', () => {
-            if (filterSelect.value === 'custom') {
-                customDateSection.classList.remove('hidden');
+    // 1. Disable future dates in the calendar UI
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (startInput && endInput) {
+        startInput.setAttribute('max', todayStr);
+        endInput.setAttribute('max', todayStr);
+    }
+
+    // 2. Handle dropdown changes
+    filterSelect.addEventListener('change', function() {
+        if (this.value === 'custom') {
+            customDateSection.classList.remove('hidden');
+        } else {
+            customDateSection.classList.add('hidden');
+            this.form.submit(); // Auto-submit for standard filters (Today, Weekly, etc.)
+        }
+    });
+
+    // 3. Form Validation on Submit
+    reportForm.addEventListener('submit', function(e) {
+        if (filterSelect.value === 'custom') {
+            const startVal = startInput.value;
+            const endVal = endInput.value;
+
+            // Check for empty dates
+            if (!startVal || !endVal) {
+                e.preventDefault();
+                return Swal.fire({ icon: 'error', title: 'Missing Dates', text: 'Please select both start and end dates.' });
             }
-        });
-    </script>
+
+            const today = new Date().setHours(0, 0, 0, 0);
+            const selectedStart = new Date(startVal).getTime();
+            const selectedEnd = new Date(endVal).getTime();
+
+            // Check for Future Dates
+            if (selectedStart > today || selectedEnd > today) {
+                e.preventDefault();
+                return Swal.fire({ 
+                    icon: 'warning', 
+                    title: 'Invalid Date', 
+                    text: 'Future dates are not allowed for sales reports.',
+                    background: '#111111',
+                    color: '#fff'
+                });
+            }
+
+            // Check if Start is after End
+            if (selectedStart > selectedEnd) {
+                e.preventDefault();
+                return Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Invalid Range', 
+                    text: 'Start date cannot be later than the end date.' 
+                });
+            }
+        }
+    });
+
+    // 4. Ensure section is visible if 'custom' is selected on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        if (filterSelect.value === 'custom') {
+            customDateSection.classList.remove('hidden');
+        }
+    });
+</script>
 </body>
 </html>

@@ -8,7 +8,8 @@ export const loadLoginPage = (req, res) => {
 
 export const loadDashboard = async (req, res) => {
     try {
-        const data = await adminService.getDashboardData();
+        // Pass req.query to the service to apply the date filters
+        const data = await adminService.getDashboardData(req.query);
 
         res.render('admin/dashboard', {
             stats: data.stats,
@@ -17,7 +18,13 @@ export const loadDashboard = async (req, res) => {
         });
     } catch (error) {
         console.error("Dashboard Error:", error);
-        res.status(500).send("Error loading dashboard data");
+        // Better UX: render the page with empty data instead of a raw 500 error
+        res.status(500).render('admin/dashboard', {
+            stats: { revenue: 0, orders: 0, avgValue: 0 },
+            activity: [],
+            chartData: { labels: [], sales: [], orders: [] },
+            error: "Failed to load dashboard data"
+        });
     }
 };
 export const logingIn = async (req, res) => {
