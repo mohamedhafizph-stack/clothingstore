@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
   wallet: { type: Number, default: 0 },
   walletHistory: [{
     amount: { type: Number, required: true },
-    type: { type: String, enum: ['credit', 'debit'], required: true },
+    type: { type: String, enum: ['credit', 'debit'], required: true,lowercase: true },
     reason: { type: String, required: true },
     date: { type: Date, default: Date.now }
 }],
