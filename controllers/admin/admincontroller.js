@@ -1,6 +1,7 @@
 import * as adminService from '../../services/admin/adminService.js';
 import User from '../../model/User.js';
 import Orders from '../../model/Orders.js';
+import logger from '../../utils/logger.js';
 export const loadLoginPage = (req, res) => {
     res.render('admin/login', { error: null });
 };
@@ -17,7 +18,11 @@ export const loadDashboard = async (req, res) => {
             chartData: data.chartData
         });
     } catch (error) {
-        console.error("Dashboard Error:", error);
+       logger.error("Dashboard Error", { 
+    message: error.message, 
+    stack: error.stack,
+    context: "Admin Dashboard" 
+});
         // Better UX: render the page with empty data instead of a raw 500 error
         res.status(500).render('admin/dashboard', {
             stats: { revenue: 0, orders: 0, avgValue: 0 },
@@ -39,7 +44,12 @@ export const logingIn = async (req, res) => {
         req.session.admin = admin._id;
         res.redirect('/admin/dashboard');
     } catch (error) {
-        console.error("Login Error:", error);
+       logger.error("Login Error", { 
+    message: error.message, 
+    stack: error.stack,
+    ip: req.ip, 
+    email: req.body.email 
+});
         res.render('admin/login', { error: 'An internal server error occurred.' });
     }
 };
@@ -57,7 +67,12 @@ export const loadUserList = async (req, res) => {
             search,count:null
         });
     } catch (error) {
-        console.error("User List Error:", error);
+        logger.error("User List Error", { 
+    message: error.message, 
+    stack: error.stack,
+    adminId: req.user?._id, // Tracks which admin tried to view the list
+    query: req.query       // Tracks if specific filters or pagination caused the crash
+});
         res.status(500).send('Error loading users');
     }
 };
@@ -77,7 +92,13 @@ export const toggleUserStatus = async (req, res) => {
 
         res.redirect('/admin/users');
     } catch (error) {
-        console.error("Toggle Status Error:", error);
+       logger.error("Toggle Status Error", { 
+    message: error.message, 
+    stack: error.stack,
+    targetId: req.params.id, // The ID of the item being toggled
+    adminId: req.user?._id,   // Who tried to change the status
+    action: "Toggle Status"
+});
         res.status(500).send('Error updating status');
     }
 };

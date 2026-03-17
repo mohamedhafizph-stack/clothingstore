@@ -57,7 +57,13 @@ export const loadOfferPage = async (req, res) => {
             status:result.status
         });
     } catch (error) {
-        console.error("Error loading Offer Page:", error);
+        logger.error("Offer Page Loading Error", { 
+    message: error.message, 
+    stack: error.stack,
+    couponCode: req.query?.code, // If they were trying to apply a specific code
+    userId: req.user?._id,        // To see if it's a specific user's account bug
+    component: "OfferController"
+});
         res.status(500).send("Internal Server Error");
     }
 };
