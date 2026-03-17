@@ -1,5 +1,5 @@
 import Coupon from "../../model/Coupons.js";
-
+import logger from "../../utils/logger.js";
 export const applyCoupon = async (req, res) => {
     try {
         const { code, subtotal } = req.body;
@@ -61,8 +61,12 @@ export const applyCoupon = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("APPLY_COUPON_ERROR:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+ logger.error("CApply Coupon Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
 

@@ -1,5 +1,5 @@
 import * as checkoutService from "../../services/user/checkoutService.js";
-
+import logger from "../../utils/logger.js";
 export const loadCheckoutpage = async (req, res) => {
     try {
         const userId = req.session.user?.id || req.user;
@@ -16,7 +16,12 @@ export const loadCheckoutpage = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Checkout Load Error:", error.message);
+        logger.error("Checkout Load Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });
         
         if (error.message === "Cart is empty") {
             return res.redirect('/home/cart');

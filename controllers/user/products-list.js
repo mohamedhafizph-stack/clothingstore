@@ -1,6 +1,9 @@
 import { productService } from '../../services/user/productService.js';
 import Product from '../../model/Product.js';
 import User from '../../model/User.js';
+import logger from '../../utils/logger.js';
+
+
 const loadProducts = async (req, res) => {
   try {
     const { category } = req.params;
@@ -27,8 +30,12 @@ const loadProducts = async (req, res) => {
       user:userData
     });
   } catch (error) {
-    console.error("Load Shirts Error:", error);
-    res.status(500).send('Server Error');
+ logger.error("products Load Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });    res.status(500).send('Server Error');
   }
 };
 
@@ -52,8 +59,12 @@ const loadProductDetails = async (req, res) => {
       user: data.user
     });
   } catch (err) {
-    console.error("Load Product Details Error:", err);
-    res.status(500).send('Server Error');
+ logger.error("product details Load Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });    res.status(500).send('Server Error');
   }
 };
 

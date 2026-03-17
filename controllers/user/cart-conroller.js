@@ -1,5 +1,5 @@
 import * as cartService from "../../services/user/cartService.js";
-
+import logger from "../../utils/logger.js";
 export const addtoCart = async (req, res) => {
     try {
         const userId = req.session.user?.id || req.user;
@@ -8,6 +8,12 @@ export const addtoCart = async (req, res) => {
         await cartService.addToCartLogic(userId, req.body);
         res.status(200).json({ success: true, message: "Added to cart!" });
     } catch (error) {
+        logger.error("Add to Cart Error", { 
+            message: error.message, 
+            stack: error.stack, 
+            userId: req.session.user?.id || req.user,
+            payload: req.body // Shows exactly what the user tried to add
+        });
         res.status(400).json({ success: false, message: error.message });
     }
 };
@@ -20,6 +26,12 @@ export const loadCart = async (req, res) => {
         const cart = await cartService.getCartData(userId);
         res.render('user/Cart', { cart ,user:userId});
     } catch (err) {
+        logger.error("load Cart Error", { 
+            message: error.message, 
+            stack: error.stack, 
+            userId: req.session.user?.id || req.user,
+            payload: req.body // Shows exactly what the user tried to add
+        });
         res.status(500).send("Internal Server Error");
     }
 };
@@ -30,6 +42,12 @@ export const updateCartQuantity = async (req, res) => {
         await cartService.updateQuantityLogic(userId, req.body);
         res.json({ success: true });
     } catch (error) {
+        logger.error("Add quantity Cart Error", { 
+            message: error.message, 
+            stack: error.stack, 
+            userId: req.session.user?.id || req.user,
+            payload: req.body // Shows exactly what the user tried to add
+        });
         res.status(400).json({ success: false, message: error.message });
     }
 };

@@ -7,6 +7,7 @@ import Coupon from '../../model/Coupons.js';
 import Razorpay from 'razorpay';
 import User from '../../model/User.js';
 import crypto from 'crypto';
+import logger from '../../utils/logger.js';
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -152,7 +153,12 @@ export const placeOrder = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("FATAL ERROR IN PLACEORDER:", error);
+         logger.error("Fatal Error in Place Order:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });
         if (!res.headersSent) {
             return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
@@ -213,7 +219,12 @@ export const verifyPayment = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("CRITICAL ERROR IN VERIFYPAYMENT:", error);
+         logger.error("Critical  Error in verifypayment:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });
         return res.status(500).json({ success: false, message: "Internal Server Error during verification" });
     }
 };
@@ -252,7 +263,12 @@ export const retryOrderPayment = async (req, res) => {
             orderId: order._id // The MongoDB ID
         });
     } catch (error) {
-        console.error("Retry Error:", error);
+         logger.error("Retry Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });
         res.status(500).json({ success: false, message: "Could not initiate retry" });
     }
 };
@@ -270,6 +286,12 @@ export const getFailurePage = async (req, res) => {
             user: req.session?.user || req.user 
         });
     } catch (err) {
+         logger.error(" Load Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });
         res.redirect('/home');
     }
 };
@@ -299,7 +321,12 @@ export const loadOrderSuccess = async (req, res) => {
             user: req.session?.user?.id||req.user 
         });
     } catch (error) {
-        console.error("LoadSuccessPage Error:", error);
+      logger.error("Load success page error", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });
         res.redirect('/');
     }
 };
@@ -405,7 +432,12 @@ export const downloadInvoice = async (req, res) => {
         doc.end();
 
     } catch (error) {
-        console.error("PDF Gen Error:", error);
+         logger.error("invoice gen  Error:", { 
+                            message: error.message, 
+                            stack: error.stack, 
+                            userId: req.session.user?.id || req.user,
+                            payload: req.body // Shows exactly what the user tried to add
+                        });
         res.status(500).send("Error generating invoice.");
     }
 };
@@ -423,8 +455,12 @@ export const getOrderDetails = async (req, res) => {
         }
         res.render('user/orderdetails', { order,user });
     } catch (error) {
-        console.error("Error fetching order:", error);
-        res.status(500).redirect('/user/orders');
+ logger.error("Error fetching order:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });        res.status(500).redirect('/user/orders');
     }
 };
 export const getMyOrders = async (req, res) => {
@@ -454,8 +490,12 @@ export const getMyOrders = async (req, res) => {
             user:userId
         });
     } catch (error) {
-        console.error("Search Error:", error);
-        res.status(500).send("Internal Server Error");
+ logger.error("Search Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });        res.status(500).send("Internal Server Error");
     }
 };
 export const getItemDetails = async (req, res) => {
@@ -474,8 +514,12 @@ export const getItemDetails = async (req, res) => {
         }
         res.render('user/order-details', { order, item });
     } catch (error) {
-        console.error("Error in getItemDetails:", error);
-        res.status(500).redirect('/user/orders');
+ logger.error("item details Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });        res.status(500).redirect('/user/orders');
     }
 };
 export const cancelOrder = async (req, res) => {
@@ -525,8 +569,12 @@ order.status = 'Cancelled';
         });
 
     } catch (error) {
-        console.error("Cancel Order Error:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+ logger.error("Cancel order Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
 export const getReturnPage = async (req, res) => {
@@ -537,6 +585,12 @@ export const getReturnPage = async (req, res) => {
         }
         res.render('user/return-order', { order });
     } catch (error) {
+         logger.error("Return page Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });
         res.redirect('/user/orders');
     }
 };
@@ -567,7 +621,12 @@ export const requestReturn = async (req, res) => {
         res.status(200).json({ success: true, message: "Return requested successfully" });
 
     } catch (error) {
-        console.error(error);
+         logger.error("request return  Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
@@ -624,7 +683,12 @@ export const requestItemReturn = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("RETURN_REQUEST_ERROR:", error);
+        logger.error("Return request  Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
@@ -707,8 +771,12 @@ export const cancelSingleItem = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("CANCEL_ITEM_ERROR:", error); 
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+ logger.error("Cancel item Error:", { 
+                    message: error.message, 
+                    stack: error.stack, 
+                    userId: req.session.user?.id || req.user,
+                    payload: req.body // Shows exactly what the user tried to add
+                });        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
 export const requestFullOrderReturn = async (req, res) => {
